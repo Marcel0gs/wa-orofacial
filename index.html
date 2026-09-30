@@ -1,0 +1,2363 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Roda ANTES de o CSS pintar, por dois motivos:
+     1. a classe `js`: sem ela a barra do topo nasce solida e nada depende de script;
+     2. a abertura: so aparece na PRIMEIRA visita da sessao, e nunca pra quem chega
+        por um link de ancora (#resultados). Com "reduzir movimento" ligado ela
+        continua existindo, mas na versao calma (so dissolve, sem portas e sem traco).
+     Quem ja viu a abertura ganha `pronto` aqui mesmo, e o topo anima sem esperar. -->
+<script>
+(function(d){
+  d.className += " js";
+  var calma = false, visto = false;
+  try { calma = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch(e){}
+  try { visto = sessionStorage.getItem("wa-abertura") === "1"; } catch(e){}
+  if (!visto && !location.hash) d.className += calma ? " com-intro intro-calma" : " com-intro";
+  else d.className += " pronto";
+})(document.documentElement);
+</script>
+
+<title>WA Orofacial Institute | Odontologia e Harmonização Facial em Itabira/MG</title>
+<meta name="description" content="Odontologia e harmonização facial em Itabira/MG, com a Dra. Welleynne Ananda Dias (CRO-MG 54413). Lentes em resina, toxina botulínica, preenchimento labial e clínica geral. Rua Armindo Costa Lage, 138, Major Lage de Baixo.">
+<meta name="theme-color" content="#14110E">
+
+<!-- O canonical e o og:image apontam pro GitHub Pages, que e o endereco oficial
+     enquanto ela nao tiver dominio proprio. Quando tiver, os dois mudam juntos. -->
+<link rel="canonical" href="https://marcel0gs.github.io/wa-orofacial/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="WA Orofacial Institute | Itabira/MG">
+<meta property="og:description" content="Seu sorriso e sua beleza, sem perder a sua essência. Odontologia e harmonização facial com a Dra. Welleynne Ananda Dias.">
+<!-- JPEG, 1200x630 e URL absoluta: e o que o cartao de link do WhatsApp exige.
+     Webp ou caminho relativo = cartao sem imagem (defeito real da Larissa). -->
+<meta property="og:image" content="https://marcel0gs.github.io/wa-orofacial/assets/img/og-capa.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Fachada da WA Orofacial à noite, com o letreiro dourado iluminado">
+<meta property="og:site_name" content="WA Orofacial Institute">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap">
+
+<!-- A foto do topo e o LCP. A mesma foto nas duas telas, mas em DOIS arquivos:
+     no celular vai um recorte vertical feito a mao (letreiro em cima, calcada
+     livre embaixo), e nao um corte do CSS em cima da horizontal. Licao do topo
+     mobile da Realce. -->
+<link rel="preload" as="image" href="assets/img/hero-fachada.webp" media="(min-width: 701px)" fetchpriority="high">
+<link rel="preload" as="image" href="assets/img/hero-mobile.webp" media="(max-width: 700px)" fetchpriority="high">
+
+<style>
+/* =====================================================================
+   WA Orofacial Institute, Itabira/MG
+   ---------------------------------------------------------------------
+   A PALETA FOI AMOSTRADA DAS FOTOS, nao inventada. Filtro por matiz em
+   cima dos pixels de cada material (so o dourado, so o veludo), porque a
+   media simples misturava o metal com o reflexo e a parede:
+     - dourado champanhe: a logo no marmore da sala de avaliacao (#C3B282)
+     - dourado aceso: o letreiro da fachada a noite (#9C762C)
+     - esmeralda: o sofa de veludo da recepcao (#1C464B, puxado pro verde)
+     - rosa antigo: a poltrona da recepcao (#A38C98)
+     - noite: o preto quente da fachada fotografada a noite
+   O dourado de verdade NAO passa em contraste como texto sobre marfim.
+   Por isso existem dois: --ouro (decoracao e texto sobre fundo escuro) e
+   --ouro-texto (escurecido, 5,5:1 sobre marfim). Trocar um pelo outro
+   quebra acessibilidade em silencio.
+   ===================================================================== */
+:root{
+  --noite:#14110E;
+  --noite-2:#1B1713;
+  --noite-3:#241E18;
+  --marfim:#FAF7F2;
+  --areia:#F2EBE1;
+  --linho:#E5DACB;
+  --papel:#FFFFFF;
+
+  --ouro:#C9AE78;
+  --ouro-vivo:#E4CE9C;
+  --ouro-aceso:#9C762C;
+  --ouro-texto:#7F5F24;
+  --esmeralda:#1C3F3B;
+  --esmeralda-2:#234C47;
+  --rosa:#C8A6A8;
+
+  --tinta:#1E1A16;
+  --tinta-suave:#6A5F55;
+  --claro:#F4ECE0;
+  --claro-suave:#BDB1A2;
+
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --sans:"Jost",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+
+  --raio:18px;
+  --raio-g:28px;
+  --suave:cubic-bezier(.22,1,.36,1);
+  /* altura da barra do topo: o hero sobe por baixo dela (margin negativa) e
+     devolve o espaco por dentro (padding). Mexeu num, mexe no outro. */
+  --topo-h:78px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+html.com-intro{overflow:hidden}
+body{
+  margin:0;background:var(--marfim);color:var(--tinta);
+  font-family:var(--sans);font-size:17px;line-height:1.65;
+  /* clip e nao hidden: hidden criaria container de rolagem e mataria o
+     sticky do topo e do hero */
+  overflow-x:clip;
+}
+img{max-width:100%;display:block;height:auto}
+a{color:inherit}
+p{margin:0 0 1rem}
+h1,h2,h3,h4{margin:0;font-family:var(--serif);font-weight:500;line-height:1.06;letter-spacing:-.005em}
+h1{font-size:clamp(2.7rem,6.6vw,4.9rem)}
+h2{font-size:clamp(2.2rem,4.8vw,3.5rem)}
+h3{font-size:1.5rem;font-weight:600}
+h1 em,h2 em{font-style:italic;color:var(--ouro-texto)}
+[id]{scroll-margin-top:88px}
+
+.env{width:min(1180px,100% - 2.5rem);margin-inline:auto}
+.secao{position:relative;padding:clamp(4.2rem,9vw,7.5rem) 0;overflow-x:clip}
+.secao--areia{background:var(--areia)}
+.secao--noite{background:var(--noite);color:var(--claro)}
+.secao--noite h2,.secao--noite h3{color:var(--claro)}
+.secao--noite h2 em,.secao--esmeralda h2 em{color:var(--ouro)}
+.secao--esmeralda{background:var(--esmeralda);color:#E7EEEA}
+.secao--esmeralda h2{color:#F3F1EA}
+
+.olho{
+  display:inline-flex;align-items:center;gap:.75rem;margin-bottom:1.1rem;
+  font-size:.74rem;font-weight:500;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ouro-texto);
+}
+.olho::before{content:"";width:30px;height:1px;background:currentColor;opacity:.8}
+.secao--noite .olho,.secao--esmeralda .olho{color:var(--ouro)}
+.chamada{max-width:56ch;color:var(--tinta-suave);font-size:1.08rem;margin-top:1.1rem}
+.secao--noite .chamada{color:var(--claro-suave)}
+.secao--esmeralda .chamada{color:#B8CCC5}
+.cabeca{margin-bottom:clamp(2.2rem,4.6vw,3.6rem)}
+.cabeca--centro{text-align:center}
+.cabeca--centro .olho::after{content:"";width:30px;height:1px;background:currentColor;opacity:.8}
+.cabeca--centro .chamada{margin-inline:auto}
+
+/* ====================== botoes ======================
+   O componente validado em video (templates/componentes/botao-brilho-hover):
+   brilho que atravessa UMA vez no hover. Nada girando, nada em repouso. */
+.btn{
+  position:relative;isolation:isolate;overflow:hidden;
+  display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
+  padding:.95rem 1.7rem;border-radius:999px;
+  background:var(--ouro);color:var(--noite);border:1px solid var(--ouro);
+  font:500 .98rem/1.1 var(--sans);letter-spacing:.02em;text-decoration:none;
+  box-shadow:0 10px 28px rgba(156,118,44,.28);
+  transition:transform .2s ease,box-shadow .3s ease,background .2s ease,border-color .3s ease;
+}
+.btn:hover,.btn:focus-visible{background:var(--ouro-vivo);border-color:var(--ouro-vivo);transform:translateY(-2px);box-shadow:0 16px 36px rgba(156,118,44,.38)}
+.btn::before{
+  content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;z-index:1;
+  background:linear-gradient(115deg,transparent,rgba(255,255,255,.55),transparent);
+  transform:skewX(-20deg);transition:left .65s ease;pointer-events:none;
+}
+.btn:hover::before,.btn:focus-visible::before{left:130%}
+.btn--linha{background:transparent;color:var(--ouro-vivo);border-color:rgba(201,174,120,.5);box-shadow:none}
+.btn--linha:hover,.btn--linha:focus-visible{background:rgba(201,174,120,.1);border-color:var(--ouro);box-shadow:none}
+.btn--escuro{background:transparent;color:var(--tinta);border-color:var(--linho);box-shadow:none}
+.btn--escuro:hover,.btn--escuro:focus-visible{background:var(--papel);border-color:var(--ouro-texto);box-shadow:0 10px 24px rgba(40,30,15,.08)}
+.btn__ico{width:18px;height:18px;flex:none;fill:currentColor}
+.btn .i{width:18px;height:18px}
+.acoes{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
+:focus-visible{outline:2px solid var(--ouro);outline-offset:3px}
+
+/* ====================== icones ======================
+   Lucide (scripts/icone-lucide.js) + WhatsApp, Instagram e labios do site da
+   Larissa. Todos em traco de 1.5: espessura diferente no mesmo jogo e o que
+   mais estraga um conjunto de icones. */
+.i{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+.pular{position:absolute;left:-999px;top:.6rem;z-index:300;background:var(--ouro);color:var(--noite);padding:.6rem 1rem;border-radius:8px}
+.pular:focus{left:.6rem}
+
+/* ====================== barra de progresso ====================== */
+.progresso{
+  position:fixed;left:0;right:0;top:0;height:2px;z-index:90;pointer-events:none;
+  background:linear-gradient(90deg,var(--ouro-aceso),var(--ouro-vivo));
+  transform-origin:0 50%;transform:scaleX(0);
+}
+
+/* =====================================================================
+   ABERTURA
+   ---------------------------------------------------------------------
+   Pedido do usuario em 30/09/2026: "animacao inicial, se ela nao gostar,
+   a gente remove". Pra remover: apagar o <div class="intro"> do HTML, este
+   bloco de CSS e o bloco 1 do primeiro script. O resto do site nao depende
+   de nada daqui.
+
+   A sequencia conversa com a fachada de verdade:
+     - os fios de luz sao as fitas de LED horizontais da parede externa;
+     - o monograma e desenhado em traco dourado e depois acende em metal;
+       o traco e a logo DELA vetorizada (potrace), nao um desenho nosso;
+     - "WA OROFACIAL" abre da esquerda pra direita, "INSTITUTE" assenta;
+     - no fim as duas metades se abrem como a porta de vidro da entrada.
+   Tres segundos, uma vez por sessao, pula com clique ou Esc, e nunca prende
+   ninguem: o script tem saida de seguranca aos 6s.
+   ===================================================================== */
+.intro{display:none;position:fixed;inset:0;z-index:200;overflow:hidden;cursor:pointer;background:transparent}
+.com-intro .intro{display:block}
+.intro__porta{position:absolute;top:0;bottom:0;width:50.5%;transition:transform 1.05s cubic-bezier(.77,0,.18,1)}
+.intro__porta--esq{left:0;background:linear-gradient(90deg,#0E0C0A,#1A1612)}
+.intro__porta--dir{right:0;background:linear-gradient(270deg,#0E0C0A,#1A1612)}
+.intro.sai .intro__porta--esq{transform:translateX(-101%)}
+.intro.sai .intro__porta--dir{transform:translateX(101%)}
+/* a fresta de luz: so acende quando as portas comecam a abrir, e alarga ate
+   sumir. Antes disso ela cortava o nome da clinica ao meio. */
+.intro__costura{
+  position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;z-index:1;
+  background:linear-gradient(180deg,transparent,rgba(255,236,190,.95) 50%,transparent);
+  opacity:0;
+}
+.intro.sai .intro__costura{animation:fresta .8s ease-out forwards}
+@keyframes fresta{0%{opacity:0;transform:scaleX(1)}25%{opacity:1}100%{opacity:0;transform:scaleX(90)}}
+.intro__led{
+  position:absolute;height:2px;border-radius:2px;z-index:1;
+  background:linear-gradient(90deg,transparent,#F5D58C 28%,#FFF1CC 50%,#F5D58C 72%,transparent);
+  box-shadow:0 0 14px rgba(245,213,140,.7),0 0 34px rgba(245,213,140,.35);
+  opacity:0;animation:led 1.7s var(--suave) forwards;
+}
+.intro__led--e{left:0;--de:-110%}
+.intro__led--d{right:0;--de:110%}
+.intro__centro{
+  position:absolute;inset:0;z-index:2;isolation:isolate;
+  display:grid;place-items:center;align-content:center;gap:1.25rem;padding:2rem;
+  transition:opacity .45s ease,transform .9s var(--suave);
+}
+.intro__mono{width:min(58vw,300px);height:auto;overflow:visible;filter:drop-shadow(0 0 12px rgba(228,206,156,.28))}
+.intro__tracos path{
+  fill:none;stroke:#EAD6A6;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:1;stroke-dashoffset:1;
+  animation:traca 1.45s .3s cubic-bezier(.65,0,.35,1) forwards;
+}
+.intro__tracos{animation:some .55s 1.65s ease forwards}
+.intro__preenche{opacity:0;animation:aparece .85s 1.25s ease forwards}
+.intro__palavra{width:min(66vw,340px);height:auto;clip-path:inset(0 100% 0 0);animation:abre 1s 1.55s cubic-bezier(.65,0,.35,1) forwards}
+.intro__sub{
+  margin:0;font:500 .72rem/1 var(--sans);letter-spacing:.95em;padding-left:.95em;
+  color:var(--ouro);opacity:0;animation:assenta .9s 2s var(--suave) forwards;
+}
+.intro__linha{margin:0;font-size:.68rem;letter-spacing:.26em;text-transform:uppercase;color:rgba(228,206,156,.62);opacity:0;animation:aparece .7s 2.25s ease forwards}
+/* O reflexo e um segundo preenchimento da logo, com um gradiente que e
+   transparente fora de uma faixa clara e anda por SMIL (o script dispara).
+   Ja foi um facho com color-dodge por cima da tela: o fundo das portas nao e
+   preto puro, e o facho clareava a metade da tela junto com o dourado. */
+.intro__pular{
+  position:absolute;right:1.1rem;bottom:1.1rem;z-index:4;
+  font:500 .8rem var(--sans);letter-spacing:.08em;color:rgba(228,206,156,.8);
+  background:rgba(20,17,14,.4);border:1px solid rgba(201,174,120,.35);border-radius:999px;
+  padding:.55rem 1.05rem;cursor:pointer;transition:opacity .3s;
+}
+.intro.sai .intro__centro{opacity:0;transform:scale(1.06)}
+.intro.sai .intro__led,.intro.sai .intro__pular{opacity:0 !important;transition:opacity .35s;animation:none}
+
+@keyframes led{0%{opacity:0;transform:translateX(var(--de))}35%{opacity:1}100%{opacity:.3;transform:translateX(0)}}
+@keyframes traca{to{stroke-dashoffset:0}}
+@keyframes some{to{opacity:0}}
+@keyframes aparece{to{opacity:1}}
+@keyframes abre{to{clip-path:inset(0 0 0 0)}}
+@keyframes assenta{to{opacity:1;letter-spacing:.56em;padding-left:.56em}}
+
+/* versao calma: com "reduzir movimento" ligado a abertura so dissolve */
+.intro-calma .intro__tracos,.intro-calma .intro__led,.intro-calma .intro__costura{display:none}
+.intro-calma .intro__preenche{animation:aparece .6s .1s ease forwards}
+.intro-calma .intro__palavra{clip-path:none;opacity:0;animation:aparece .6s .3s ease forwards}
+.intro-calma .intro__sub{letter-spacing:.56em;padding-left:.56em;animation:aparece .6s .45s ease forwards}
+.intro-calma .intro__linha{animation:aparece .6s .55s ease forwards}
+.intro-calma .intro__porta{transition:none}
+.intro-calma .intro.sai{opacity:0;transition:opacity .6s ease}
+.intro-calma .intro.sai .intro__porta--esq,.intro-calma .intro.sai .intro__porta--dir{transform:none}
+
+/* ====================== topo ====================== */
+.topo{
+  position:sticky;top:0;z-index:60;
+  background:rgba(20,17,14,.9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(201,174,120,.18);
+  transition:background .35s ease,border-color .35s ease;
+}
+.js .topo:not(.topo--rolado){background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom-color:transparent}
+.topo__linha{display:flex;align-items:center;gap:1.2rem;min-height:var(--topo-h)}
+.marca{display:flex;align-items:center;gap:.8rem;flex:none;text-decoration:none;color:var(--ouro)}
+.js .topo:not(.topo--rolado) .marca{filter:drop-shadow(0 1px 8px rgba(0,0,0,.55))}
+.marca__mono{width:59px;height:37px;fill:currentColor}
+.marca__texto{display:flex;flex-direction:column;gap:.34rem}
+.marca__palavra{width:132px;height:19px;fill:currentColor}
+.marca__sub{font-size:.55rem;line-height:1;letter-spacing:.5em;text-transform:uppercase;color:rgba(228,206,156,.9)}
+.menu{display:none;margin-left:auto;gap:1.5rem}
+.menu a{
+  display:flex;align-items:center;min-height:48px;text-decoration:none;
+  font-size:.9rem;letter-spacing:.04em;color:rgba(244,236,224,.86);transition:color .2s;
+}
+.menu a:hover{color:var(--ouro-vivo)}
+.js .topo:not(.topo--rolado) .menu a{text-shadow:0 1px 10px rgba(0,0,0,.6)}
+.topo__cta{margin-left:auto;padding:.68rem 1.25rem;font-size:.9rem}
+@media (min-width:1080px){.menu{display:flex}.topo__cta{margin-left:1.2rem}}
+@media (max-width:430px){
+  .marca{gap:.6rem}
+  .marca__mono{width:48px;height:30px}
+  .marca__palavra{width:106px;height:15px}
+  .marca__sub{font-size:.5rem;letter-spacing:.42em}
+  .topo__cta{padding:.58rem .95rem;font-size:.84rem;gap:.45rem}
+}
+
+/* =====================================================================
+   HERO, "coberto pelo scroll" (o efeito do site do Marcelo)
+   ---------------------------------------------------------------------
+   O hero trava e o resto da pagina sobe por cima dele como uma folha, em
+   vez de ele rolar pra fora. O `top` vem do script: se o hero for mais alto
+   que a tela, ele primeiro rola ate mostrar o fim e so entao trava.
+   --cobre (0 a 1) escurece e recua o conteudo enquanto e coberto.
+   Sem JS o sticky continua funcionando: so nao escurece.
+   ===================================================================== */
+.hero{
+  position:sticky;top:var(--hero-topo,0px);z-index:0;
+  display:flex;align-items:flex-end;
+  min-height:100vh;min-height:100svh;
+  margin-top:calc(-1 * var(--topo-h));
+  padding:calc(var(--topo-h) + 4rem) 0 clamp(3.4rem,8vw,5.2rem);
+  color:#fff;background:var(--noite);overflow:hidden;
+}
+.hero--coberto{visibility:hidden}
+.hero__midia{position:absolute;inset:0;z-index:-2;transform:scale(calc(1 + var(--cobre,0) * .06))}
+.hero__midia picture,.hero__midia img{width:100%;height:100%}
+.hero__midia img{object-fit:cover;object-position:50% 30%}
+/* Ken Burns curto: a foto chega um pouco mais perto e assenta. Enquanto a
+   abertura esta na tela ela espera parada no zoom inicial. */
+.js .hero__midia img{transform:scale(1.12)}
+.pronto .hero__midia img{animation:kenburns 3.2s var(--suave) both}
+@keyframes kenburns{from{transform:scale(1.12)}to{transform:scale(1)}}
+/* o veu nao e cortina: elipse escura so onde o texto mora, base rasteira e
+   um fio no topo pra logo e menu. O resto da foto fica limpo. */
+.hero__veu{
+  position:absolute;inset:0;z-index:-1;
+  background:
+    /* a porta de vidro acesa fica bem atras do italico dourado: esta camada
+       escurece SO o miolo do bloco de texto, sem chegar no letreiro la em cima */
+    radial-gradient(48% 34% at 26% 70%,rgba(12,10,8,.5) 0%,rgba(12,10,8,.28) 55%,rgba(12,10,8,0) 100%),
+    radial-gradient(120% 92% at 0% 100%,rgba(12,10,8,.93) 0%,rgba(12,10,8,.78) 26%,rgba(12,10,8,.42) 52%,rgba(12,10,8,0) 78%),
+    linear-gradient(0deg,rgba(12,10,8,.72) 0%,rgba(12,10,8,.22) 20%,rgba(12,10,8,0) 38%),
+    linear-gradient(180deg,rgba(12,10,8,.74) 0%,rgba(12,10,8,.36) 12%,rgba(12,10,8,0) 26%);
+}
+.hero::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:#0B0907;opacity:calc(var(--cobre,0) * .7);
+}
+.hero__conteudo{
+  position:relative;z-index:1;max-width:42rem;
+  transform:translateY(calc(var(--cobre,0) * -56px)) scale(calc(1 - var(--cobre,0) * .04));
+  transform-origin:left bottom;
+}
+.hero__selo{
+  display:inline-flex;align-items:center;gap:.6rem;margin-bottom:1.5rem;
+  padding:.45rem 1.05rem;border-radius:999px;
+  background:rgba(20,17,14,.42);border:1px solid rgba(201,174,120,.45);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ouro-vivo);
+}
+.hero__selo .i{width:15px;height:15px}
+/* DUAS linhas no desktop, e isso e o que mantem o letreiro "WA OROFACIAL" da
+   foto livre: ele ocupa a faixa de 80 a 290px da tela a 1440x900, e um bloco
+   de texto mais alto que ~420px sobe por cima dele (aconteceu na 1a versao,
+   com o titulo em quatro linhas). Mexeu no tamanho, confere com print. */
+.hero h1{font-size:clamp(2.5rem,4.5vw,4.15rem);max-width:12em;color:#FBF6EE;text-shadow:0 2px 30px rgba(0,0,0,.45)}
+.hero h1 em{display:block;color:var(--ouro-vivo)}
+.hero__sub{max-width:33rem;margin:1.3rem 0 0;font-size:1.12rem;color:rgba(251,246,238,.9);text-shadow:0 1px 14px rgba(0,0,0,.5)}
+.hero .acoes{margin-top:2.1rem}
+.hero__nota{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .8rem;margin-top:1.7rem;font-size:.92rem;color:rgba(251,246,238,.86)}
+.hero__nota .estrelas{color:var(--ouro-vivo);letter-spacing:.14em}
+.hero__nota b{color:#fff;font-weight:600}
+/* indicacao de rolagem, so no desktop */
+.hero__rolar{
+  position:absolute;right:clamp(1.4rem,4vw,3rem);bottom:clamp(2.4rem,6vw,4rem);z-index:1;
+  display:none;flex-direction:column;align-items:center;gap:.9rem;
+  font-size:.64rem;letter-spacing:.34em;text-transform:uppercase;color:rgba(228,206,156,.82);
+  writing-mode:vertical-rl;
+}
+.hero__rolar::after{content:"";width:1px;height:64px;background:linear-gradient(var(--ouro-vivo),transparent);animation:gota 2.2s ease-in-out infinite}
+@keyframes gota{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media (min-width:900px){.hero__rolar{display:flex}}
+/* no celular: recorte vertical da mesma foto (hero-mobile.webp, 600x1086),
+   centrado no letreiro e na porta. O letreiro ocupa 75% da largura do recorte;
+   a 360px de tela ainda cabe inteiro. */
+@media (max-width:700px){
+  .hero__midia img{object-position:50% 50%}
+  .hero{padding-bottom:2.6rem}
+  /* O texto mora na metade de baixo (calcada e parte baixa da porta), o veu
+     escurece SO essa metade, e a de cima fica limpa: letreiro e o lustre de
+     aneis aparecendo pela porta de vidro. */
+  .hero__veu{
+    background:
+      linear-gradient(0deg,rgba(12,10,8,.95) 0%,rgba(12,10,8,.88) 30%,rgba(12,10,8,.58) 47%,rgba(12,10,8,0) 63%),
+      linear-gradient(180deg,rgba(12,10,8,.7) 0%,rgba(12,10,8,0) 16%);
+  }
+  .hero__selo{margin-bottom:1rem}
+  .hero__sub{margin-top:.9rem;font-size:1rem}
+  .hero .acoes{margin-top:1.4rem}
+  .hero__nota{margin-top:1.1rem}
+}
+@media (max-width:430px){
+  .hero h1{font-size:2.3rem}
+  .hero__selo{font-size:.62rem;letter-spacing:.16em;padding:.4rem .85rem}
+  .hero__selo-cidade{display:none}
+  /* Um botao so no hero desde 30/09/2026: o "Ver antes e depois" saiu a
+     pedido do usuario (o menu e a rolagem ja levam la). No celular o que
+     ficou ocupa a linha inteira. Escopado em .hero de proposito: .acoes e
+     usado em outras secoes. */
+  .hero .acoes .btn{flex:1 1 auto}
+}
+/* entrada do texto, SO depois da abertura (na volta a pagina nao espera) */
+.entrada .hero__conteudo > *{animation:sobe .9s var(--suave) both}
+.entrada .hero__conteudo > :nth-child(2){animation-delay:.08s}
+.entrada .hero__conteudo > :nth-child(3){animation-delay:.16s}
+.entrada .hero__conteudo > :nth-child(4){animation-delay:.24s}
+.entrada .hero__conteudo > :nth-child(5){animation-delay:.32s}
+@keyframes sobe{from{opacity:0;transform:translateY(22px)}}
+
+/* dourado que brilha uma vez: faixa clara atravessa o texto e assenta */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .brilho{
+    background:linear-gradient(100deg,currentColor 0%,currentColor 40%,#FFF3D6 50%,currentColor 60%,currentColor 100%);
+    background-size:260% 100%;background-position:100% 0;
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .pronto .hero .brilho,.brilho.brilhou{animation:varre 1.9s .6s ease-in-out both}
+}
+@keyframes varre{from{background-position:100% 0}to{background-position:0 0}}
+
+/* ====================== a folha que cobre o hero ======================
+   Tudo depois do hero fica acima dele (z-index 1) e com fundo proprio. A
+   faixa e a borda da folha: canto arredondado e sombra, pra ler como papel
+   passando por cima e nao como corte seco. */
+main > section:not(.hero),.rodape{position:relative;z-index:1}
+/* ⚠ Toda secao precisa de fundo OPACO, senao o hero travado aparece por tras
+   dela (aconteceu na 1a versao, com o texto do topo por baixo do texto da
+   secao). :where() zera a especificidade: secao com fundo proprio manda. */
+:where(main > section:not(.hero)){background-color:var(--marfim)}
+.faixa{
+  margin-top:-30px;border-radius:30px 30px 0 0;
+  background:var(--noite-2);border-top:1px solid rgba(201,174,120,.3);
+  box-shadow:0 -26px 60px rgba(0,0,0,.5);
+  overflow:hidden;padding:1.2rem 0 1.25rem;
+}
+.faixa__pista{display:flex;width:max-content;animation:faixa 42s linear infinite}
+.faixa:hover .faixa__pista{animation-play-state:paused}
+.faixa__trilho{display:flex;align-items:center;gap:2.4rem;padding-right:2.4rem;white-space:nowrap}
+.faixa__item{display:inline-flex;align-items:center;gap:.65rem;font-size:.86rem;letter-spacing:.06em;color:#E9DFD0}
+.faixa__item .i{width:18px;height:18px;color:var(--ouro)}
+.faixa__item b{color:var(--ouro-vivo);font-weight:500}
+.faixa__sep{width:6px;height:6px;transform:rotate(45deg);background:var(--ouro);opacity:.75;flex:none}
+@keyframes faixa{to{transform:translateX(-50%)}}
+
+/* ====================== essencia ====================== */
+.essencia{display:grid;gap:clamp(3rem,6vw,5rem);align-items:center}
+@media (min-width:980px){.essencia{grid-template-columns:1.05fr .95fr}}
+.pilares{display:grid;gap:.9rem;margin-top:2.3rem}
+@media (min-width:560px){.pilares{grid-template-columns:1fr 1fr}}
+.pilar{
+  display:flex;gap:1rem;align-items:flex-start;padding:1.2rem 1.15rem;
+  border-radius:var(--raio);background:var(--papel);border:1px solid var(--linho);
+  transition:transform .35s var(--suave),box-shadow .35s ease,border-color .35s ease;
+}
+.pilar:hover{transform:translateY(-4px);border-color:rgba(156,118,44,.45);box-shadow:0 18px 40px rgba(60,44,20,.1)}
+.pilar__ico{
+  width:46px;height:46px;border-radius:50%;flex:none;display:grid;place-items:center;
+  color:var(--ouro-texto);background:radial-gradient(circle at 30% 30%,#fff,#F3E9D6);
+  border:1px solid rgba(201,174,120,.55);
+}
+.pilar__ico .i{width:22px;height:22px}
+.pilar h3{font-size:1.28rem;margin:.1rem 0 .3rem}
+.pilar p{margin:0;font-size:.94rem;line-height:1.55;color:var(--tinta-suave)}
+
+/* composicao em camadas: cada peca anda numa velocidade (data-px) */
+.compo{position:relative;min-height:clamp(430px,50vw,600px)}
+.compo__a{
+  position:absolute;right:0;top:0;width:70%;aspect-ratio:3/4;
+  border-radius:var(--raio-g);overflow:hidden;box-shadow:0 34px 70px rgba(40,30,15,.26);
+}
+.compo__a img,.compo__b img{width:100%;height:100%;object-fit:cover}
+.compo__b{
+  position:absolute;left:0;bottom:4%;width:50%;aspect-ratio:33/26;z-index:2;
+  border-radius:var(--raio);overflow:hidden;border:7px solid var(--marfim);
+  box-shadow:0 26px 50px rgba(40,30,15,.3);
+}
+.compo__anel{
+  position:absolute;left:8%;top:6%;width:30%;aspect-ratio:1;z-index:1;border-radius:50%;
+  border:1.5px solid rgba(201,174,120,.75);
+  box-shadow:0 0 34px rgba(201,174,120,.35),inset 0 0 24px rgba(201,174,120,.22);
+}
+.compo__anel::after{
+  content:"";position:absolute;inset:22% -10%;border-radius:50%;
+  border:1.5px solid rgba(201,174,120,.6);transform:rotate(-14deg);
+}
+.compo__selo{
+  position:absolute;right:5%;bottom:-2%;z-index:3;
+  display:flex;align-items:center;gap:.85rem;padding:.95rem 1.2rem;border-radius:16px;
+  background:var(--noite);color:var(--claro);box-shadow:0 20px 44px rgba(20,17,14,.35);
+}
+.compo__selo strong{font:600 2.3rem/1 var(--serif);color:var(--ouro)}
+.compo__selo span{display:block;font-size:.8rem;line-height:1.35;color:var(--claro-suave)}
+.compo__selo .estrelas{color:var(--ouro-vivo);letter-spacing:.14em;font-size:.82rem}
+@media (max-width:560px){
+  .compo{min-height:0;aspect-ratio:10/11}
+  .compo__a{width:76%}
+  .compo__b{width:56%;border-width:5px}
+  .compo__selo{padding:.8rem 1rem}
+  .compo__selo strong{font-size:1.9rem}
+}
+
+/* ====================== tratamentos ====================== */
+.tratamentos{
+  background:
+    radial-gradient(60% 50% at 100% 0%,rgba(201,174,120,.12),transparent 70%),
+    radial-gradient(50% 40% at 0% 100%,rgba(28,63,59,.35),transparent 70%),
+    var(--noite);
+}
+.familias{display:grid;gap:clamp(1.4rem,3vw,2.2rem)}
+@media (min-width:1000px){.familias{grid-template-columns:1fr 1fr}}
+.familia{
+  border-radius:var(--raio-g);padding:clamp(1.3rem,3vw,2.1rem);
+  background:linear-gradient(160deg,rgba(201,174,120,.1),rgba(201,174,120,.02) 60%);
+  border:1px solid rgba(201,174,120,.22);
+}
+.familia__cab{display:flex;align-items:center;gap:1rem;margin-bottom:.6rem}
+.familia__cab .i{width:30px;height:30px;color:var(--ouro)}
+.familia__cab h3{font-size:clamp(1.7rem,3vw,2.1rem);font-weight:500;color:var(--claro)}
+.familia__txt{color:var(--claro-suave);font-size:.98rem;margin:0 0 1.4rem}
+.trats{display:grid;gap:.85rem}
+@media (min-width:560px){.trats{grid-template-columns:1fr 1fr}}
+.trat{
+  position:relative;overflow:hidden;padding:1.25rem 1.15rem 1.3rem;border-radius:var(--raio);
+  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);
+  transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:transform .3s ease-out,border-color .3s ease,background .3s ease;
+}
+.trat::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(228,206,156,.2),transparent 55%);
+}
+.trat:hover{border-color:rgba(201,174,120,.45);background:rgba(255,255,255,.05)}
+.trat:hover::after{opacity:1}
+.trat__ico{
+  width:46px;height:46px;border-radius:13px;display:grid;place-items:center;margin-bottom:.95rem;
+  color:var(--ouro-vivo);background:rgba(201,174,120,.1);border:1px solid rgba(201,174,120,.32);
+  transition:transform .45s var(--suave),background .3s ease;
+}
+.trat:hover .trat__ico{transform:translateY(-3px) rotate(-7deg);background:rgba(201,174,120,.18)}
+.trat h4{font:600 1.32rem/1.15 var(--serif);color:var(--claro);margin:0 0 .35rem}
+.trat p{margin:0;font-size:.93rem;line-height:1.55;color:var(--claro-suave)}
+/* no celular o card deita: icone ao lado do texto. Empilhado, a secao
+   passava de 2.600px de altura so com oito cards */
+@media (max-width:559px){
+  .trat{display:grid;grid-template-columns:auto 1fr;column-gap:.95rem;align-items:start;padding:1.05rem 1rem}
+  .trat__ico{grid-row:span 2;margin:0;width:42px;height:42px}
+  .trat h4{font-size:1.22rem;margin-top:.1rem}
+}
+.extras{display:grid;gap:.85rem;margin-top:clamp(1.4rem,3vw,2.2rem)}
+@media (min-width:760px){.extras{grid-template-columns:1fr 1fr}}
+.extra{
+  display:flex;align-items:center;gap:1rem;padding:1.15rem 1.3rem;border-radius:var(--raio);
+  border:1px dashed rgba(201,174,120,.35);color:var(--claro-suave);font-size:.95rem;line-height:1.5;text-decoration:none;
+  transition:border-color .3s ease,background .3s ease;
+}
+.extra .i{width:28px;height:28px;color:var(--ouro)}
+.extra b{display:block;font:600 1.2rem/1.2 var(--serif);color:var(--claro)}
+a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
+.extra__seta{margin-left:auto;width:20px;height:20px;color:var(--ouro)}
+/* no celular o icone sobe e a seta vai pro canto: lado a lado, os dois
+   comiam as laterais e sobravam ~200px de texto (medido a 390) */
+@media (max-width:560px){
+  .extra{position:relative;flex-direction:column;align-items:flex-start;gap:.6rem;padding-right:3rem}
+  .extra__seta{position:absolute;right:1.1rem;top:1.2rem}
+}
+
+/* =====================================================================
+   ANTES E DEPOIS: templates/componentes/antes-depois.html, sem alteracao
+   de mecanica. A cortina e um <input type="range"> invisivel.
+   ⚠ Os quatro pares vieram como MONTAGEM (duas fotos coladas). Foram
+   separados nas costuras medidas pixel a pixel e ALINHADOS por correlacao
+   (escala + deslocamento), pra o rosto nao pular quando a linha passa.
+   Contas no CLAUDE.md da pasta. Trocar uma foto sem refazer = par desalinhado.
+   ===================================================================== */
+.ad{
+  --ad-linha:#fff;
+  --ad-selo:rgba(20,17,14,.62);
+  --ad-selo-txt:#fff;
+  --ad-raio:20px;
+  margin:0;
+}
+.ads{display:grid;gap:clamp(1.6rem,3.4vw,2.4rem)}
+@media (min-width:820px){.ads--2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ad__quadro{
+  --p:50%;
+  position:relative;overflow:hidden;border-radius:var(--ad-raio);
+  aspect-ratio:4/3;background:#E8DED3;contain:paint;
+  box-shadow:0 24px 56px rgba(40,30,15,.16);
+}
+.ad__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-drag:none}
+.ad__corte{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--p)) 0 0)}
+.ad__linha{
+  position:absolute;top:0;bottom:0;left:var(--p);width:2px;margin-left:-1px;
+  background:var(--ad-linha);box-shadow:0 0 0 1px rgba(0,0,0,.18);pointer-events:none;
+}
+.ad__alca{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:46px;height:46px;border-radius:50%;
+  background:var(--ad-linha);color:var(--ouro-texto);
+  display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,.3);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.ad__alca svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ad__selo{
+  position:absolute;top:.8rem;padding:.32rem .75rem;border-radius:999px;
+  background:var(--ad-selo);color:var(--ad-selo-txt);
+  font-size:.66rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;
+  pointer-events:none;transition:opacity .2s ease;
+}
+.ad__selo--a{left:.8rem}
+.ad__selo--d{right:.8rem}
+.ad__range{
+  position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;
+  -webkit-appearance:none;appearance:none;background:transparent;
+  touch-action:pan-y;
+}
+.ad__range::-webkit-slider-thumb{-webkit-appearance:none;width:56px;height:100%}
+.ad__range::-moz-range-thumb{width:56px;height:100%;border:0;opacity:0}
+.ad__quadro:hover .ad__alca{transform:translate(-50%,-50%) scale(1.06)}
+.ad__range:active + .ad__linha .ad__alca{transform:translate(-50%,-50%) scale(1.12)}
+.ad__range:focus-visible + .ad__linha .ad__alca{box-shadow:0 0 0 3px var(--ad-linha),0 0 0 6px rgba(0,0,0,.35)}
+.ad__legenda{margin-top:1rem;font-size:.9rem;line-height:1.45;color:var(--tinta-suave)}
+.ad__legenda b{display:block;font:600 1.35rem/1.2 var(--serif);color:var(--tinta)}
+.ad__aviso{margin:clamp(1.6rem,3vw,2.2rem) auto 0;max-width:62ch;text-align:center;font-size:.84rem;color:var(--tinta-suave)}
+
+/* =====================================================================
+   "VIVA A EXPERIENCIA WA": degrade escuro, o monograma gigante em linha
+   ao fundo (anda mais devagar que a rolagem: e o parallax desta faixa) e a
+   poeira dourada subindo.
+   ⚠ HISTORICO, 30/09/2026, tudo decisao do usuario:
+   - teve cinco recortes do espaco flutuando em volta da frase (modelo do
+     site das placas): REPROVADO, "nao ficou bom essas imagens flutuando";
+   - teve foto da recepcao desfocada de fundo: ele pediu o fundo antigo de
+     volta, "so remova as imagens flutuando".
+   Nao voltar com foto nem com cards soltos aqui.
+   ===================================================================== */
+.exp{
+  position:relative;isolation:isolate;overflow:hidden;
+  min-height:min(92svh,820px);display:grid;place-items:center;text-align:center;
+  padding:clamp(7rem,15vw,10rem) 1.25rem;
+  background:radial-gradient(ellipse at 50% 42%,#2B221A 0%,var(--noite) 62%);
+  color:var(--claro);
+}
+/* aspect-ratio explicito: <svg> sem viewBox com height:auto cai no padrao de
+   300x150 do navegador. O centrar vai no transform; o parallax usa translate. */
+.exp__mono{
+  position:absolute;left:50%;top:50%;z-index:-1;width:min(96vw,1040px);height:auto;aspect-ratio:1022/636;
+  transform:translate(-50%,-50%);
+  fill:none;stroke:rgba(201,174,120,.16);stroke-width:1.4;
+}
+.exp__texto{position:relative;z-index:2;max-width:46rem}
+.exp h2{font-size:clamp(3.1rem,9.4vw,7.4rem);line-height:.98;color:#FBF6EE;text-shadow:0 6px 40px rgba(0,0,0,.6)}
+.exp h2 em{color:var(--ouro)}
+.exp p{margin:1.4rem auto 0;max-width:30rem;font-size:1.15rem;color:#D6CABA}
+.exp .acoes{justify-content:center}
+.poeira{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.poeira i{
+  position:absolute;left:var(--x);top:var(--y);width:var(--t,3px);height:var(--t,3px);border-radius:50%;
+  background:#F5D58C;box-shadow:0 0 10px rgba(245,213,140,.9);opacity:0;
+  animation:flutua var(--d,7s) var(--a,0s) ease-in-out infinite;
+}
+@keyframes flutua{0%{opacity:0;transform:translateY(20px)}30%{opacity:.8}70%{opacity:.5}100%{opacity:0;transform:translateY(-60px)}}
+@media (max-width:700px){
+  .exp{min-height:auto;padding:9rem 1.25rem}
+}
+
+/* =====================================================================
+   POR DENTRO DA WA: o palco da Larissa (bolha de vidro em WebGL), na
+   versao da galeria da Realce (sem legenda na foto), com a lista de
+   ambientes ao lado no desktop e embaixo no celular.
+   O quadro e QUADRADO e as seis fotos foram recortadas 1:1 com o assunto
+   enquadrado: no recorte central a logo da sala de avaliacao saia cortada.
+   Sem JS: some o palco e aparece a grade com as seis fotos.
+   ===================================================================== */
+.galeria{display:grid;gap:1.6rem 4rem;grid-template-areas:"cab" "palco" "lista"}
+@media (min-width:980px){
+  .galeria{grid-template-columns:.82fr 1.18fr;grid-template-areas:"cab palco" "lista palco";align-items:start}
+}
+.galeria__cab{grid-area:cab}
+.galeria__cab .cabeca{margin-bottom:0}
+.galeria__palco{grid-area:palco}
+.comodos{grid-area:lista}
+.palco{position:relative;display:none}
+.js .palco{display:block}
+.palco__quadro{
+  position:relative;aspect-ratio:1/1;border-radius:var(--raio-g);overflow:hidden;
+  background:#2A231C;box-shadow:0 34px 70px rgba(40,30,15,.26);
+}
+.palco__quadro::before{
+  content:"";position:absolute;inset:0 0 auto;height:24%;z-index:1;pointer-events:none;
+  background:linear-gradient(rgba(0,0,0,.38),transparent);
+}
+.palco__foto,.palco__tela{position:absolute;inset:0;width:100%;height:100%;display:block}
+.palco__foto{object-fit:cover;transition:opacity .3s ease}
+.palco--trocando .palco__foto{opacity:0}
+.palco__tela{opacity:0;transition:opacity .4s ease}
+.palco--gl .palco__tela{opacity:1}
+.palco--gl .palco__foto{visibility:hidden}
+.palco__conta{position:absolute;left:1.2rem;top:1.05rem;z-index:2;font-size:.78rem;letter-spacing:.18em;color:rgba(255,255,255,.82);text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.palco__conta b{color:#fff;font-weight:500}
+.palco__seta{
+  position:absolute;bottom:1rem;z-index:2;width:48px;height:48px;border-radius:50%;
+  display:grid;place-items:center;cursor:pointer;color:#fff;
+  background:rgba(20,17,14,.5);border:1px solid rgba(255,255,255,.35);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:background .2s ease,border-color .2s ease;
+}
+.palco__seta:hover{background:rgba(20,17,14,.78);border-color:var(--ouro-vivo)}
+.palco__seta .i{width:20px;height:20px}
+.palco__seta--ant{right:4.7rem}
+.palco__seta--prox{right:1rem}
+/* position:relative e o que faz o offsetLeft dos itens ser medido a partir
+   da lista (o script centraliza o ambiente da vez na fila do celular) */
+.comodos{position:relative;list-style:none;margin:0;padding:0;display:none;gap:.1rem}
+.js .comodos{display:grid}
+.comodo{
+  position:relative;width:100%;display:grid;grid-template-columns:auto 1fr;column-gap:1.1rem;align-items:center;
+  padding:.95rem 0;text-align:left;background:none;border:0;border-bottom:1px solid var(--linho);
+  font:inherit;color:inherit;cursor:pointer;
+}
+.comodo__n{font-size:.76rem;letter-spacing:.16em;color:var(--tinta-suave);transition:color .3s}
+.comodo__txt b{display:block;font:600 1.38rem/1.2 var(--serif);color:var(--tinta);transition:color .3s}
+.comodo__txt small{display:block;font-size:.88rem;color:var(--tinta-suave)}
+.comodo__linha{position:absolute;left:0;right:0;bottom:-1px;height:2px;overflow:hidden}
+.comodo__linha i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ouro-aceso),var(--ouro))}
+.comodo[aria-current="true"] .comodo__txt b,.comodo[aria-current="true"] .comodo__n,.comodo:hover .comodo__txt b{color:var(--ouro-texto)}
+@media (max-width:979px){
+  .js .comodos{
+    grid-auto-flow:column;grid-auto-columns:minmax(158px,44%);gap:.7rem;
+    overflow-x:auto;scroll-snap-type:x mandatory;padding:.2rem .1rem .6rem;scrollbar-width:none;
+  }
+  .comodos::-webkit-scrollbar{display:none}
+  .comodo{
+    grid-template-columns:1fr;row-gap:.2rem;scroll-snap-align:start;
+    padding:.85rem .95rem .95rem;border:1px solid var(--linho);border-radius:14px;background:var(--papel);overflow:hidden;
+  }
+  .comodo__txt b{font-size:1.2rem}
+  .comodo__txt small{font-size:.8rem}
+  .comodo__linha{left:.95rem;right:.95rem;bottom:.45rem}
+}
+.galeria-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin:0}
+.galeria-grade img{border-radius:var(--raio);aspect-ratio:1/1;object-fit:cover;width:100%}
+.js .galeria-grade{display:none}
+
+/* ====================== quem cuida ====================== */
+.quem{padding-top:0}
+.quem__banda{
+  position:relative;isolation:isolate;overflow:hidden;
+  min-height:clamp(460px,50vw,640px);display:flex;align-items:center;
+  padding:clamp(4rem,8vw,6rem) 0;margin-bottom:clamp(3rem,6vw,4.5rem);
+}
+.quem__retrato{
+  position:absolute;z-index:-2;right:0;top:-9%;height:118%;width:auto;max-width:none;
+  aspect-ratio:1320/800;object-fit:cover;
+}
+.quem__banda::after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:
+    linear-gradient(90deg,var(--noite) 18%,rgba(20,17,14,.72) 40%,rgba(20,17,14,0) 66%),
+    linear-gradient(0deg,var(--noite) 0%,rgba(20,17,14,0) 22%),
+    linear-gradient(180deg,var(--noite) 0%,rgba(20,17,14,0) 16%);
+}
+.quem__banda-txt{position:relative}
+.quem__banda-txt > *{max-width:34rem}
+.quem__cargo{margin:1rem 0 0;font-size:.82rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ouro)}
+.quem__frase{margin:2rem 0 0;font:italic 500 clamp(1.7rem,3.2vw,2.4rem)/1.2 var(--serif);color:var(--claro)}
+.quem__frase::before{content:"“";display:block;font-size:3.4rem;line-height:.6;color:var(--ouro);margin-bottom:.2rem}
+.quem__fonte{display:block;margin-top:.7rem;font-size:.84rem;color:var(--claro-suave)}
+@media (max-width:760px){
+  .quem__banda{align-items:flex-end;min-height:clamp(600px,168vw,720px);padding-bottom:2.4rem}
+  .quem__retrato{top:0;height:62%;width:100%;aspect-ratio:auto;object-fit:cover;object-position:74% 22%}
+  .quem__banda::after{background:linear-gradient(0deg,var(--noite) 44%,rgba(20,17,14,.55) 60%,rgba(20,17,14,0) 76%)}
+}
+.quem__grade{display:grid;gap:clamp(3rem,6vw,5rem);align-items:center}
+@media (min-width:960px){.quem__grade{grid-template-columns:.95fr 1.05fr}}
+.quem__fotos{position:relative;min-height:clamp(460px,52vw,620px)}
+.quem__premio{
+  position:absolute;left:0;top:0;width:66%;aspect-ratio:3/4;border-radius:var(--raio-g);overflow:hidden;
+  box-shadow:0 34px 70px rgba(0,0,0,.5);
+}
+.quem__aula{
+  position:absolute;right:0;bottom:0;width:48%;aspect-ratio:3/4;border-radius:var(--raio);overflow:hidden;z-index:2;
+  border:6px solid var(--noite);box-shadow:0 30px 60px rgba(0,0,0,.55);
+}
+.quem__premio img,.quem__aula img{width:100%;height:100%;object-fit:cover}
+.quem__aula img{object-position:40% 50%}
+.quem__medalha{
+  position:absolute;right:4%;top:10%;z-index:3;display:flex;align-items:center;gap:.7rem;
+  padding:.8rem 1.05rem;border-radius:14px;background:rgba(27,23,19,.86);
+  border:1px solid rgba(201,174,120,.45);box-shadow:0 18px 40px rgba(0,0,0,.45);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.quem__medalha .i{width:30px;height:30px;color:var(--ouro-vivo)}
+.quem__medalha b{display:block;font:600 1.15rem/1.1 var(--serif);color:var(--claro)}
+.quem__medalha span{display:block;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ouro)}
+.fatos{list-style:none;margin:0;padding:0;display:grid;gap:1.15rem}
+.fatos li{display:flex;gap:1rem;align-items:flex-start;color:var(--claro-suave);font-size:1rem;line-height:1.55}
+.fatos .i{width:26px;height:26px;color:var(--ouro);margin-top:.1rem}
+.fatos b{color:var(--claro);font-weight:500}
+@media (max-width:560px){
+  .quem__fotos{min-height:0;aspect-ratio:1/1.12}
+  .quem__premio{width:70%}
+  .quem__aula{width:50%}
+  .quem__medalha{right:0;top:6%;padding:.65rem .8rem}
+  .quem__medalha b{font-size:1rem}
+}
+
+/* =====================================================================
+   A EQUIPE: pedido do usuario em 30/09/2026 ("crie um campo no site para
+   apresentar cada"). As fotos saem dos posts da propria clinica.
+   RETRATO 3:4, DA CABECA AO PEITO (pedido de 30/09: "fotos de corpo
+   inteiro, nao so da cabeca"). Corpo inteiro nao existe nos posts: abaixo
+   do peito tem o nome, o cargo e a marca d'agua da WA por cima do corpo.
+   Entao cada foto vai ate onde o post esta limpo, e as tres tem a cabeca
+   do mesmo tamanho no quadro (a da Livinha e de corpo inteiro, mas nesse
+   corte a cabeca dela ficaria com metade do tamanho das outras).
+   ⚠ LETRAS APAGADAS, SEM IA. Na Fernanda Souza, o "anda" de "Fernanda" e o
+   "uza" de "Souza" passavam pelo pescoco, pela gola e pelo cabelo; na
+   Fernanda Diniz, o comeco de "TRATAMENTO"/"PROGRESSIVA" na parede. Cada
+   pixel da letra virou a interpolacao dos vizinhos de fora dela, so na
+   vertical sobre as ripas do fundo, mais o grao da foto em volta. O rosto
+   nao foi tocado. Ferramenta: scripts/tira-letras.js (as zonas usadas
+   estao no CLAUDE.md do cliente).
+   A da Fernanda Diniz e o post "Agora na WA", e nao o do nome grande: la o
+   nome cobre o tronco inteiro, inclusive o bordado do jaleco.
+   As tres foram equalizadas de brilho e contraste, porque os posts tem um
+   veu escuro por baixo do texto branco e a foto da Livinha nao.
+   Parallax: a moldura dourada atras de cada foto anda na propria
+   velocidade (data-px), e no hover ela encosta na foto. A moldura sai
+   18px pra direita e pra baixo, e o margin da .membro__foto guarda esse
+   espaco: sem ele ela passaria da coluna e abriria rolagem lateral no
+   celular.
+   ===================================================================== */
+.time{display:grid;gap:3.4rem clamp(1.4rem,3vw,2.6rem)}
+@media (min-width:700px){.time{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* o do meio desce: ritmo de revista, em vez de tres cartoes em fila */
+@media (min-width:980px){.membro:nth-child(2){margin-top:4.5rem}}
+@media (max-width:699px){.time{max-width:420px;margin-inline:auto}}
+.membro{position:relative;margin:0}
+.membro__foto{position:relative;aspect-ratio:3/4;margin:0 18px 2.2rem 0}
+.membro__moldura{
+  position:absolute;inset:0;border-radius:var(--raio-g);
+  border:1px solid rgba(156,118,44,.6);
+  transform:translate(18px,18px);transition:transform .7s var(--suave);
+}
+.membro__img{
+  position:relative;height:100%;overflow:hidden;border-radius:var(--raio-g);
+  background:var(--linho);box-shadow:0 26px 56px rgba(40,30,15,.18);
+}
+.membro__img img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--suave)}
+.membro:hover .membro__img img{transform:scale(1.05)}
+.membro:hover .membro__moldura{transform:translate(9px,9px)}
+.membro__n{
+  position:absolute;left:1rem;top:1rem;z-index:2;
+  padding:.3rem .75rem;border-radius:999px;
+  font:italic 500 1rem/1.2 var(--serif);letter-spacing:.08em;color:#fff;
+  background:rgba(20,17,14,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.membro h3{font-size:clamp(1.75rem,2.6vw,2.05rem);color:var(--tinta)}
+.membro__cargo{
+  display:flex;align-items:center;gap:.55rem;margin:.55rem 0 .95rem;
+  font-size:.72rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--ouro-texto);
+}
+.membro__cargo .i{width:18px;height:18px}
+.membro__txt{margin:0;color:var(--tinta-suave);font-size:.98rem;line-height:1.6}
+.membro__chips{list-style:none;margin:1rem 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.45rem}
+.membro__chips li{
+  font-size:.8rem;line-height:1.3;padding:.36rem .8rem;border-radius:999px;
+  background:var(--papel);border:1px solid var(--linho);color:var(--tinta);
+}
+
+/* ====================== avaliacoes ====================== */
+.avaliacoes-secao{background:radial-gradient(70% 60% at 50% 0%,var(--esmeralda-2),var(--esmeralda) 70%)}
+.placar{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1rem 2rem;
+  max-width:780px;margin:0 auto 2.4rem;padding:1.5rem 1.8rem;border-radius:var(--raio);
+  background:rgba(0,0,0,.16);border:1px solid rgba(201,174,120,.3);
+}
+.placar__nota{font:600 clamp(3rem,7vw,3.8rem)/1 var(--serif);color:var(--ouro-vivo);font-variant-numeric:tabular-nums}
+.placar__txt{display:block;margin-top:.35rem;font-size:.95rem;color:#D5E1DC}
+.placar__txt b{color:#fff;font-weight:500}
+.placar__fonte{font-size:.8rem;color:#9FB5AD}
+.estrelas-med{position:relative;display:inline-block;line-height:1;font-size:1.35rem;letter-spacing:.12em}
+.estrelas-med span{display:block;white-space:nowrap}
+.estrelas-med .vazias{color:rgba(255,255,255,.18)}
+.estrelas-med .cheias{position:absolute;left:0;top:0;overflow:hidden;color:var(--ouro-vivo);width:100%}
+.js .estrelas-med .cheias{width:0;transition:width 1.5s cubic-bezier(.16,1,.3,1) .15s}
+.js .estrelas-med.contou .cheias{width:100%}
+.avals{display:grid;gap:1rem}
+.aval{
+  position:relative;display:flex;flex-direction:column;gap:1rem;
+  padding:clamp(1.6rem,3vw,2.2rem);border-radius:var(--raio);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+}
+.aval .i{width:34px;height:34px;color:var(--ouro);opacity:.8}
+.aval blockquote{margin:0;font:500 clamp(1.25rem,2.3vw,1.55rem)/1.4 var(--serif);color:#F3F1EA}
+.aval__quem{margin-top:auto;display:flex;align-items:center;gap:.85rem}
+.aval__ini{
+  width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:rgba(201,174,120,.18);color:var(--ouro-vivo);border:1px solid rgba(201,174,120,.4);
+  font-weight:500;font-size:.88rem;letter-spacing:.04em;
+}
+.aval__quem b{display:block;font-weight:500;color:#fff;font-size:.98rem}
+.aval__quem .fonte{display:block;font-size:.8rem;color:#A9BEB6}
+.carrossel__janela{overflow:hidden}
+.carrossel--on .carrossel__janela{max-width:820px;margin-inline:auto}
+.carrossel--on .avals{display:flex;gap:0;transition:transform .7s cubic-bezier(.22,1,.36,1);will-change:transform}
+.carrossel--on .aval{flex:0 0 100%;min-width:100%;align-self:stretch;opacity:.15;transition:opacity .7s ease}
+.carrossel--on .aval[aria-hidden="false"]{opacity:1}
+.carrossel__controles{display:none;align-items:center;justify-content:center;gap:1rem;margin-top:1.6rem}
+.carrossel--on .carrossel__controles{display:flex}
+.seta{
+  width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;cursor:pointer;
+  background:transparent;border:1px solid rgba(255,255,255,.28);color:#fff;
+  transition:border-color .18s,color .18s,transform .18s;
+}
+.seta .i{width:20px;height:20px}
+.seta:hover{border-color:var(--ouro-vivo);color:var(--ouro-vivo);transform:translateY(-1px)}
+.pontos{display:flex;align-items:center;gap:.45rem}
+.ponto{position:relative;width:22px;height:48px;padding:0;border:0;background:none;cursor:pointer;transition:width .3s cubic-bezier(.22,1,.36,1)}
+.ponto::after{content:"";position:absolute;inset:50% 0 auto 0;transform:translateY(-50%);height:8px;border-radius:999px;background:rgba(255,255,255,.25);transition:background .3s}
+.ponto[aria-current="true"]{width:40px}
+.ponto[aria-current="true"]::after{background:var(--ouro-vivo)}
+
+/* ====================== instagram (o leque da Realce) ====================== */
+.insta{text-align:center;overflow:hidden}
+.insta .chamada{margin-inline:auto}
+.insta__leque{--passo:150px;--card:180px;--dyf:1px;position:relative;z-index:1;height:300px;margin:2.5rem 0 1rem}
+.insta__item{
+  --x:calc(var(--i) * var(--passo));--y:calc(var(--dy) * var(--dyf));
+  display:block;position:absolute;top:50%;left:50%;
+  width:calc(var(--card) * var(--n));aspect-ratio:3/4;overflow:hidden;border-radius:18px;
+  box-shadow:0 14px 34px rgba(40,30,15,.26);
+  transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r));
+  transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease;
+}
+.insta__item:hover,.insta__item:focus-visible{
+  transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y) - 12px)) rotate(0deg) scale(1.06);
+  box-shadow:0 22px 44px rgba(40,30,15,.34);z-index:50 !important;
+}
+.insta__item img{width:100%;height:100%;object-fit:cover}
+.insta .acoes{justify-content:center;margin-top:1.4rem}
+@media (max-width:760px){
+  .insta__leque{--passo:70px;--card:138px;--dyf:.5px;height:250px;margin:2rem 0 .5rem}
+  .insta__item{border-radius:13px;box-shadow:0 8px 20px rgba(40,30,15,.24)}
+  .insta__item:hover{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r));box-shadow:0 8px 20px rgba(40,30,15,.24)}
+}
+@media (max-width:400px){.insta__leque{--passo:62px;--card:122px;height:225px}}
+
+/* ====================== duvidas ====================== */
+.faq{max-width:820px;margin:0 auto;display:grid;gap:.75rem}
+.faq details{border:1px solid var(--linho);border-radius:var(--raio);background:var(--papel);transition:border-color .3s,box-shadow .3s}
+.faq details[open]{border-color:rgba(156,118,44,.45);box-shadow:0 14px 34px rgba(60,44,20,.08)}
+.faq summary{
+  list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  padding:1.15rem 1.35rem;font:600 1.25rem/1.25 var(--serif);color:var(--tinta);
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .i{width:22px;height:22px;color:var(--ouro-texto);transition:transform .35s var(--suave)}
+.faq details[open] summary .i{transform:rotate(45deg)}
+.faq details p{margin:0;padding:0 1.35rem 1.25rem;color:var(--tinta-suave)}
+
+/* ====================== onde fica ====================== */
+.onde{display:grid;gap:clamp(2.4rem,5vw,4rem);align-items:start}
+@media (min-width:980px){.onde{grid-template-columns:.95fr 1.05fr}}
+.dados{list-style:none;margin:0;padding:0;display:grid;gap:1.2rem}
+.dados li{display:flex;gap:1rem;align-items:flex-start}
+.dados .i{width:24px;height:24px;color:var(--ouro);margin-top:.2rem}
+.dados b{display:block;font:600 1.15rem/1.3 var(--serif);color:var(--claro)}
+.dados span{color:var(--claro-suave);font-size:.98rem}
+.horas{display:grid;grid-template-columns:auto auto;gap:.1rem 1.4rem;margin-top:.2rem;width:max-content;max-width:100%}
+.horas dt{color:var(--claro-suave)}
+.horas dd{margin:0;color:var(--claro)}
+.onde__fotos{display:grid;gap:1rem}
+.onde__foto{border-radius:var(--raio-g);overflow:hidden;aspect-ratio:4/3}
+.onde__foto img{width:100%;height:100%;object-fit:cover}
+.onde__mapa{border-radius:var(--raio);overflow:hidden;aspect-ratio:16/9;background:var(--noite-3);border:1px solid rgba(201,174,120,.2)}
+.onde__mapa iframe{width:100%;height:100%;border:0;display:block;filter:grayscale(.35) contrast(1.05)}
+
+/* ====================== rodape ====================== */
+.rodape{background:var(--noite-2);color:var(--claro-suave);padding:clamp(3.4rem,7vw,5rem) 0 6.5rem;border-top:1px solid rgba(201,174,120,.18)}
+.rodape__grade{display:grid;gap:2.4rem}
+@media (min-width:860px){.rodape__grade{grid-template-columns:1.4fr 1fr 1fr}}
+.rodape__marca{display:flex;align-items:center;gap:1rem;color:var(--ouro);text-decoration:none}
+.rodape__marca .marca__mono{width:78px;height:49px}
+.rodape__marca .marca__palavra{width:160px;height:23px}
+.rodape p{margin:1.1rem 0 0;max-width:34ch;font-size:.95rem}
+.rodape h4{font:500 .78rem/1 var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--ouro);margin:0 0 1.1rem}
+.rodape__lista{list-style:none;margin:0;padding:0;display:grid;gap:.15rem}
+.rodape__lista a{display:flex;align-items:center;gap:.7rem;min-height:44px;text-decoration:none;font-size:.95rem;transition:color .2s}
+.rodape__lista a:hover{color:var(--ouro-vivo)}
+.rodape__lista .i{width:18px;height:18px;color:var(--ouro)}
+.sociais{display:flex;gap:.6rem;margin-top:1.3rem}
+.social{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:var(--ouro);border:1px solid rgba(201,174,120,.35);transition:border-color .2s,color .2s,transform .2s}
+.social:hover{border-color:var(--ouro-vivo);color:var(--ouro-vivo);transform:translateY(-2px)}
+.social .i{width:20px;height:20px}
+.rodape__rt{margin-top:2.6rem;padding-top:1.6rem;border-top:1px solid rgba(201,174,120,.15);font-size:.84rem;color:#9E9284}
+.rodape__rt b{color:var(--claro-suave);font-weight:500}
+.rodape__rt p{max-width:none;margin:.3rem 0 0;font-size:.84rem}
+
+/* ====================== botao flutuante ====================== */
+.zap{
+  position:fixed;right:16px;bottom:16px;z-index:70;
+  display:flex;align-items:center;gap:.55rem;padding:.8rem 1.25rem;border-radius:999px;
+  background:#25D366;color:#0B3D22;font-weight:600;font-size:.95rem;text-decoration:none;
+  box-shadow:0 10px 26px rgba(0,0,0,.28);
+  transition:transform .4s var(--suave),opacity .4s ease;
+}
+.zap svg{width:20px;height:20px;fill:currentColor}
+.js .zap{opacity:0;transform:translateY(20px);pointer-events:none}
+.js .zap.zap--on{opacity:1;transform:none;pointer-events:auto}
+@media (max-width:430px){.zap span{display:none}.zap{padding:.9rem}}
+
+/* =====================================================================
+   REDUZIR MOVIMENTO: sai o que se MEXE sozinho ou com a rolagem (parallax,
+   Ken Burns, letreiro, poeira, giro automatico, bolha de vidro). O que e
+   conteudo continua inteiro: nada fica escondido esperando animacao.
+   Licao da Realce: quem liga isso quer menos movimento, nao pagina morta.
+   ===================================================================== */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .pronto .hero__midia img,.js .hero__midia img{animation:none;transform:none}
+  .hero__midia,.hero__conteudo{transform:none}
+  .faixa__pista{animation:none;width:auto;justify-content:center}
+  .faixa__trilho{flex-wrap:wrap;justify-content:center;white-space:normal;row-gap:.7rem;padding:0 1.25rem}
+  .faixa__trilho + .faixa__trilho{display:none}
+  .poeira,.hero__rolar::after{display:none}
+  .entrada .hero__conteudo > *{animation:none}
+  .brilho{animation:none !important}
+}
+</style>
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<!-- Sprite: icones (Lucide) e a marca vetorizada. A logo foi tracada com potrace a
+     partir do arquivo oficial dela e DEPENDE de fill-rule="evenodd": sem ele o miolo
+     do laco e do A saem preenchidos. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="ouroMetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9C762C"/>
+      <stop offset=".3" stop-color="#C9AE78"/>
+      <stop offset=".5" stop-color="#F3E3B8"/>
+      <stop offset=".7" stop-color="#C9AE78"/>
+      <stop offset="1" stop-color="#9C762C"/>
+    </linearGradient>
+    <!-- o reflexo da abertura: nasce fora da logo (translate -1) e atravessa -->
+    <linearGradient id="ouroReflexo" x1="0" y1="0" x2="1" y2=".35" gradientTransform="translate(-1 0)">
+      <stop offset="0" stop-color="#FFF6DA" stop-opacity="0"/>
+      <stop offset=".4" stop-color="#FFF6DA" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#FFF6DA" stop-opacity=".92"/>
+      <stop offset=".6" stop-color="#FFF6DA" stop-opacity="0"/>
+      <stop offset="1" stop-color="#FFF6DA" stop-opacity="0"/>
+      <animateTransform id="reflexoAnda" attributeName="gradientTransform" type="translate" values="-1 0;1 0" dur="1.3s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".45 0 .55 1"/>
+    </linearGradient>
+  </defs>
+  <symbol id="wa-mono" viewBox="36 37 1022 636"><path fill-rule="evenodd" d="M104.5 41C102.3 41.5,98.3 42.4,95.5 43C81.1 46.3,65 53.4,54.2 61.4C45.4 68,38 75,38 76.9C38 79.6,51.8 92.7,53.4 91.5C54.1 90.9,57.5 88.2,60.9 85.3C77.4 71.3,97.5 63.7,119 63.6C136.9 63.5,151.2 67.5,165.2 76.7C183.2 88.5,189.1 97.2,207 138.5C223.4 176.3,226.1 182.6,227.9 186.5C228.9 188.7,232.1 195.9,235 202.5C237.9 209.1,241.1 216.5,242.2 219C243.3 221.5,246.9 229.6,250.2 237C253.4 244.4,256.8 252,257.7 253.9C258.5 255.8,260.5 260.3,262 263.9C263.6 267.5,271 284.5,278.5 301.5C292.2 332.6,306.5 365,312.5 379C314.3 383.1,318.6 392.8,322 400.5C325.4 408.2,330.2 419.2,332.7 425C335.2 430.8,338.3 438,339.7 441C343.7 449.7,362.9 493.7,366.7 502.5C371.1 512.9,372.4 514,380.9 514C384.8 514,388.3 513.5,389.2 512.8C390.1 512.1,398 493.5,406.8 471.5C420.5 437.4,437.5 395.4,442.6 383.1C444.5 378.6,445.4 379.6,450.7 392C453 397.2,460.3 414.1,467 429.5C473.8 444.9,481.2 462,483.5 467.5C485.9 473,489.7 481.7,491.9 486.9C494.2 492.1,496 497.3,496 498.4C496 499.6,491.7 511.1,486.4 524C468.4 568.1,468.9 566.9,471.1 568.1C473.1 569.1,492.6 568.7,493.7 567.6C494 567.4,501.9 547.9,511.4 524.3L528.5 481.5 609.7 481.2C679 481,691.1 481.2,692.3 482.4C693.1 483.2,696.8 491,700.5 499.7C720.9 547.5,737 583.5,741.1 590.8C758 620.2,789.9 647,823 659.3C854.8 671.2,891 670.6,920.5 657.8C950 645.1,957 635.8,960.9 605C963.6 582.9,964 579.1,964 572.8C964 564.3,966.1 553.7,969.8 543C977 522.6,976.4 514.3,967.1 502.6C965.4 500.5,964 497.8,964 496.7C964 495.7,966.5 492.1,969.5 488.8C976.3 481.5,978 477.6,978 469.5C978 462,976.3 457.6,969.2 446.7C963.7 438.2,962.4 434.1,963.5 428.3C964.3 423.9,965.9 421.6,976.8 408.6C999.9 381.2,999.6 374.3,974 355.5C969.6 352.2,961.5 346.1,956.2 341.9C924 316.7,906.1 284.8,902.5 246.5C901.3 233.6,899.8 224.6,897.3 215C893.6 200.8,888.9 189.9,879.6 174C875.9 167.6,876.2 166.6,882.8 163.7C895.6 158,905.1 157.1,928.5 159.4C951.9 161.7,962.3 163.7,981.5 169.5C996.8 174.2,1021.9 185.9,1034.7 194.4C1042.6 199.7,1050.1 198.5,1053.4 191.6C1055.4 187.4,1055.4 185.7,1053.5 182C1049.8 174.8,1013.5 155.9,987.5 147.7C957.9 138.2,912.2 134.2,883.3 138.5C864.3 141.3,857 138.3,839.5 120.4C825.9 106.5,818.6 100,804.5 89.6C774.8 67.4,741.7 52.4,706.4 45.1C685.2 40.7,674.4 39.7,657.5 40.3C634.9 41.1,621.2 44.4,602.1 53.8C586.7 61.3,577.7 69.6,571.7 81.9L567.6 90.5 567.6 103C567.7 114,568 116.3,570.3 122.2C578.9 144.5,594.8 157.8,631.3 173.4C653.9 183,677.9 188.3,707.3 190.2C738.8 192.2,769.5 188.9,828.7 177C837 175.4,844.6 174,845.4 174C848.8 174,854.9 181.2,859.3 190.3C867.6 207.4,872.3 223.7,875.4 246C879.4 274.1,880.5 280,883.2 288.5C894.8 323.8,913.5 347,948.5 369.4C958.7 376,963 379.7,963 381.9C963 383.5,959.4 388.1,947.9 401.4C944.2 405.6,939.5 412.3,937.4 416.3C934 422.8,933.6 424.2,933.6 431C933.7 439.8,937.3 448.9,945.9 461.3C948.7 465.3,951 469,951 469.4C951 469.8,949.2 472.9,947 476.3C941.8 484.2,940.6 488.6,940.7 498.4C940.8 505.8,941.1 507,945.5 515.7C950.8 526.2,950.8 527.2,944.8 534.8C939.9 540.9,935.1 552,933.9 560.2C932.7 567.7,933.4 580.5,936 598.5C938.5 615.7,938.5 615.7,935.7 619.3C930.8 625.8,911.3 636.7,896.2 641.4C885.5 644.7,866.7 645.1,855.5 642.1C840.3 638.1,826.7 630,816.4 618.6C808.8 610.3,805.2 604.3,797.6 586.8C794.1 578.9,790.6 570.9,789.7 569C788.9 567.1,777.9 542.1,765.5 513.5C753 484.9,734 441.5,723.3 417C712.5 392.5,701.6 367.6,699 361.5C696.4 355.5,693.3 348.5,692.2 346C691.1 343.5,686.3 332.5,681.5 321.5C676.7 310.5,669 293,664.4 282.5C659.9 272.1,650.8 251.4,644.3 236.5L632.5 209.5 624.8 209.2C617.1 208.9,617 209,610.8 213.2C592.6 225.7,585 231.4,585 232.6C585 233.3,585.9 236,587.1 238.7C591.3 248.6,592.2 250.5,593.1 252.2C595.2 256.3,597.4 250.6,550.5 366C541.9 387.2,533 409.1,530.8 414.8C528.5 420.4,526.1 425,525.5 425C524.8 425,523.1 422.4,521.7 419.3C520.4 416.1,515.2 404.3,510.2 393C505.3 381.7,496.3 361.3,490.2 347.5C484.2 333.8,477.8 319.2,476 315.1L472.8 307.7 478.9 292.6C482.2 284.3,487.3 271.9,490.1 265C498.1 245.4,521.5 187.6,530.6 165C535.2 153.4,538.4 144.1,537.9 143.6C536.6 142.2,515.8 142.8,514.4 144.3C513.7 144.9,505.5 164.6,496.2 188C482.4 222.4,463.9 268.4,461.3 274.8C460.3 277.2,459.2 275.9,455.7 267.8C453.7 263.2,450.1 255,447.7 249.5C445.3 244,435.1 220.8,425 198C401.2 143.7,400.9 143,399.6 143C388.5 142.7,343.6 143.1,343.2 143.5C342.6 144,345 150.3,349.8 161C351.1 164,352.8 167.9,353.5 169.5C364.8 195.4,369.6 206.5,371.6 211.2C372.9 214.3,375.4 219.9,377.1 223.7C378.8 227.4,383.5 238.2,387.5 247.5C391.6 256.9,402.4 281.6,411.5 302.5C420.7 323.4,428.9 342.4,429.7 344.6L431.3 348.8 424.2 366.6C409.8 402.7,397.9 431.5,397 432.4C396.5 432.9,395.9 433.2,395.7 432.9C395.3 432.5,371.1 377,366.7 366.5C365.3 363.2,361.6 354.7,358.5 347.5C355.4 340.4,350.2 328.4,347 321C343.8 313.6,339.3 303.2,337 298C334.6 292.8,331.7 286,330.5 283C329.2 280,321.4 261.8,313 242.5C304.6 223.3,296.5 204.6,295 201C261.8 122,254.5 108.5,233 87C210.5 64.5,183.7 49.7,153 42.9C142.4 40.5,111.8 39.3,104.5 41M640 67.5C614.2 71.9,590.4 90.7,592.3 105.1C596.8 139.1,664.1 166.7,734.5 163.5C742.8 163.1,756.7 161.9,765.5 160.8C781.9 158.8,784.5 158.4,803.5 155.5C809.6 154.6,818.6 153.3,823.5 152.6C835 151.1,834.9 150.6,822.2 138.1C784.3 101.4,744.5 79.3,700.5 70.6C678.8 66.3,654.4 65,640 67.5M606.1 290.1C605.6 291.4,602.6 298.8,599.5 306.5C596.3 314.2,593 322.5,592 325C589.4 331.8,568.3 383.9,566.1 389C565 391.5,561.7 399.6,558.7 407C555.7 414.4,550 428.7,545.9 438.7C541.9 448.7,538.8 457.2,539.1 457.4C540 458.3,680.3 458.1,681.1 457.3C681.5 456.9,678 447.7,673.3 437C668.7 426.3,661.6 409.9,657.5 400.5C653.5 391.2,649.1 381,647.7 378C646.3 375,640.8 362.4,635.5 350C630.2 337.6,624.3 324.1,622.5 320C620.7 315.9,617.1 307.6,614.5 301.5C608.9 288.4,607.5 286.6,606.1 290.1"/></symbol>
+  <symbol id="wa-palavra" viewBox="-3 -2 2120 305"><path fill-rule="evenodd" d="M0 10C0 16.4,0.3 18,1.5 18C4.5 18,13.7 22.9,19.1 27.3C25 32.3,30.6 39.7,33.8 47C36.6 53.4,41.6 64.8,50.3 84.5C54.4 93.9,62.6 112.5,68.5 126C74.4 139.5,83.4 160,88.5 171.5C93.6 183.1,107.1 213.9,118.5 240C130 266.1,140 288.1,140.9 288.8C142.8 290.4,150.5 290.4,151.7 288.8C152.3 288.1,157.4 276,163 262C168.6 248,175.6 230.7,178.5 223.5C181.4 216.4,184.3 210.5,185 210.5C185.7 210.5,188.4 215.5,191 221.5C193.6 227.6,198.7 239.5,202.5 248C206.2 256.5,210.8 267.1,212.7 271.5C218.1 284.3,220.2 288.5,221.4 289.2C222.8 290.2,230.2 290.2,231.6 289.2C232.3 288.8,236.2 280,240.5 269.5C244.7 259.1,251.6 242.2,255.7 232C259.8 221.8,266 206.5,269.5 198C273 189.5,281 169.7,287.3 154C305.1 109.8,313.4 89.5,318.4 77.3C320.9 71.2,323 65.6,323 65C323 64.3,320.3 64,314.9 64.2L306.9 64.5 272.1 151.5C252.9 199.4,236.7 238.5,236.1 238.5C235.4 238.5,232.6 233.3,229.9 227C227.1 220.7,219.9 204.4,213.9 190.8C207.9 177.1,203 165.1,203 164.1C203 163,203.9 160,205.1 157.3C206.2 154.7,211.6 141.5,217 128C222.5 114.5,230.3 95.2,234.4 85.1C238.6 74.9,242 66,242 65.3C242 64.4,240 64,234.7 64L227.3 64 225.7 67.8C223.1 73.5,200.1 130.8,197.7 137.3C196.6 140.4,195.1 143,194.5 143C193.8 143,188.9 133,183.5 120.8C166.4 82,159.5 66.5,158.7 65.3C157.8 63.8,123 63.4,123 64.8C123 65.6,136 96.3,141.8 109C142.9 111.5,146.8 120.5,150.5 129C154.2 137.5,158.3 146.8,159.5 149.5C167.9 168.3,176 187.9,176 189.2C176 191,158.2 235.9,156.7 237.8C155.2 239.7,154.5 239.3,152.8 234.8C151.9 232.4,148.4 224.2,145 216.5C141.6 208.8,136.9 198,134.5 192.5C132.2 187,125.6 171.9,120 159C114.4 146.1,108.5 132.6,107 129C101.6 116.3,78.2 62.4,76 57.5C64.5 32.3,38.8 11.1,11.3 4.1C-0.6 1,0 0.7,0 10M354 66.1C342.4 74.4,342.6 74,346.1 81.3C347.7 84.7,349 88.3,349 89.3C349 90.9,343.2 105.6,306.5 196.5C277.1 269.2,272 282.3,272 284.1C272 285.9,272.6 286.1,279.2 285.8L286.4 285.5 296.6 260.1C302.2 246.1,307.3 233.8,307.9 232.8C309 231.1,311.7 231,360.2 231.2L411.4 231.5 412.7 234C413.4 235.4,415.1 239,416.4 242C428.3 269.6,432.4 279,433.8 282L435.5 285.5 453.3 285.8C468.1 286,471 285.8,471 284.6C471 283.3,465.7 270.7,452.7 241C449.7 234.1,443.8 220.6,439.6 211C435.4 201.4,431.3 192.2,430.5 190.5C428.2 185.4,396.8 114,387.5 92.5C385.1 87,381 77.6,378.3 71.5L373.3 60.5 367.9 60.2C362.7 60,362.2 60.2,354 66.1M676 61C663 62.6,642.9 69.7,631.5 76.5C628.3 78.4,625.6 80,625.3 80C624.5 80,614.2 88.5,608.6 93.8C589.1 112.6,578.2 133.9,574.4 160.8C567.8 207.9,593.2 254,637.9 276.5C664.8 289.9,693.8 293.3,722.6 286.4C758.7 277.8,789.1 253.5,804.3 221.2C810.9 207,814 192.3,814 174.8C814 159.4,813.5 156.3,809 141.4C797.3 103.5,765.2 74,724 63.6C712.4 60.6,688.6 59.3,676 61M1084.3 61C1042.6 66.9,1005.4 95,990.2 132.1C984 147.2,981.7 158.8,981.8 175.5C981.8 192,983.7 201.7,990 217.4C1011 270.4,1074.8 301,1133 285.9C1174.5 275.1,1206.3 245.3,1217.9 206.3C1223.7 186.7,1224.2 167.9,1219.4 148.5C1208.9 106.1,1175.4 74.2,1129.6 62.9C1120.3 60.6,1094.6 59.5,1084.3 61M1419.4 64.3C1416.1 66.6,1411.6 69.9,1409.5 71.6L1405.6 74.7 1408.8 81.4C1410.6 85.1,1412 88.6,1412 89.2C1412 90.2,1400.3 120.2,1397.1 127.5C1396.1 129.6,1392.3 139.1,1363.9 210C1354 234.5,1345.6 255.4,1345.1 256.5C1341.9 263.5,1334.8 281.8,1334.6 283.5C1334.5 285.3,1335.2 285.5,1341.1 285.8C1345.7 286,1348 285.7,1348.8 284.7C1349.4 284,1354.6 271.7,1360.4 257.4L1370.8 231.5 1422.3 231.2C1462.7 231,1473.9 231.3,1474.7 232.2C1475.2 232.9,1477.4 237.6,1479.4 242.5C1481.5 247.5,1484 253.3,1485 255.5C1486 257.7,1488.9 264.5,1491.4 270.5C1498.7 287.6,1496.1 286,1516.5 286C1529.9 286,1534 285.7,1534 284.7C1534 284,1531.9 278.8,1529.4 273C1526.9 267.2,1521 253.7,1516.3 243C1511.7 232.3,1506.3 219.9,1504.3 215.5C1502.3 211.1,1499.9 205.7,1499 203.5C1498 201.3,1489 180.9,1479 158.1C1469.1 135.3,1460.1 114.8,1459.1 112.6C1454.1 101.5,1437.7 64.2,1436.9 62.3C1436.2 60.3,1435.3 60,1430.8 60C1426.2 60,1424.7 60.6,1419.4 64.3M1626 61.1C1619.5 61.9,1617.4 62.4,1605 66.3C1576.7 75.1,1549.1 98.7,1535.6 125.8C1517.8 161.2,1521 204.4,1543.8 237.9C1562.7 265.7,1595.3 284.8,1631 289C1668.5 293.4,1701.9 278.2,1722.6 247.2C1725.7 242.6,1727.9 238.3,1727.7 237.6C1727.2 236.3,1718.5 231,1716.9 231C1716.4 231,1713.9 234.3,1711.3 238.3C1702.1 252.2,1687.7 264.4,1674 269.8C1656 277,1630.6 276.7,1613.5 269.1C1589.8 258.6,1571.3 234.9,1563.5 205C1559.9 191.1,1558.9 168.2,1561.4 154.5C1569.8 109.1,1597.5 79.4,1635.6 74.9C1666.5 71.2,1696.2 86.3,1712.7 114C1714.2 116.4,1715.9 118,1717 118C1719 118,1726 114.3,1727.2 112.6C1729.7 108.9,1708.8 84,1696 75.3C1686 68.5,1671.7 62.9,1660 61C1652.5 59.9,1635.5 59.9,1626 61.1M1876.7 62C1875.3 63.1,1873.7 64,1873.1 64C1872.5 64,1872 64.3,1872 64.8C1872 65.2,1870 66.7,1867.7 68.2C1859.5 73.4,1859.4 73.8,1862.9 81.8C1864.6 85.7,1866 89.2,1866 89.5C1866 90.4,1859.7 106.4,1856.6 113.5C1855.3 116.3,1853.8 120.1,1853.1 122C1852.4 123.9,1851.4 126.4,1850.9 127.5C1850.4 128.6,1847.2 136.7,1843.6 145.5C1840.1 154.3,1829.2 181.3,1819.5 205.5C1809.7 229.7,1801.1 251.1,1800.4 253C1799.7 254.9,1796.6 262.6,1793.5 269.9C1790.5 277.3,1788.2 284,1788.5 284.7C1788.8 285.7,1790.8 286,1795.7 285.8L1802.5 285.5 1804.7 281C1805.9 278.5,1807.8 274,1808.9 271C1810 268,1814 257.9,1817.8 248.5L1824.7 231.5 1876.6 231.5L1928.5 231.5 1932.5 240.6C1934.7 245.5,1937.3 251.4,1938.2 253.6C1943.7 266.4,1949.9 280.9,1951 283.3L1952.3 286 1970.2 286C1983.5 286,1988 285.7,1988 284.8C1988 283.8,1967 235.1,1955.9 210.5C1954.9 208.3,1951.6 200.7,1948.5 193.5C1945.4 186.4,1938.8 171.5,1934 160.5C1929.2 149.5,1922.6 134.7,1919.5 127.5C1916.4 120.4,1912.9 112.5,1911.8 110C1910.7 107.5,1906 97,1901.5 86.5C1888.8 57.4,1890.5 60,1884.5 60C1880.8 60,1878.5 60.6,1876.7 62M828.6 65.5C827.9 67.5,827.9 279.6,828.7 283.3L829.2 286 845.6 286C854.6 286,862 285.7,862 285.3C862.1 284.8,862.2 260.6,862.3 231.3C862.4 202.1,862.8 177.8,863.2 177.4C864.1 176.5,872 175.9,874.1 176.6C875 176.8,880.7 184.1,886.8 192.8C908.9 224.1,950.2 281.6,952.3 283.8C954.3 285.9,954.9 286,973.1 286C983.4 286,992.1 285.6,992.4 285.1C992.7 284.6,989.6 279.6,985.5 273.9C978.2 263.7,955.5 232.2,944.2 216.7C941.1 212.4,937.8 207.8,937 206.6C932.2 199.5,922 185.8,918.2 181.2C915.8 178.3,914 175.7,914.2 175.4C914.5 175.2,918.2 174.1,922.6 173C933.4 170.2,947.4 163.3,953.7 157.6C968.7 144,974.3 124.6,968.5 106.1C961.8 85,944.6 70.7,919.7 65.5C908.9 63.3,829.5 63.3,828.6 65.5M1237.2 174.7L1237.5 285.5 1253.5 285.5L1269.5 285.5 1269.8 232.1C1269.9 195,1270.4 178.3,1271.1 177.4C1272 176.3,1277 176,1293.9 176.1C1305.8 176.1,1316.5 176.1,1317.8 176.1C1320 176,1320.1 175.7,1319.8 169.3L1319.5 162.5 1295.5 162.2C1277.9 162,1271.4 161.6,1270.8 160.7C1269.4 158.5,1269.8 80.2,1271.3 79.3C1271.9 78.9,1291 78.3,1313.5 78L1354.5 77.5 1354.5 71L1354.5 64.5 1295.7 64.2L1237 64 1237.2 174.7M1749.2 174.8L1749.5 285.5 1765.8 285.8L1782 286.1 1782 175L1782 64 1765.5 64L1749 64 1749.2 174.8M1993.6 65.6C1992.4 68.7,1993 283.2,1994.1 284.7C1995 285.7,2006.6 286,2054.6 286L2114 286 2114.5 283.7C2114.8 282.5,2115 279.4,2114.8 277L2114.5 272.5 2071.9 272.2C2037.8 272,2029 271.7,2028.1 270.6C2027.3 269.7,2026.9 240.1,2026.8 166.9L2026.5 64.5 2010.4 64.2C1996.2 64,1994.2 64.1,1993.6 65.6M683 74.9C663.1 77.8,644.7 88.7,632.1 105C587.9 162.1,610.5 255.3,672.7 272.6C681.7 275.1,701.2 275.6,710.7 273.5C742.2 266.6,765.7 241.2,775.2 203.7C778.1 192.6,778.3 190.1,778.4 175C778.4 158,778 154.8,773.3 139C764.2 107.9,742.2 84.7,715 77.2C706.5 74.8,691.2 73.8,683 74.9M1090.5 75C1055.6 80.5,1030 107.2,1019.8 148.9C1016.9 160.6,1016.7 187.7,1019.3 199C1026.3 229,1039.8 250,1060.6 263.3C1068.3 268.1,1075.2 271.1,1085 273.6C1093.8 275.8,1115.8 275.1,1124.5 272.2C1151 263.7,1170.9 242.6,1180.9 212.5C1200 154.5,1172 89.7,1122.3 76.9C1113.3 74.6,1098.7 73.8,1090.5 75M863.1 79.8C861.7 82.4,861.7 157.6,863.1 160.1C864 161.9,865.4 162,881.8 162C909.7 162,918 158.8,929.3 143.9C933.6 138.2,935.5 130.9,935.5 119.9C935.5 109.8,935.4 109.1,931.8 101.9C925.6 89.4,916.6 82.3,903.3 79.5C899 78.6,890.5 78,880.3 78C865.5 78,864 78.2,863.1 79.8M351.3 123.7C348.5 130.7,339.2 154,330.6 175.4C322 196.7,315.3 214.6,315.6 215.1C316.4 216.4,404 216.3,404 214.9C404 214.4,402.8 211.3,401.4 208.2C400 205.1,398 200.5,397 198C388.4 176.9,358.8 111.4,357.7 111.2C356.8 111,354.7 115.1,351.3 123.7M1416.7 117.3C1403.6 149.2,1378 213.8,1378 214.9C1378 216.2,1465.6 216.5,1466.4 215.1C1466.7 214.7,1464.8 209.4,1462.1 203.4C1459.5 197.4,1454 185.1,1450 176C1446 166.9,1441.9 157.6,1440.9 155.3C1439.9 153,1439 150.9,1439 150.6C1439 150.4,1437.5 146.9,1435.6 142.8C1433.8 138.8,1429.9 130,1427 123.3C1424.1 116.5,1421.1 111,1420.5 111C1419.8 111,1418.1 113.8,1416.7 117.3M1872.3 112.8C1872 113.7,1862.7 136.8,1851.8 164C1840.9 191.2,1832 214,1832 214.7C1832 215.7,1840.7 216,1876 216C1918.3 216,1920 215.9,1920 214.1C1920 212.5,1916 202.8,1908.8 187C1906.9 183,1898.6 164,1889.5 143C1875.1 109.7,1874.1 107.9,1872.3 112.8"/></symbol>
+  <symbol id="i-sorriso" viewBox="0 0 24 24"><path d="M15 10V9"/><path d="M16.472 15a6 6 0 01-8.943 0"/><path d="M9 10V9"/><circle cx="12" cy="12" r="10"/></symbol>
+  <symbol id="i-escova" viewBox="0 0 24 24"><path d="M10 3H8"/><path d="M14.586 11.414 22 4"/><path d="M15 11a8 8 0 01-.429.4"/><path d="m2 22 7-7c1.857-1.857 3.714-1.99 5.571-3.6l-1.985-1.986A2 2 0 0114 6a2 2 0 012-2 2 2 0 013.262-1.552l2.152 2.138"/><path d="M20 15v4"/><path d="M22 17h-4"/><path d="M4 5v4"/><path d="M6 7H2"/><path d="M9 2v2"/></symbol>
+  <symbol id="i-brilho" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol>
+  <symbol id="i-rosto" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></symbol>
+  <symbol id="i-olho" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-gema" viewBox="0 0 24 24"><path d="M10.5 3 8 9l4 13 4-13-2.5-6"/><path d="M17 3a2 2 0 0 1 1.6.8l3 4a2 2 0 0 1 .013 2.382l-7.99 10.986a2 2 0 0 1-3.247 0l-7.99-10.986A2 2 0 0 1 2.4 7.8l2.998-3.997A2 2 0 0 1 7 3z"/><path d="M2 9h20"/></symbol>
+  <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-digital" viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></symbol>
+  <symbol id="i-maos" viewBox="0 0 24 24"><path d="M11 14h2a2 2 0 0 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16"/><path d="m14.45 13.39 5.05-4.694C20.196 8 21 6.85 21 5.75a2.75 2.75 0 0 0-4.797-1.837.276.276 0 0 1-.406 0A2.75 2.75 0 0 0 11 5.75c0 1.2.802 2.248 1.5 2.946L16 11.95"/><path d="m2 15 6 6"/><path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a1 1 0 0 0-2.75-2.91"/></symbol>
+  <symbol id="i-agenda" viewBox="0 0 24 24"><path d="M12.127 21H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5.125"/><path d="M14.62 17.8A2.25 2.25 0 1118 14.836a2.25 2.25 0 113.38 2.966l-2.626 2.856a.998.998 0 01-1.507 0z"/><path d="M16 2v3"/><path d="M3 9h18"/><path d="M8 2v3"/></symbol>
+  <symbol id="i-premio" viewBox="0 0 24 24"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></symbol>
+  <symbol id="i-aula" viewBox="0 0 24 24"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></symbol>
+  <symbol id="i-acessivel" viewBox="0 0 24 24"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 0 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/></symbol>
+  <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-fone" viewBox="0 0 24 24"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></symbol>
+  <symbol id="i-esq" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-dir" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-estrela" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="i-aspas" viewBox="0 0 24 24"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></symbol>
+  <symbol id="i-raiox" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></symbol>
+  <symbol id="i-sofa" viewBox="0 0 24 24"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/><path d="M4 18v2"/><path d="M20 18v2"/><path d="M12 4v9"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+  <symbol id="i-mais" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-flor" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1"/><circle cx="12" cy="8" r="2"/><path d="M12 10v12"/><path d="M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z"/><path d="M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z"/></symbol>
+  <symbol id="i-estetos" viewBox="0 0 24 24"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></symbol>
+  <symbol id="i-coroa" viewBox="0 0 24 24"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.7.1s-.8 1-.9 1.2c-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5 4.4.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3ZM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.2-.4-4.5-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-labios" viewBox="0 0 24 24"><path d="M3.6 11.4c2.4-2.9 4.4-4 6-4 1.2 0 1.8.7 2.4 1.3.6-.6 1.2-1.3 2.4-1.3 1.6 0 3.6 1.1 6 4"/><path d="M3.6 11.4c1.4 3.4 4.6 5.2 8.4 5.2s7-1.8 8.4-5.2"/><path d="M6.8 11.6h10.4"/></symbol>
+  <symbol id="i-mao" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></symbol>
+  <symbol id="i-gota" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></symbol>
+</svg>
+
+<!-- ===== abertura (remover: apagar este bloco, o CSS "ABERTURA" e o bloco 1 do script) ===== -->
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro__porta intro__porta--esq"></div>
+  <div class="intro__porta intro__porta--dir"></div>
+  <span class="intro__costura"></span>
+  <span class="intro__led intro__led--e" style="top:17%;width:34vw;animation-delay:.05s"></span>
+  <span class="intro__led intro__led--d" style="top:30%;width:26vw;animation-delay:.18s"></span>
+  <span class="intro__led intro__led--e" style="top:47%;width:17vw;animation-delay:.3s"></span>
+  <span class="intro__led intro__led--d" style="top:63%;width:29vw;animation-delay:.12s"></span>
+  <span class="intro__led intro__led--e" style="top:79%;width:24vw;animation-delay:.24s"></span>
+  <span class="intro__led intro__led--d" style="top:88%;width:15vw;animation-delay:.36s"></span>
+  <div class="intro__centro">
+    <svg class="intro__mono" viewBox="36 37 1022 636">
+      <g class="intro__tracos">
+        <path pathLength="1" d="M104.5 41C102.3 41.5,98.3 42.4,95.5 43C81.1 46.3,65 53.4,54.2 61.4C45.4 68,38 75,38 76.9C38 79.6,51.8 92.7,53.4 91.5C54.1 90.9,57.5 88.2,60.9 85.3C77.4 71.3,97.5 63.7,119 63.6C136.9 63.5,151.2 67.5,165.2 76.7C183.2 88.5,189.1 97.2,207 138.5C223.4 176.3,226.1 182.6,227.9 186.5C228.9 188.7,232.1 195.9,235 202.5C237.9 209.1,241.1 216.5,242.2 219C243.3 221.5,246.9 229.6,250.2 237C253.4 244.4,256.8 252,257.7 253.9C258.5 255.8,260.5 260.3,262 263.9C263.6 267.5,271 284.5,278.5 301.5C292.2 332.6,306.5 365,312.5 379C314.3 383.1,318.6 392.8,322 400.5C325.4 408.2,330.2 419.2,332.7 425C335.2 430.8,338.3 438,339.7 441C343.7 449.7,362.9 493.7,366.7 502.5C371.1 512.9,372.4 514,380.9 514C384.8 514,388.3 513.5,389.2 512.8C390.1 512.1,398 493.5,406.8 471.5C420.5 437.4,437.5 395.4,442.6 383.1C444.5 378.6,445.4 379.6,450.7 392C453 397.2,460.3 414.1,467 429.5C473.8 444.9,481.2 462,483.5 467.5C485.9 473,489.7 481.7,491.9 486.9C494.2 492.1,496 497.3,496 498.4C496 499.6,491.7 511.1,486.4 524C468.4 568.1,468.9 566.9,471.1 568.1C473.1 569.1,492.6 568.7,493.7 567.6C494 567.4,501.9 547.9,511.4 524.3L528.5 481.5 609.7 481.2C679 481,691.1 481.2,692.3 482.4C693.1 483.2,696.8 491,700.5 499.7C720.9 547.5,737 583.5,741.1 590.8C758 620.2,789.9 647,823 659.3C854.8 671.2,891 670.6,920.5 657.8C950 645.1,957 635.8,960.9 605C963.6 582.9,964 579.1,964 572.8C964 564.3,966.1 553.7,969.8 543C977 522.6,976.4 514.3,967.1 502.6C965.4 500.5,964 497.8,964 496.7C964 495.7,966.5 492.1,969.5 488.8C976.3 481.5,978 477.6,978 469.5C978 462,976.3 457.6,969.2 446.7C963.7 438.2,962.4 434.1,963.5 428.3C964.3 423.9,965.9 421.6,976.8 408.6C999.9 381.2,999.6 374.3,974 355.5C969.6 352.2,961.5 346.1,956.2 341.9C924 316.7,906.1 284.8,902.5 246.5C901.3 233.6,899.8 224.6,897.3 215C893.6 200.8,888.9 189.9,879.6 174C875.9 167.6,876.2 166.6,882.8 163.7C895.6 158,905.1 157.1,928.5 159.4C951.9 161.7,962.3 163.7,981.5 169.5C996.8 174.2,1021.9 185.9,1034.7 194.4C1042.6 199.7,1050.1 198.5,1053.4 191.6C1055.4 187.4,1055.4 185.7,1053.5 182C1049.8 174.8,1013.5 155.9,987.5 147.7C957.9 138.2,912.2 134.2,883.3 138.5C864.3 141.3,857 138.3,839.5 120.4C825.9 106.5,818.6 100,804.5 89.6C774.8 67.4,741.7 52.4,706.4 45.1C685.2 40.7,674.4 39.7,657.5 40.3C634.9 41.1,621.2 44.4,602.1 53.8C586.7 61.3,577.7 69.6,571.7 81.9L567.6 90.5 567.6 103C567.7 114,568 116.3,570.3 122.2C578.9 144.5,594.8 157.8,631.3 173.4C653.9 183,677.9 188.3,707.3 190.2C738.8 192.2,769.5 188.9,828.7 177C837 175.4,844.6 174,845.4 174C848.8 174,854.9 181.2,859.3 190.3C867.6 207.4,872.3 223.7,875.4 246C879.4 274.1,880.5 280,883.2 288.5C894.8 323.8,913.5 347,948.5 369.4C958.7 376,963 379.7,963 381.9C963 383.5,959.4 388.1,947.9 401.4C944.2 405.6,939.5 412.3,937.4 416.3C934 422.8,933.6 424.2,933.6 431C933.7 439.8,937.3 448.9,945.9 461.3C948.7 465.3,951 469,951 469.4C951 469.8,949.2 472.9,947 476.3C941.8 484.2,940.6 488.6,940.7 498.4C940.8 505.8,941.1 507,945.5 515.7C950.8 526.2,950.8 527.2,944.8 534.8C939.9 540.9,935.1 552,933.9 560.2C932.7 567.7,933.4 580.5,936 598.5C938.5 615.7,938.5 615.7,935.7 619.3C930.8 625.8,911.3 636.7,896.2 641.4C885.5 644.7,866.7 645.1,855.5 642.1C840.3 638.1,826.7 630,816.4 618.6C808.8 610.3,805.2 604.3,797.6 586.8C794.1 578.9,790.6 570.9,789.7 569C788.9 567.1,777.9 542.1,765.5 513.5C753 484.9,734 441.5,723.3 417C712.5 392.5,701.6 367.6,699 361.5C696.4 355.5,693.3 348.5,692.2 346C691.1 343.5,686.3 332.5,681.5 321.5C676.7 310.5,669 293,664.4 282.5C659.9 272.1,650.8 251.4,644.3 236.5L632.5 209.5 624.8 209.2C617.1 208.9,617 209,610.8 213.2C592.6 225.7,585 231.4,585 232.6C585 233.3,585.9 236,587.1 238.7C591.3 248.6,592.2 250.5,593.1 252.2C595.2 256.3,597.4 250.6,550.5 366C541.9 387.2,533 409.1,530.8 414.8C528.5 420.4,526.1 425,525.5 425C524.8 425,523.1 422.4,521.7 419.3C520.4 416.1,515.2 404.3,510.2 393C505.3 381.7,496.3 361.3,490.2 347.5C484.2 333.8,477.8 319.2,476 315.1L472.8 307.7 478.9 292.6C482.2 284.3,487.3 271.9,490.1 265C498.1 245.4,521.5 187.6,530.6 165C535.2 153.4,538.4 144.1,537.9 143.6C536.6 142.2,515.8 142.8,514.4 144.3C513.7 144.9,505.5 164.6,496.2 188C482.4 222.4,463.9 268.4,461.3 274.8C460.3 277.2,459.2 275.9,455.7 267.8C453.7 263.2,450.1 255,447.7 249.5C445.3 244,435.1 220.8,425 198C401.2 143.7,400.9 143,399.6 143C388.5 142.7,343.6 143.1,343.2 143.5C342.6 144,345 150.3,349.8 161C351.1 164,352.8 167.9,353.5 169.5C364.8 195.4,369.6 206.5,371.6 211.2C372.9 214.3,375.4 219.9,377.1 223.7C378.8 227.4,383.5 238.2,387.5 247.5C391.6 256.9,402.4 281.6,411.5 302.5C420.7 323.4,428.9 342.4,429.7 344.6L431.3 348.8 424.2 366.6C409.8 402.7,397.9 431.5,397 432.4C396.5 432.9,395.9 433.2,395.7 432.9C395.3 432.5,371.1 377,366.7 366.5C365.3 363.2,361.6 354.7,358.5 347.5C355.4 340.4,350.2 328.4,347 321C343.8 313.6,339.3 303.2,337 298C334.6 292.8,331.7 286,330.5 283C329.2 280,321.4 261.8,313 242.5C304.6 223.3,296.5 204.6,295 201C261.8 122,254.5 108.5,233 87C210.5 64.5,183.7 49.7,153 42.9C142.4 40.5,111.8 39.3,104.5 41"/>
+        <path pathLength="1" d="M640 67.5C614.2 71.9,590.4 90.7,592.3 105.1C596.8 139.1,664.1 166.7,734.5 163.5C742.8 163.1,756.7 161.9,765.5 160.8C781.9 158.8,784.5 158.4,803.5 155.5C809.6 154.6,818.6 153.3,823.5 152.6C835 151.1,834.9 150.6,822.2 138.1C784.3 101.4,744.5 79.3,700.5 70.6C678.8 66.3,654.4 65,640 67.5"/>
+        <path pathLength="1" d="M606.1 290.1C605.6 291.4,602.6 298.8,599.5 306.5C596.3 314.2,593 322.5,592 325C589.4 331.8,568.3 383.9,566.1 389C565 391.5,561.7 399.6,558.7 407C555.7 414.4,550 428.7,545.9 438.7C541.9 448.7,538.8 457.2,539.1 457.4C540 458.3,680.3 458.1,681.1 457.3C681.5 456.9,678 447.7,673.3 437C668.7 426.3,661.6 409.9,657.5 400.5C653.5 391.2,649.1 381,647.7 378C646.3 375,640.8 362.4,635.5 350C630.2 337.6,624.3 324.1,622.5 320C620.7 315.9,617.1 307.6,614.5 301.5C608.9 288.4,607.5 286.6,606.1 290.1"/>
+      </g>
+      <use class="intro__preenche" href="#wa-mono" fill="url(#ouroMetal)"/>
+      <use class="intro__preenche" href="#wa-mono" fill="url(#ouroReflexo)"/>
+    </svg>
+    <svg class="intro__palavra" viewBox="-3 -2 2120 305"><use href="#wa-palavra" fill="url(#ouroMetal)"/><use href="#wa-palavra" fill="url(#ouroReflexo)"/></svg>
+    <p class="intro__sub">Institute</p>
+    <p class="intro__linha">Odontologia e Harmonização Facial</p>
+  </div>
+  <button class="intro__pular" type="button" data-pular>Pular</button>
+</div>
+
+<div class="progresso" aria-hidden="true"></div>
+
+<header class="topo">
+  <div class="env topo__linha">
+    <a class="marca" href="#topo" aria-label="WA Orofacial Institute, início">
+      <svg class="marca__mono" aria-hidden="true"><use href="#wa-mono"/></svg>
+      <span class="marca__texto">
+        <svg class="marca__palavra" aria-hidden="true"><use href="#wa-palavra"/></svg>
+        <span class="marca__sub">Institute</span>
+      </span>
+    </a>
+    <nav class="menu" aria-label="Seções">
+      <a href="#tratamentos">Tratamentos</a>
+      <a href="#resultados">Antes e depois</a>
+      <a href="#clinica">A clínica</a>
+      <a href="#quem-cuida">Quem cuida</a>
+      <a href="#equipe">Equipe</a>
+      <a href="#avaliacoes">Avaliações</a>
+      <a href="#onde">Onde fica</a>
+    </nav>
+    <a class="btn topo__cta" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">
+      <svg class="btn__ico" aria-hidden="true"><use href="#i-zap"/></svg>Agendar
+    </a>
+  </div>
+</header>
+
+<main id="conteudo">
+
+<!-- ===== hero ===== -->
+<section class="hero" id="topo">
+  <!-- ⚠ FOTO RETOCADA POR IA (ChatGPT), trazida pelo usuario em 30/09/2026 a
+       partir da foto real da fachada a noite. Conferida contra a original: letreiro,
+       logos, porta, recepcao e lustre estao onde estao na fachada de verdade. A
+       regra da raiz e que imagem de IA nao posa de foto real do cliente; aqui e
+       RETOQUE fiel, como na Larissa, e ela precisa saber disso antes de ver. -->
+  <div class="hero__midia">
+    <picture>
+      <source media="(max-width: 700px)" srcset="assets/img/hero-mobile.webp" width="600" height="1086">
+      <img src="assets/img/hero-fachada.webp" width="1448" height="1086" fetchpriority="high" decoding="async"
+           alt="Fachada da WA Orofacial à noite, com o letreiro dourado, as fitas de luz e a recepção iluminada atrás da porta de vidro">
+    </picture>
+  </div>
+  <div class="hero__veu" aria-hidden="true"></div>
+  <div class="env">
+    <div class="hero__conteudo">
+      <span class="hero__selo"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg>Odontologia e Harmonização Facial<span class="hero__selo-cidade">· Itabira/MG</span></span>
+      <!-- "sem perder a essência" é a frase DELA, da bio do @dra.welleynne.
+           "Seu sorriso" puxa a odontologia pra dentro do título: a ficha do
+           Google classifica a clínica como clínico geral, não só estética. -->
+      <h1>Seu sorriso e sua beleza, <em class="brilho">sem perder a sua essência.</em></h1>
+      <p class="hero__sub">Odontologia e harmonização facial com a Dra. Welleynne Ananda Dias e uma equipe que cuida de você do primeiro contato ao pós-atendimento.</p>
+      <div class="acoes">
+        <a class="btn" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">
+          <svg class="btn__ico" aria-hidden="true"><use href="#i-zap"/></svg>Agendar avaliação
+        </a>
+      </div>
+      <p class="hero__nota"><span class="estrelas" aria-hidden="true">★★★★★</span><span><b>5,0 no Google</b> · 26 avaliações</span></p>
+    </div>
+  </div>
+  <span class="hero__rolar" aria-hidden="true">Role</span>
+</section>
+
+<!-- ===== faixa: a borda da folha que cobre o hero =====
+     HTML duplicado de proposito (o segundo trilho com aria-hidden): a pista anda
+     -50% e a emenda nao aparece. Mudou um item, muda nos DOIS trilhos. -->
+<section class="faixa" aria-label="Credenciais">
+  <div class="faixa__pista">
+    <div class="faixa__trilho">
+      <span class="faixa__item"><svg class="i" aria-hidden="true"><use href="#i-estrela"/></svg><b>5,0</b> no Google, 26 avaliações</span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i" aria-hidden="true"><use href="#i-brilho"/></svg>Odontologia e Harmonização Facial</span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i" aria-hidden="true"><use href="#i-escudo"/></svg>RT Dra. Welleynne Ananda Dias · <b>CRO-MG 54413</b></span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i" aria-hidden="true"><use href="#i-premio"/></svg><b>Top of Mind 2026</b> · DeFato</span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg>Major Lage de Baixo · Itabira/MG</span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i" aria-hidden="true"><use href="#i-acessivel"/></svg>Acessível para cadeira de rodas</span><span class="faixa__sep"></span>
+    </div>
+    <div class="faixa__trilho" aria-hidden="true">
+      <span class="faixa__item"><svg class="i"><use href="#i-estrela"/></svg><b>5,0</b> no Google, 26 avaliações</span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i"><use href="#i-brilho"/></svg>Odontologia e Harmonização Facial</span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i"><use href="#i-escudo"/></svg>RT Dra. Welleynne Ananda Dias · <b>CRO-MG 54413</b></span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i"><use href="#i-premio"/></svg><b>Top of Mind 2026</b> · DeFato</span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i"><use href="#i-pin"/></svg>Major Lage de Baixo · Itabira/MG</span><span class="faixa__sep"></span>
+      <span class="faixa__item"><svg class="i"><use href="#i-acessivel"/></svg>Acessível para cadeira de rodas</span><span class="faixa__sep"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== essencia =====
+     Os quatro titulos dos pilares sao as frases dos posts da propria clinica
+     ("Para nos cada paciente e unico e importante", "Atendimento personalizado",
+     "Uma clinica completa...", "Aqui voce vive uma experiencia completa"), e a
+     frase de missao e a legenda deles. Descricao de pilar e nossa: so fato
+     visivel nas fotos ou dito nas avaliacoes. -->
+<section class="secao" id="essencia">
+  <div class="env essencia">
+    <div>
+      <span class="olho">A experiência WA</span>
+      <h2>Para nós, cada paciente é <em>único e importante.</em></h2>
+      <p class="chamada">Na WA, a missão é transformar vidas com qualidade e dedicação, criando sorrisos e autoestima. Odontologia e harmonização facial caminham juntas aqui, sempre a partir de quem você é.</p>
+      <div class="pilares">
+        <div class="pilar">
+          <span class="pilar__ico"><svg class="i" aria-hidden="true"><use href="#i-digital"/></svg></span>
+          <div><h3>Cada paciente é único</h3><p>Antes de qualquer procedimento, vem a conversa: o que incomoda você e o que faz sentido no seu caso.</p></div>
+        </div>
+        <div class="pilar">
+          <span class="pilar__ico"><svg class="i" aria-hidden="true"><use href="#i-maos"/></svg></span>
+          <div><h3>Atendimento personalizado</h3><p>Hora marcada e acompanhamento antes e depois de cada consulta.</p></div>
+        </div>
+        <div class="pilar">
+          <span class="pilar__ico"><svg class="i" aria-hidden="true"><use href="#i-escudo"/></svg></span>
+          <div><h3>Uma clínica completa</h3><p>Sala de radiografia e central de esterilização dentro da própria clínica.</p></div>
+        </div>
+        <div class="pilar">
+          <span class="pilar__ico"><svg class="i" aria-hidden="true"><use href="#i-sofa"/></svg></span>
+          <div><h3>Uma experiência completa</h3><p>Recepção aconchegante, cantinho do café e ambientes pensados para o seu conforto.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="compo" data-px-pai aria-hidden="true">
+      <!-- a recepcao (teto ondulado aceso, lustre de aneis, logo na parede). Era o
+           sofa da sala de espera, trocado em 30/09/2026: "nao impactou" -->
+      <div class="compo__a" data-px="-0.05"><img src="assets/img/recepcao.webp" width="773" height="1020" loading="lazy" decoding="async" alt=""></div>
+      <span class="compo__anel" data-px="-0.18"></span>
+      <div class="compo__b" data-px="0.12"><img src="assets/img/px-logo.webp" width="330" height="260" loading="lazy" decoding="async" alt=""></div>
+      <div class="compo__selo" data-px="0.2">
+        <strong>5,0</strong>
+        <div><span class="estrelas">★★★★★</span><span>26 avaliações<br>no Google</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== tratamentos =====
+     ⚠ Lista montada do que a clinica MOSTRA publicamente: "Odontologia e
+     Harmonizacao Facial" no letreiro, destaques BOTOX e Labios no Instagram,
+     o par de olheiras, o post das lentes em resina, a sala de raio-x e a
+     esterilizacao nas fotos, "clinico geral" na ficha do Google. Nenhum
+     procedimento foi inventado, mas a lista completa CONFIRMA-SE COM ELA na
+     reuniao (pendencia no CLAUDE.md). Sem preco e sem promessa: regra do CFO. -->
+<section class="secao secao--noite tratamentos" id="tratamentos">
+  <div class="env">
+    <div class="cabeca">
+      <span class="olho">Tratamentos</span>
+      <h2>Odontologia e harmonização facial, <em>no mesmo endereço.</em></h2>
+      <p class="chamada">Tudo começa com uma avaliação. A partir dela, o plano é montado para você, com o que faz sentido para o seu rosto e para o seu sorriso.</p>
+    </div>
+
+    <div class="familias">
+      <div class="familia">
+        <div class="familia__cab"><svg class="i" aria-hidden="true"><use href="#i-brilho"/></svg><h3>Harmonização facial</h3></div>
+        <p class="familia__txt">Procedimentos planejados a partir dos seus traços, respeitando quem você é.</p>
+        <div class="trats">
+          <article class="trat" data-tilt>
+            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-gota"/></svg></span>
+            <h4>Toxina botulínica</h4>
+            <p>Indicada para linhas de expressão da testa e ao redor dos olhos, com dose planejada para cada rosto.</p>
+          </article>
+          <article class="trat" data-tilt>
+            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-labios"/></svg></span>
+            <h4>Preenchimento labial</h4>
+            <p>Contorno e volume dos lábios, em proporção com o restante do rosto.</p>
+          </article>
+          <article class="trat" data-tilt>
+            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-olho"/></svg></span>
+            <h4>Região dos olhos</h4>
+            <p>Avaliação e tratamento das olheiras e da região ao redor dos olhos.</p>
+          </article>
+          <article class="trat" data-tilt>
+            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-rosto"/></svg></span>
+            <h4>Contorno facial</h4>
+            <p>Queixo, mandíbula e proporções do rosto, pensados em conjunto.</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="familia">
+        <div class="familia__cab"><svg class="i" aria-hidden="true"><use href="#i-sorriso"/></svg><h3>Odontologia</h3></div>
+        <p class="familia__txt">Do cuidado de rotina ao sorriso novo, com estrutura completa dentro da clínica.</p>
+        <div class="trats">
+          <article class="trat" data-tilt>
+            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-gema"/></svg></span>
+            <h4>Lentes em resina</h4>
+            <p>Forma, cor e alinhamento dos dentes redesenhados com resina, planejados junto com você.</p>
+          </article>
+          <article class="trat" data-tilt>
+            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-escova"/></svg></span>
+            <h4>Clínica geral</h4>
+            <p>Consultas, limpeza e prevenção para manter a saúde da boca em dia.</p>
+          </article>
+          <article class="trat" data-tilt>
+            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-raiox"/></svg></span>
+            <h4>Radiografia na clínica</h4>
+            <p>Sala própria de raio X: o exame é feito ali mesmo, sem sair da clínica.</p>
+          </article>
+          <article class="trat" data-tilt>
+            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-escudo"/></svg></span>
+            <h4>Biossegurança</h4>
+            <p>Central de esterilização com autoclave e materiais selados em embalagem individual.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="extras">
+      <a class="extra" href="#equipe">
+        <svg class="i" aria-hidden="true"><use href="#i-flor"/></svg>
+        <div><b>Estética e fisioterapia dermatofuncional</b>Limpeza de pele, peeling, micropigmentação e remoção de tatuagem a laser com a esteticista Fernanda Souza, e redução progressiva dos pelos com a fisioterapeuta Fernanda Diniz.</div>
+        <svg class="i extra__seta" aria-hidden="true"><use href="#i-seta"/></svg>
+      </a>
+      <a class="extra" href="https://bio.site/wainstitute" target="_blank" rel="noopener">
+        <svg class="i" aria-hidden="true"><use href="#i-aula"/></svg>
+        <div><b>Para profissionais</b>Imersão presencial em HOF com a Dra. Welleynne. Entre na lista de interesse.</div>
+        <svg class="i extra__seta" aria-hidden="true"><use href="#i-seta"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== antes e depois =====
+     ⚠ DECISAO DO USUARIO em 30/09/2026: "vamos colocar o antes e depois... se
+     elas nao gostarem, a gente remove". O risco de conselho foi levantado na
+     Realce (Art. 44 do Codigo de Etica Odontologica x Res. CFO-196/2019) e
+     continua valendo aqui. O que reduz: os quatro pares ja estao publicados
+     pela propria clinica no Instagram; o de olheiras tem o "pode repostar" da
+     paciente por escrito; nome e CRO da RT em cada legenda; so antes e depois,
+     nunca durante; e o aviso de que resultado varia. Confirmar com ela a
+     autorizacao dos outros tres. -->
+<section class="secao secao--areia" id="resultados">
+  <div class="env">
+    <div class="cabeca cabeca--centro">
+      <span class="olho">Antes e depois</span>
+      <h2>Arraste e veja <em>de perto.</em></h2>
+      <p class="chamada">Casos de pacientes da WA, publicados pela própria clínica. Arraste a linha sobre cada foto para comparar.</p>
+    </div>
+
+    <div class="ads ads--2">
+      <figure class="ad" data-ad>
+        <!-- A foto de BAIXO e a DEPOIS; a cortada por cima e a ANTES (aparece a esquerda).
+             ⚠ ORDEM DESTE PAR DEFINIDA PELO USUARIO em 30/09/2026: o ANTES e a foto
+             da blusa vermelha (lado DIREITO da montagem original). A leitura da
+             montagem apontava o contrario (labio mais cheio e mandibula mais marcada
+             nessa foto). Confirmar com a Dra. na reuniao: antes e depois trocado e
+             propaganda enganosa. Desfazer = trocar os dois nomes de arquivo. -->
+        <div class="ad__quadro">
+          <img class="ad__img" src="assets/img/ad-rosto-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois do procedimento: rosto de frente">
+          <div class="ad__corte">
+            <img class="ad__img" src="assets/img/ad-rosto-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes do procedimento: rosto de frente">
+          </div>
+          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
+          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
+          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
+          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: harmonização facial, vista de frente. Arraste ou use as setas do teclado">
+        </div>
+        <figcaption class="ad__legenda"><b>Harmonização facial</b>Vista de frente · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
+      </figure>
+
+      <figure class="ad" data-ad>
+        <div class="ad__quadro">
+          <img class="ad__img" src="assets/img/ad-perfil-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois: perfil do rosto, com queixo e linha da mandíbula mais definidos">
+          <div class="ad__corte">
+            <img class="ad__img" src="assets/img/ad-perfil-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes: perfil do rosto, antes do procedimento">
+          </div>
+          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
+          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
+          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
+          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: perfil, região do queixo e da mandíbula. Arraste ou use as setas do teclado">
+        </div>
+        <figcaption class="ad__legenda"><b>Perfil</b>Região do queixo e da mandíbula · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
+      </figure>
+
+      <figure class="ad" data-ad>
+        <div class="ad__quadro">
+          <img class="ad__img" src="assets/img/ad-olhar-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois: região dos olhos com olheiras mais suaves">
+          <div class="ad__corte">
+            <img class="ad__img" src="assets/img/ad-olhar-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes: região dos olhos com olheiras marcadas">
+          </div>
+          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
+          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
+          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
+          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: região dos olhos. Arraste ou use as setas do teclado">
+        </div>
+        <figcaption class="ad__legenda"><b>Região dos olhos</b>Olheiras · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
+      </figure>
+
+      <figure class="ad" data-ad>
+        <div class="ad__quadro">
+          <img class="ad__img" src="assets/img/ad-sorriso-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois: sorriso com lentes em resina, dentes com forma e cor uniformes">
+          <div class="ad__corte">
+            <img class="ad__img" src="assets/img/ad-sorriso-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes: sorriso com dentes de formatos e tons diferentes">
+          </div>
+          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
+          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
+          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
+          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: lentes em resina. Arraste ou use as setas do teclado">
+        </div>
+        <figcaption class="ad__legenda"><b>Lentes em resina</b>Forma e cor dos dentes · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
+      </figure>
+    </div>
+
+    <!-- ⚠ Regra 4 do componente. Nao apagar. -->
+    <p class="ad__aviso">Resultados variam de pessoa para pessoa e dependem de avaliação individual. Responsável técnica: Dra. Welleynne Ananda Dias, CRO-MG 54413.</p>
+  </div>
+</section>
+
+<!-- ===== viva a experiencia WA: a faixa de parallax ===== -->
+<section class="exp" id="experiencia" data-px-pai>
+  <svg class="exp__mono" data-px="-0.1" aria-hidden="true"><use href="#wa-mono"/></svg>
+  <div class="poeira" aria-hidden="true">
+    <i style="--x:12%;--y:62%;--d:7s;--a:.2s"></i><i style="--x:22%;--y:30%;--d:9s;--a:1.4s;--t:2px"></i>
+    <i style="--x:34%;--y:78%;--d:8s;--a:2.6s"></i><i style="--x:46%;--y:18%;--d:10s;--a:.8s;--t:2px"></i>
+    <i style="--x:58%;--y:70%;--d:7.5s;--a:3.1s"></i><i style="--x:67%;--y:26%;--d:9.5s;--a:1.9s;--t:4px"></i>
+    <i style="--x:78%;--y:58%;--d:8.5s;--a:.5s;--t:2px"></i><i style="--x:88%;--y:36%;--d:7s;--a:2.2s"></i>
+    <i style="--x:40%;--y:48%;--d:11s;--a:4s;--t:2px"></i><i style="--x:62%;--y:88%;--d:9s;--a:3.6s"></i>
+  </div>
+  <div class="exp__texto">
+    <!-- as duas frases sao da bio do @wa.institute -->
+    <h2>Viva a experiência <em class="brilho" data-brilho>WA</em></h2>
+    <p>Seu sorriso, sua beleza, sua saúde e seu bem-estar.</p>
+    <div class="acoes">
+      <a class="btn" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">
+        <svg class="btn__ico" aria-hidden="true"><use href="#i-zap"/></svg>Agendar minha avaliação
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== por dentro da WA ===== -->
+<section class="secao" id="clinica">
+  <div class="env galeria">
+    <div class="galeria__cab">
+      <div class="cabeca">
+        <span class="olho">A clínica</span>
+        <h2>Por dentro <em>da WA</em></h2>
+        <p class="chamada">Da fachada iluminada ao consultório, cada ambiente foi pensado para receber você com conforto e privacidade.</p>
+      </div>
+    </div>
+
+    <div class="galeria__palco">
+      <div class="palco" data-palco>
+        <div class="palco__quadro">
+          <img class="palco__foto" data-foto src="assets/img/g-fachada.webp" width="880" height="880" loading="lazy" decoding="async" alt="Fachada da WA Orofacial à noite, com o letreiro dourado e o WA gigante na parede">
+          <canvas class="palco__tela" data-tela aria-hidden="true"></canvas>
+          <p class="palco__conta" aria-hidden="true"><b data-atual>01</b> / <span data-total>06</span></p>
+          <button class="palco__seta palco__seta--ant" type="button" data-ant aria-label="Ambiente anterior"><svg class="i" aria-hidden="true"><use href="#i-esq"/></svg></button>
+          <button class="palco__seta palco__seta--prox" type="button" data-prox aria-label="Próximo ambiente"><svg class="i" aria-hidden="true"><use href="#i-dir"/></svg></button>
+        </div>
+      </div>
+      <!-- estado sem JS: as seis fotos em grade -->
+      <div class="galeria-grade">
+        <img src="assets/img/g-fachada.webp" width="880" height="880" loading="lazy" decoding="async" alt="Fachada da WA Orofacial à noite">
+        <img src="assets/img/g-recepcao.webp" width="773" height="773" loading="lazy" decoding="async" alt="Recepção com o balcão dourado e o lustre de anéis">
+        <img src="assets/img/g-espera.webp" width="768" height="768" loading="lazy" decoding="async" alt="Sala de espera com sofá de veludo verde">
+        <img src="assets/img/g-avaliacao.webp" width="790" height="790" loading="lazy" decoding="async" alt="Sala de avaliação com o logotipo dourado na parede de mármore">
+        <img src="assets/img/g-consultorio.webp" width="820" height="820" loading="lazy" decoding="async" alt="Consultório odontológico">
+        <img src="assets/img/g-estrutura.webp" width="572" height="572" loading="lazy" decoding="async" alt="Central de esterilização com autoclave">
+      </div>
+    </div>
+
+    <ol class="comodos" data-comodos aria-label="Ambientes da clínica">
+      <li><button class="comodo" type="button" data-item data-img="assets/img/g-fachada.webp" data-alt="Fachada da WA Orofacial à noite, com o letreiro dourado e o WA gigante na parede"><span class="comodo__n">01</span><span class="comodo__txt"><b>Fachada</b><small>O letreiro dourado, aceso à noite</small></span><span class="comodo__linha"><i></i></span></button></li>
+      <li><button class="comodo" type="button" data-item data-img="assets/img/g-recepcao.webp" data-alt="Recepção com o balcão ripado de filete dourado, o lustre de anéis e o logotipo na parede"><span class="comodo__n">02</span><span class="comodo__txt"><b>Recepção</b><small>Onde a experiência começa</small></span><span class="comodo__linha"><i></i></span></button></li>
+      <li><button class="comodo" type="button" data-item data-img="assets/img/g-espera.webp" data-alt="Sala de espera com sofá curvo de veludo verde e cantinho do café"><span class="comodo__n">03</span><span class="comodo__txt"><b>Sala de espera</b><small>Sofá de veludo e cantinho do café</small></span><span class="comodo__linha"><i></i></span></button></li>
+      <li><button class="comodo" type="button" data-item data-img="assets/img/g-avaliacao.webp" data-alt="Sala de avaliação com o logotipo dourado da WA na parede de mármore"><span class="comodo__n">04</span><span class="comodo__txt"><b>Sala de avaliação</b><small>Onde o seu plano é desenhado</small></span><span class="comodo__linha"><i></i></span></button></li>
+      <li><button class="comodo" type="button" data-item data-img="assets/img/g-consultorio.webp" data-alt="Consultório odontológico com cadeira, prateleiras e luminária"><span class="comodo__n">05</span><span class="comodo__txt"><b>Consultório</b><small>Atendimento reservado</small></span><span class="comodo__linha"><i></i></span></button></li>
+      <li><button class="comodo" type="button" data-item data-img="assets/img/g-estrutura.webp" data-alt="Central de esterilização com autoclave e seladora"><span class="comodo__n">06</span><span class="comodo__txt"><b>Esterilização</b><small>Biossegurança em cada material</small></span><span class="comodo__linha"><i></i></span></button></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===== quem cuida =====
+     Nome e CRO como ela assina na bio da clinica ("RT: Dra. Welleynne Ananda
+     Dias 54413"). Grafia com DOIS "n", como no @dra.welleynne; as avaliacoes
+     escrevem "Welleyne" e ficam como estao, porque sao citacao literal.
+     ⚠ Sem a palavra "especialista": nao foi confirmado registro de
+     especialidade no CRO (Art. 24 do Codigo de Etica). -->
+<section class="secao secao--noite quem" id="quem-cuida">
+  <div class="quem__banda" data-px-pai>
+    <img class="quem__retrato" data-px="0.1" src="assets/img/dra-retrato.webp" width="1320" height="800" loading="lazy" decoding="async" alt="Retrato em preto e branco da Dra. Welleynne Ananda Dias">
+    <div class="env quem__banda-txt">
+      <span class="olho">Quem cuida de você</span>
+      <h2>Dra. Welleynne <em>Ananda Dias</em></h2>
+      <p class="quem__cargo">Cirurgiã-dentista · CRO-MG 54413</p>
+      <p class="quem__frase">Harmonização facial sem perder a essência.</p>
+      <span class="quem__fonte">Dra. Welleynne, na apresentação do perfil dela no Instagram</span>
+    </div>
+  </div>
+
+  <div class="env quem__grade">
+    <div class="quem__fotos" data-px-pai>
+      <div class="quem__premio" data-px="-0.04"><img src="assets/img/dra-premio.webp" width="720" height="960" loading="lazy" decoding="async" alt="Dra. Welleynne segurando o troféu Top of Mind 2026, do DeFato"></div>
+      <div class="quem__aula" data-px="0.14"><img src="assets/img/dra-aula.webp" width="720" height="960" loading="lazy" decoding="async" alt="Dra. Welleynne apresentando um caso numa aula para profissionais"></div>
+      <div class="quem__medalha" data-px="0.24">
+        <svg class="i" aria-hidden="true"><use href="#i-premio"/></svg>
+        <div><b>Top of Mind 2026</b><span>DeFato</span></div>
+      </div>
+    </div>
+    <div>
+      <ul class="fatos">
+        <li><svg class="i" aria-hidden="true"><use href="#i-coroa"/></svg><span><b>Fundadora e responsável técnica</b> da WA Orofacial Institute.</span></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-aula"/></svg><span><b>Ministra a Imersão Presencial em HOF</b>, para profissionais que querem se aprofundar em harmonização orofacial.</span></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-premio"/></svg><span><b>Premiada no Top of Mind 2026</b>, do DeFato.</span></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-maos"/></svg><span>Atende ao lado de uma <b>equipe com dentistas, esteticista e fisioterapeuta</b>, apresentada logo abaixo.</span></li>
+      </ul>
+      <div class="acoes">
+        <a class="btn btn--linha" href="https://www.instagram.com/dra.welleynne/" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-insta"/></svg>@dra.welleynne</a>
+        <a class="btn btn--linha" href="https://bio.site/wainstitute" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-aula"/></svg>Imersão em HOF</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== equipe =====
+     Pedido do usuario em 30/09/2026. Tudo sai dos posts da propria clinica
+     (Fotos e Imagens/Equipe/):
+     - Fernanda Souza: "esteticista, responsavel pelos atendimentos de" limpeza
+       de pele, peeling, micropigmentacao labial e de sobrancelhas e remocao de
+       tatuagem a laser (carrossel de dois cards)
+     - Fernanda Diniz: "fisioterapeuta dermatofuncional"; "Agora na WA:
+       tratamento de reducao progressiva dos pelos". ⚠ O CREFITO dela nao
+       aparece em material nenhum: pedir o numero
+     - Livinha: "responsavel por auxiliar nos procedimentos de harmonizacao,
+       proporcionando ainda mais conforto para voces". ⚠ O POST E DE 14/08/2023:
+       confirmar se ela continua na equipe e o nome que ela quer no site
+     A chamada e a legenda do post da Fernanda Diniz. Faltam os dentistas da
+     equipe (citados numa avaliacao, sem nome nem foto ainda). -->
+<section class="secao" id="equipe">
+  <div class="env">
+    <div class="cabeca cabeca--centro">
+      <span class="olho">A equipe</span>
+      <h2>Profissionais unidos pelo <em>mesmo propósito.</em></h2>
+      <p class="chamada">A WA cresce, evolui e segue reunindo profissionais que compartilham do mesmo propósito. Conheça quem cuida de você ao lado da Dra. Welleynne.</p>
+    </div>
+
+    <div class="time">
+      <article class="membro" data-px-pai>
+        <div class="membro__foto">
+          <span class="membro__moldura" data-px="0.06" aria-hidden="true"></span>
+          <div class="membro__img"><img src="assets/img/equipe-souza.webp" width="600" height="800" loading="lazy" decoding="async" alt="Fernanda Souza, esteticista da WA Orofacial"></div>
+          <span class="membro__n" aria-hidden="true">01</span>
+        </div>
+        <h3>Fernanda Souza</h3>
+        <p class="membro__cargo"><svg class="i" aria-hidden="true"><use href="#i-flor"/></svg>Esteticista</p>
+        <p class="membro__txt">Responsável pelos atendimentos de estética da clínica.</p>
+        <ul class="membro__chips" aria-label="Atendimentos da Fernanda Souza">
+          <li>Limpeza de pele</li>
+          <li>Peeling</li>
+          <li>Micropigmentação labial</li>
+          <li>Micropigmentação de sobrancelhas</li>
+          <li>Remoção de tatuagem a laser</li>
+        </ul>
+      </article>
+
+      <article class="membro" data-px-pai>
+        <div class="membro__foto">
+          <span class="membro__moldura" data-px="0.1" aria-hidden="true"></span>
+          <div class="membro__img"><img src="assets/img/equipe-diniz.webp" width="600" height="800" loading="lazy" decoding="async" alt="Fernanda Diniz, fisioterapeuta dermatofuncional da WA Orofacial, na recepção da clínica"></div>
+          <span class="membro__n" aria-hidden="true">02</span>
+        </div>
+        <h3>Fernanda Diniz</h3>
+        <p class="membro__cargo"><svg class="i" aria-hidden="true"><use href="#i-mao"/></svg>Fisioterapeuta dermatofuncional</p>
+        <p class="membro__txt">Responsável pelo tratamento de redução progressiva dos pelos.</p>
+      </article>
+
+      <article class="membro" data-px-pai>
+        <div class="membro__foto">
+          <span class="membro__moldura" data-px="0.06" aria-hidden="true"></span>
+          <div class="membro__img"><img src="assets/img/equipe-livia.webp" width="600" height="800" loading="lazy" decoding="async" alt="Livinha, da equipe de harmonização da WA Orofacial"></div>
+          <span class="membro__n" aria-hidden="true">03</span>
+        </div>
+        <h3>Livinha</h3>
+        <p class="membro__cargo"><svg class="i" aria-hidden="true"><use href="#i-brilho"/></svg>Equipe de harmonização</p>
+        <p class="membro__txt">Auxilia nos procedimentos de harmonização, proporcionando ainda mais conforto para você.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== avaliacoes =====
+     Triagem da ficha do Google (30/09/2026, 26 avaliacoes, nota 5,0):
+     - FORA por superlativo/comparacao: Cristiane Milanio ("os melhores
+       profissionais que nossa cidade oferece") e Ana Carla Gorino ("o melhor
+       atendimento da cidade"). Regra do CFO, vale mesmo na boca do paciente.
+     - FORA: Ricardo Alencar ("eu que pintei esta clinica"), Bruna Vieira
+       (informal demais), Edilene Dias e Ana Claudia Santos (curtas).
+     - CORTADA com (…): Cecilia, sai "atualizada sempre com as melhores
+       solucoes" e "nunca ouvi ninguem falar mal"; France, sai o trecho de
+       resultado ("superaram minhas expectativas").
+     - Nome como PRIMEIRO NOME + INICIAL: mitigacao do Art. 44, VI achada na
+       auditoria da Realce (paciente nomeado "para autopromocao").
+     Sem aggregateRating no JSON-LD: nota de terceiro marcada como do site
+     vai contra a diretriz do Google. -->
+<section class="secao secao--esmeralda avaliacoes-secao" id="avaliacoes">
+  <div class="env">
+    <div class="cabeca cabeca--centro">
+      <span class="olho">Avaliações no Google</span>
+      <h2>Quem passa pela WA <em>conta como foi.</em></h2>
+    </div>
+
+    <div class="placar" data-placar>
+      <div class="placar__nota" data-conta data-alvo="5.0" data-casas="1">5,0</div>
+      <div>
+        <span class="estrelas-med" data-estrelas aria-hidden="true"><span class="vazias">★★★★★</span><span class="cheias">★★★★★</span></span>
+        <span class="placar__txt">Nota máxima em <b data-conta data-alvo="26" data-casas="0">26</b> avaliações de pacientes</span>
+      </div>
+      <span class="placar__fonte">Fonte: Google · setembro de 2026</span>
+    </div>
+
+    <div class="carrossel" data-carrossel>
+      <div class="carrossel__janela">
+        <div class="avals" data-trilho>
+          <article class="aval">
+            <svg class="i" aria-hidden="true"><use href="#i-aspas"/></svg>
+            <blockquote>Ser cuidada pela WA é ter o privilégio de ser mimada, ser bem amparada não só dentro do consultório mas antes da consulta e no pós também. Equipe preparada (…) desde a recepção até os dentistas. Sou paciente há mais de 3 anos.</blockquote>
+            <div class="aval__quem"><span class="aval__ini" aria-hidden="true">CF</span><div><b>Cecília F.</b><span class="fonte">Google</span></div></div>
+          </article>
+          <article class="aval">
+            <svg class="i" aria-hidden="true"><use href="#i-aspas"/></svg>
+            <blockquote>Desde a recepção até os procedimentos, tudo foi conduzido com muita atenção, profissionalismo e cuidado. Um elogio especial à Dra. Welleyne, que é extremamente competente, detalhista e acolhedora.</blockquote>
+            <div class="aval__quem"><span class="aval__ini" aria-hidden="true">NA</span><div><b>Núbia A.</b><span class="fonte">Google</span></div></div>
+          </article>
+          <article class="aval">
+            <svg class="i" aria-hidden="true"><use href="#i-aspas"/></svg>
+            <blockquote>Excelente espaço... o profissionalismo e qualificação dos profissionais é o grande diferencial. Um lugar que acolhe a gente desde o atendimento até o pós procedimento.</blockquote>
+            <div class="aval__quem"><span class="aval__ini" aria-hidden="true">LS</span><div><b>Luciléia S.</b><span class="fonte">Google · Local Guide</span></div></div>
+          </article>
+          <article class="aval">
+            <svg class="i" aria-hidden="true"><use href="#i-aspas"/></svg>
+            <blockquote>Desde o atendimento inicial, fui tratada com muito profissionalismo e cuidado. A equipe foi atenciosa, explicou todo o processo de forma clara e me deixou muito confortável durante cada etapa.</blockquote>
+            <div class="aval__quem"><span class="aval__ini" aria-hidden="true">FJ</span><div><b>France J.</b><span class="fonte">Google</span></div></div>
+          </article>
+          <article class="aval">
+            <svg class="i" aria-hidden="true"><use href="#i-aspas"/></svg>
+            <blockquote>Clínica perfeita. Ótima estrutura, e ótimos profissionais. Estou bem realizada com todos os procedimentos que já precisei fazer na clínica.</blockquote>
+            <div class="aval__quem"><span class="aval__ini" aria-hidden="true">CO</span><div><b>Camila O.</b><span class="fonte">Google</span></div></div>
+          </article>
+          <article class="aval">
+            <svg class="i" aria-hidden="true"><use href="#i-aspas"/></svg>
+            <blockquote>O local é impecável, o atendimento é excelente, todo mundo muito profissional e simpático. Recomendo!!!</blockquote>
+            <div class="aval__quem"><span class="aval__ini" aria-hidden="true">RF</span><div><b>Robert F.</b><span class="fonte">Google</span></div></div>
+          </article>
+          <article class="aval">
+            <svg class="i" aria-hidden="true"><use href="#i-aspas"/></svg>
+            <blockquote>Local lindo e aconchegante, equipe extremamente simpática e profissional.</blockquote>
+            <div class="aval__quem"><span class="aval__ini" aria-hidden="true">NT</span><div><b>Nayara T.</b><span class="fonte">Google</span></div></div>
+          </article>
+          <article class="aval">
+            <svg class="i" aria-hidden="true"><use href="#i-aspas"/></svg>
+            <blockquote>Atendimento humanizado, de ótima qualidade.</blockquote>
+            <div class="aval__quem"><span class="aval__ini" aria-hidden="true">DV</span><div><b>Daniel V.</b><span class="fonte">Google</span></div></div>
+          </article>
+        </div>
+      </div>
+      <div class="carrossel__controles">
+        <button class="seta" type="button" data-anterior aria-label="Avaliação anterior"><svg class="i" aria-hidden="true"><use href="#i-esq"/></svg></button>
+        <div class="pontos" data-pontos role="group" aria-label="Escolher avaliação"></div>
+        <button class="seta" type="button" data-proximo aria-label="Próxima avaliação"><svg class="i" aria-hidden="true"><use href="#i-dir"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== instagram =====
+     Cinco posts reais do @wa.institute, em leque (componente da Realce).
+     O do centro e o de maior peso visual e o unico inteiro no celular: por
+     isso e o "Bem vindos a WA", com a fachada e a logo. O post-4 e o do "pode
+     repostar" da paciente: e a propria clinica mostrando a autorizacao. -->
+<section class="secao insta" id="instagram">
+  <div class="env">
+    <div class="cabeca cabeca--centro">
+      <span class="olho">No Instagram</span>
+      <h2>O dia a dia <em>da clínica</em></h2>
+      <p class="chamada">Bastidores, casos e novidades da WA, publicados no perfil oficial da clínica.</p>
+    </div>
+    <div class="insta__leque">
+      <a class="insta__item" style="--i:-2;--dy:18;--r:-4deg;--n:.86;z-index:10" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><img src="assets/img/instagram/post-1.webp" width="540" height="720" loading="lazy" decoding="async" alt="Publicação do Instagram: consultório odontológico, com a frase “Atendimento personalizado”"></a>
+      <a class="insta__item" style="--i:-1;--dy:38;--r:-2deg;--n:.94;z-index:20" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><img src="assets/img/instagram/post-2.webp" width="540" height="720" loading="lazy" decoding="async" alt="Publicação do Instagram: apresentação da esteticista Fernanda Souza"></a>
+      <a class="insta__item" style="--i:0;--dy:4;--r:0deg;--n:1;z-index:40" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><img src="assets/img/instagram/post-3.webp" width="540" height="720" loading="lazy" decoding="async" alt="Publicação do Instagram: fachada da WA Orofacial, com a frase “Bem-vindos à WA”"></a>
+      <a class="insta__item" style="--i:1;--dy:30;--r:2deg;--n:.94;z-index:20" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><img src="assets/img/instagram/post-4.webp" width="540" height="720" loading="lazy" decoding="async" alt="Publicação do Instagram: retrato da Dra. Welleynne e a mensagem de uma paciente autorizando a publicação do resultado"></a>
+      <a class="insta__item" style="--i:2;--dy:12;--r:4deg;--n:.86;z-index:10" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><img src="assets/img/instagram/post-5.webp" width="540" height="720" loading="lazy" decoding="async" alt="Publicação do Instagram: recepção da clínica, com a frase “Aqui você vive uma experiência completa”"></a>
+    </div>
+    <div class="acoes">
+      <a class="btn" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-insta"/></svg>@wa.institute</a>
+      <a class="btn btn--escuro" href="https://www.instagram.com/dra.welleynne/" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-insta"/></svg>@dra.welleynne</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== duvidas ===== -->
+<section class="secao secao--areia" id="duvidas">
+  <div class="env">
+    <div class="cabeca cabeca--centro">
+      <span class="olho">Dúvidas frequentes</span>
+      <h2>Antes de <em>marcar</em></h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Como faço para agendar?<svg class="i" aria-hidden="true"><use href="#i-mais"/></svg></summary>
+        <p>Pelo WhatsApp <b>(31) 3840-3975</b>, que é o mesmo número do telefone da clínica. O atendimento é de segunda a sexta, das 8h30 às 19h, e aos sábados, das 9h às 13h.</p>
+      </details>
+      <details>
+        <summary>A WA faz odontologia e harmonização no mesmo lugar?<svg class="i" aria-hidden="true"><use href="#i-mais"/></svg></summary>
+        <p>Sim. Os dois atendimentos acontecem no mesmo endereço, com sala de radiografia e central de esterilização dentro da própria clínica.</p>
+      </details>
+      <details>
+        <summary>A clínica tem acessibilidade?<svg class="i" aria-hidden="true"><use href="#i-mais"/></svg></summary>
+        <p>Tem. Entrada, banheiro e estacionamento são acessíveis para cadeira de rodas.</p>
+      </details>
+      <details>
+        <summary>Quem é a responsável técnica?<svg class="i" aria-hidden="true"><use href="#i-mais"/></svg></summary>
+        <p>A Dra. Welleynne Ananda Dias, cirurgiã-dentista inscrita no CRO-MG sob o número 54413.</p>
+      </details>
+      <details>
+        <summary>Onde fica a clínica?<svg class="i" aria-hidden="true"><use href="#i-mais"/></svg></summary>
+        <p>Na Rua Armindo Costa Lage, 138, bairro Major Lage de Baixo, em Itabira/MG. A fachada tem o letreiro dourado da WA, aceso à noite.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== onde fica =====
+     Horario e acessibilidade copiados da ficha do Google em 30/09/2026. Se a
+     ficha mudar, muda aqui junto: o site nao pode virar a fonte desatualizada. -->
+<section class="secao secao--noite" id="onde">
+  <div class="env onde">
+    <div>
+      <span class="olho">Onde fica</span>
+      <h2>Major Lage de Baixo, <em>Itabira</em></h2>
+      <ul class="dados" style="margin-top:2rem">
+        <li><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg><div><b>Endereço</b><span>Rua Armindo Costa Lage, 138, Major Lage de Baixo, Itabira/MG, <span style="white-space:nowrap">35900-212</span></span></div></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-relogio"/></svg><div><b>Horário</b>
+          <dl class="horas"><dt>Segunda a sexta</dt><dd>8h30 às 19h</dd><dt>Sábado</dt><dd>9h às 13h</dd><dt>Domingo</dt><dd>Fechado</dd></dl></div></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-fone"/></svg><div><b>Telefone e WhatsApp</b><span>(31) 3840-3975</span></div></li>
+        <li><svg class="i" aria-hidden="true"><use href="#i-acessivel"/></svg><div><b>Acessibilidade</b><span>Entrada, banheiro e estacionamento acessíveis para cadeira de rodas</span></div></li>
+      </ul>
+      <div class="acoes">
+        <a class="btn" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener"><svg class="btn__ico" aria-hidden="true"><use href="#i-zap"/></svg>Agendar pelo WhatsApp</a>
+        <a class="btn btn--linha" href="https://www.google.com/maps/search/?api=1&amp;query=WA+Orofacial+Institute+Itabira" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg>Como chegar</a>
+      </div>
+    </div>
+    <div class="onde__fotos">
+      <div class="onde__foto"><img src="assets/img/onde-fachada.webp" width="1200" height="900" loading="lazy" decoding="async" alt="Fachada da WA Orofacial vista da rua, com o letreiro dourado e a porta de vidro"></div>
+      <div class="onde__mapa">
+        <iframe src="https://www.google.com/maps?q=WA+Orofacial+Institute,+R.+Armindo+Costa+Lage,+138,+Itabira+-+MG&amp;z=17&amp;output=embed"
+                title="Mapa: WA Orofacial Institute, Rua Armindo Costa Lage, 138, Itabira/MG" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="rodape">
+  <div class="env rodape__grade">
+    <div>
+      <a class="rodape__marca" href="#topo" aria-label="WA Orofacial Institute, voltar ao início">
+        <svg class="marca__mono" aria-hidden="true"><use href="#wa-mono"/></svg>
+        <span class="marca__texto">
+          <svg class="marca__palavra" aria-hidden="true"><use href="#wa-palavra"/></svg>
+          <span class="marca__sub">Institute</span>
+        </span>
+      </a>
+      <p>Seu sorriso, sua beleza, sua saúde e seu bem-estar. Odontologia e harmonização facial em Itabira/MG.</p>
+      <div class="sociais">
+        <a class="social" href="https://wa.me/553138403975" target="_blank" rel="noopener" aria-label="Falar no WhatsApp"><svg class="i" aria-hidden="true"><use href="#i-zap"/></svg></a>
+        <a class="social" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener" aria-label="Instagram da clínica, @wa.institute"><svg class="i" aria-hidden="true"><use href="#i-insta"/></svg></a>
+        <a class="social" href="https://www.google.com/maps/search/?api=1&amp;query=WA+Orofacial+Institute+Itabira" target="_blank" rel="noopener" aria-label="Ver no Google Maps"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <h4>Contato</h4>
+      <ul class="rodape__lista">
+        <li><a href="https://wa.me/553138403975" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-zap"/></svg>(31) 3840-3975</a></li>
+        <li><a href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-insta"/></svg>@wa.institute</a></li>
+        <li><a href="https://www.instagram.com/dra.welleynne/" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-insta"/></svg>@dra.welleynne</a></li>
+        <li><a href="https://www.google.com/maps/search/?api=1&amp;query=WA+Orofacial+Institute+Itabira" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg>Major Lage de Baixo, Itabira/MG</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Navegue</h4>
+      <ul class="rodape__lista">
+        <li><a href="#tratamentos">Tratamentos</a></li>
+        <li><a href="#resultados">Antes e depois</a></li>
+        <li><a href="#clinica">A clínica</a></li>
+        <li><a href="#quem-cuida">Quem cuida</a></li>
+        <li><a href="#equipe">Equipe</a></li>
+        <li><a href="#avaliacoes">Avaliações</a></li>
+        <li><a href="#onde">Onde fica</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="env rodape__rt">
+    <p>Responsável técnica: <b>Dra. Welleynne Ananda Dias, cirurgiã-dentista, CRO-MG 54413</b>. WA Orofacial Institute, Itabira/MG.</p>
+    <p>As informações deste site têm caráter informativo e não substituem a avaliação presencial. Resultados variam de pessoa para pessoa.</p>
+  </div>
+</footer>
+
+<a class="zap" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener" aria-label="Agendar pelo WhatsApp">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-zap"/></svg><span>Agendar</span>
+</a>
+
+<!-- ====================================================================
+     SCRIPT 1: o que a pagina inteira usa. Abertura, topo, progresso, hero
+     coberto, parallax, tilt, brilho, placar e carrossel.
+     Regra: se o JS nao rodar, a pagina continua completa e legivel.
+     ==================================================================== -->
+<script>
+(function(){
+  "use strict";
+  var d = document.documentElement;
+  var reduzido = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var mouse = !!(window.matchMedia && matchMedia("(hover: hover) and (pointer: fine)").matches);
+  var temObs = "IntersectionObserver" in window;
+  function $(s, r){ return (r || document).querySelector(s); }
+  function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+
+  /* ---------- 1. abertura ---------- */
+  var intro = $("#intro");
+  if (intro && d.classList.contains("com-intro")) {
+    var saiu = false, calma = d.classList.contains("intro-calma");
+    var sair = function(){
+      if (saiu) return;
+      saiu = true;
+      intro.classList.add("sai");
+      d.classList.add("pronto");
+      if (!calma) d.classList.add("entrada");
+      /* as portas estao na metade aos ~600ms: e ai que a rolagem volta */
+      setTimeout(function(){ d.classList.remove("com-intro"); }, 620);
+      setTimeout(function(){ if (intro.parentNode) intro.parentNode.removeChild(intro); }, 1500);
+      try { sessionStorage.setItem("wa-abertura", "1"); } catch(e){}
+    };
+    /* o reflexo e SMIL (anda dentro do desenho da logo); o CSS nao alcanca */
+    var reflexo = document.getElementById("reflexoAnda");
+    if (reflexo && reflexo.beginElement && !calma) setTimeout(function(){ try { reflexo.beginElement(); } catch(e){} }, 2150);
+    setTimeout(sair, calma ? 1500 : 3050);
+    setTimeout(sair, 6000);   /* rede lenta ou aba em segundo plano: nunca prender ninguem */
+    intro.addEventListener("click", sair);
+    document.addEventListener("keydown", function(e){ if (e.key === "Escape") sair(); });
+  }
+
+  /* ---------- 2. topo, barra de progresso e botao flutuante ---------- */
+  var topo = $(".topo"), barra = $(".progresso"), zap = $(".zap");
+  function aoRolar(){
+    var y = window.pageYOffset || d.scrollTop || 0;
+    var max = d.scrollHeight - innerHeight;
+    if (topo) topo.classList.toggle("topo--rolado", y > 24);
+    if (barra) barra.style.transform = "scaleX(" + (max > 0 ? Math.min(y / max, 1) : 0).toFixed(4) + ")";
+    if (zap) zap.classList.toggle("zap--on", y > innerHeight * .7);
+  }
+  addEventListener("scroll", aoRolar, { passive: true });
+  aoRolar();
+
+  /* ---------- 3. hero coberto pelo scroll ----------
+     A altura fica em cache: por quadro so se le window.scrollY, que nao
+     obriga o navegador a recalcular layout. */
+  var hero = $(".hero");
+  if (hero) {
+    var alturaHero = 0, inicio = 0, pedidoH = false;
+    var mede = function(){
+      alturaHero = hero.offsetHeight;
+      hero.style.setProperty("--hero-topo", Math.min(0, innerHeight - alturaHero) + "px");
+      inicio = Math.max(0, alturaHero - innerHeight);
+      cobre();
+    };
+    var cobre = function(){
+      pedidoH = false;
+      var p = ((window.pageYOffset || 0) - inicio) / innerHeight;
+      p = p < 0 ? 0 : p > 1 ? 1 : p;
+      hero.style.setProperty("--cobre", reduzido ? (p >= 1 ? 1 : 0) : p.toFixed(3));
+      hero.classList.toggle("hero--coberto", p >= 1);
+    };
+    addEventListener("scroll", function(){ if (!pedidoH) { pedidoH = true; requestAnimationFrame(cobre); } }, { passive: true });
+    addEventListener("resize", mede);
+    mede();
+  }
+
+  /* ---------- 4. parallax (o do site das placas) ----------
+     Cada peca anda (distancia do centro da tela) x velocidade, na propriedade
+     `translate`: assim nao briga com rotate nem com o transform do tilt.
+     Le tudo primeiro e escreve depois, pra nao alternar leitura e escrita de
+     layout no mesmo quadro. No celular a velocidade cai pela metade. */
+  var camadas = reduzido ? [] : $$("[data-px]").map(function(el){
+    return { el: el, v: parseFloat(el.getAttribute("data-px")) || 0, pai: el.closest("[data-px-pai]") || el.closest("section") || el.parentElement };
+  });
+  var pedidoP = false;
+  function parallax(){
+    pedidoP = false;
+    var meio = innerHeight / 2, fator = innerWidth < 700 ? .5 : 1;
+    var desl = camadas.map(function(c){
+      var r = c.pai.getBoundingClientRect();
+      if (r.bottom < -300 || r.top > innerHeight + 300) return null;
+      return ((r.top + r.height / 2) - meio) * c.v * fator;
+    });
+    camadas.forEach(function(c, i){ if (desl[i] !== null) c.el.style.translate = "0 " + desl[i].toFixed(1) + "px"; });
+  }
+  if (camadas.length) {
+    var pedeParallax = function(){ if (!pedidoP) { pedidoP = true; requestAnimationFrame(parallax); } };
+    addEventListener("scroll", pedeParallax, { passive: true });
+    addEventListener("resize", pedeParallax);
+    parallax();
+  }
+
+  /* ---------- 5. tilt 3D nos cards de tratamento (so com mouse) ---------- */
+  if (mouse && !reduzido) {
+    $$("[data-tilt]").forEach(function(el){
+      el.addEventListener("pointermove", function(e){
+        var r = el.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        el.style.setProperty("--ry", ((x - .5) * 10).toFixed(2) + "deg");
+        el.style.setProperty("--rx", ((.5 - y) * 10).toFixed(2) + "deg");
+        el.style.setProperty("--mx", (x * 100).toFixed(1) + "%");
+        el.style.setProperty("--my", (y * 100).toFixed(1) + "%");
+      });
+      el.addEventListener("pointerleave", function(){
+        el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg");
+      });
+    });
+  }
+
+  /* ---------- 6. brilho dourado que passa uma vez ---------- */
+  var brilhos = $$("[data-brilho]");
+  if (brilhos.length && temObs && !reduzido) {
+    var obsB = new IntersectionObserver(function(itens){
+      itens.forEach(function(it){ if (it.isIntersecting) { it.target.classList.add("brilhou"); obsB.unobserve(it.target); } });
+    }, { threshold: .6 });
+    brilhos.forEach(function(el){ obsB.observe(el); });
+  }
+
+  /* ---------- 7. placar que conta ---------- */
+  function formata(v, casas){ return casas ? v.toFixed(casas).replace(".", ",") : String(Math.round(v)); }
+  function conta(el){
+    var alvo = parseFloat(el.getAttribute("data-alvo")), casas = parseInt(el.getAttribute("data-casas") || "0", 10);
+    if (reduzido) { el.textContent = formata(alvo, casas); return; }
+    var t0 = null, dur = 1500;
+    requestAnimationFrame(function passo(t){
+      if (t0 === null) t0 = t;
+      var p = Math.min((t - t0) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = formata(alvo * e, casas);
+      if (p < 1) requestAnimationFrame(passo);
+    });
+  }
+  var placar = $("[data-placar]");
+  if (placar) {
+    var dispara = function(){
+      $$("[data-conta]", placar).forEach(conta);
+      var est = $("[data-estrelas]", placar);
+      if (est) est.classList.add("contou");
+    };
+    if (!temObs) dispara();
+    else {
+      var obsP = new IntersectionObserver(function(is){
+        is.forEach(function(i){ if (i.isIntersecting) { dispara(); obsP.disconnect(); } });
+      }, { threshold: .35 });
+      obsP.observe(placar);
+    }
+  }
+
+  /* ---------- 8. carrossel das avaliacoes ----------
+     O pausar fica SO na faixa dos controles, nunca no carrossel inteiro: quem
+     rola de mouse deixa o cursor parado em cima dele e o giro nunca aconteceria
+     (defeito achado e corrigido na Realce). */
+  var car = $("[data-carrossel]");
+  if (car) {
+    var trilho = $("[data-trilho]", car);
+    var slides = trilho ? Array.prototype.slice.call(trilho.children) : [];
+    if (slides.length > 1) {
+      car.classList.add("carrossel--on");
+      var pontos = $("[data-pontos]", car), atual = 0, timer = null;
+      var ir = function(n){
+        atual = (n + slides.length) % slides.length;
+        trilho.style.transform = "translateX(" + (-atual * 100) + "%)";
+        $$(".ponto", pontos).forEach(function(p, i){ p.setAttribute("aria-current", i === atual ? "true" : "false"); });
+        slides.forEach(function(s, i){ s.setAttribute("aria-hidden", i === atual ? "false" : "true"); });
+      };
+      var parar = function(){ if (timer) { clearInterval(timer); timer = null; } };
+      var girar = function(){ parar(); if (!reduzido) timer = setInterval(function(){ ir(atual + 1); }, 5500); };
+      slides.forEach(function(s, i){
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "ponto";
+        b.setAttribute("aria-label", "Avaliação " + (i + 1) + " de " + slides.length);
+        b.addEventListener("click", function(){ ir(i); girar(); });
+        pontos.appendChild(b);
+      });
+      $("[data-anterior]", car).addEventListener("click", function(){ ir(atual - 1); girar(); });
+      $("[data-proximo]", car).addEventListener("click", function(){ ir(atual + 1); girar(); });
+      var ctr = $(".carrossel__controles", car);
+      ctr.addEventListener("mouseenter", parar);
+      ctr.addEventListener("mouseleave", girar);
+      car.addEventListener("focusin", parar);
+      car.addEventListener("focusout", girar);
+      document.addEventListener("visibilitychange", function(){ if (document.hidden) parar(); else girar(); });
+      var x0 = null;
+      car.addEventListener("touchstart", function(e){ x0 = e.touches[0].clientX; parar(); }, { passive: true });
+      car.addEventListener("touchend", function(e){
+        if (x0 === null) return;
+        var dx = e.changedTouches[0].clientX - x0;
+        if (Math.abs(dx) > 40) ir(atual + (dx < 0 ? 1 : -1));
+        x0 = null; girar();
+      }, { passive: true });
+      ir(0); girar();
+    }
+  }
+})();
+</script>
+
+<!-- ====================================================================
+     SCRIPT 2: antes e depois (templates/componentes/antes-depois.html).
+     O JS nao anima a cortina: copia o valor do range pra variavel --p.
+     O empurraozinho da primeira vez e o que ensina que da pra arrastar.
+     ==================================================================== -->
+<script>
+(function(){
+  "use strict";
+  var pares = document.querySelectorAll("[data-ad]");
+  if (!pares.length) return;
+  var mq = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  var semMovimento = !!(mq && mq.matches);
+
+  Array.prototype.forEach.call(pares, function(ad){
+    var quadro = ad.querySelector(".ad__quadro");
+    var range  = ad.querySelector(".ad__range");
+    var selA   = ad.querySelector("[data-selo-a]");
+    var selD   = ad.querySelector("[data-selo-d]");
+    if (!quadro || !range) return;
+
+    function pinta(v){
+      quadro.style.setProperty("--p", v + "%");
+      if (selA) selA.style.opacity = v < 16 ? 0 : 1;
+      if (selD) selD.style.opacity = v > 84 ? 0 : 1;
+    }
+    range.addEventListener("input", function(){ pinta(range.value); });
+    pinta(range.value);
+
+    if (semMovimento || !("IntersectionObserver" in window)) return;
+    var obs = new IntersectionObserver(function(itens){
+      itens.forEach(function(e){
+        if (!e.isIntersecting) return;
+        obs.disconnect();
+        var ini = null, DUR = 1600;
+        requestAnimationFrame(function passo(t){
+          if (!ini) ini = t;
+          var p = Math.min((t - ini) / DUR, 1);
+          var v = 50 + Math.sin(p * Math.PI * 2) * 18 * (1 - p);
+          range.value = v; pinta(v);
+          if (p < 1) requestAnimationFrame(passo);
+          else { range.value = 50; pinta(50); }
+        });
+      });
+    }, { threshold: 0.5 });
+    obs.observe(quadro);
+  });
+})();
+</script>
+
+<!-- ====================================================================
+     SCRIPT 3: o palco "Por dentro da WA". A bolha de vidro e o shader do
+     site da Larissa, LINHA POR LINHA (mexeu num numero aqui, mexe la tambem,
+     ou os dois deixam de ser o mesmo componente). Em bloco proprio porque
+     WebGL e a unica parte que depende de driver de video: se cair, cai so.
+     Planos B, em ordem: sem WebGL ou com "reduzir movimento" a troca vira
+     dissolucao; foto que nao carrega desliga o efeito; sem JS, a grade.
+     ==================================================================== -->
+<script>
+(function(){
+  "use strict";
+  var palco = document.querySelector("[data-palco]");
+  var lista = document.querySelector("[data-comodos]");
+  if (!palco || !lista) return;
+  var quadro = palco.querySelector(".palco__quadro");
+  var foto = palco.querySelector("[data-foto]");
+  var tela = palco.querySelector("[data-tela]");
+  var elAt = palco.querySelector("[data-atual]");
+  var elTot = palco.querySelector("[data-total]");
+  var itens = Array.prototype.slice.call(lista.querySelectorAll("[data-item]"));
+  if (itens.length < 2 || !quadro) return;
+
+  var mq = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  var semMovimento = !!(mq && mq.matches);
+  var DEMORA = 5200, TROCA = 1900;
+  var atual = 0, indo = false, relogio = null, t0 = 0, visivel = false, preparado = false, pronto = false;
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  if (elTot) elTot.textContent = pad(itens.length);
+
+  var VERT = "attribute vec2 aPos;varying vec2 vUv;void main(){vUv=aPos*0.5+0.5;gl_Position=vec4(aPos,0.0,1.0);}";
+  var FRAG =
+    "precision highp float;" +
+    "uniform sampler2D uT1,uT2;uniform float uProg;uniform vec2 uRes,uS1,uS2;varying vec2 vUv;" +
+    "vec2 cobre(vec2 uv,vec2 ts){vec2 s=uRes/ts;float k=max(s.x,s.y);vec2 sz=ts*k;vec2 off=(uRes-sz)*0.5;return (uv*uRes-off)/sz;}" +
+    "void main(){" +
+      "vec2 uv1=cobre(vUv,uS1),uv2=cobre(vUv,uS2);" +
+      "float t=uProg*5.0;" +
+      "float raio=length(uRes)*0.60;float br=uProg*raio;" +
+      "vec2 p=vUv*uRes,c=uRes*0.5;float d=length(p-c);float nd=d/max(br,0.001);" +
+      "float calma=1.0-smoothstep(0.55,1.0,uProg);" +
+      "float borda=2.0+uRes.y*0.03*smoothstep(0.55,1.0,uProg);" +
+      "float dentro=smoothstep(br+borda,br-borda,d);" +
+      "vec2 dir=d>0.0?(p-c)/d:vec2(0.0);" +
+      "float ro=0.075*pow(smoothstep(0.30,1.0,nd),1.5)*calma;" +
+      "vec2 du=uv2-dir*ro+vec2(sin(t+nd*10.0),cos(t*0.8+nd*8.0))*0.011*nd*dentro*calma;" +
+      "float ca=0.012*pow(smoothstep(0.3,1.0,nd),1.2)*calma;" +
+      "vec4 img=vec4(texture2D(uT2,du+dir*ca*1.2).r,texture2D(uT2,du+dir*ca*0.2).g,texture2D(uT2,du-dir*ca*0.8).b,1.0);" +
+      "img.rgb+=smoothstep(0.94,1.0,nd)*(1.0-smoothstep(1.0,1.02,nd))*0.10*calma;" +
+      "img=mix(img,texture2D(uT2,uv2),smoothstep(0.88,1.0,uProg));" +
+      "gl_FragColor=mix(texture2D(uT1,uv1),img,dentro);" +
+    "}";
+
+  var gl = null, prog = null, loc = {}, tex = [], tam = [], res = [1,1];
+  function compila(tipo, src){ var s = gl.createShader(tipo); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; }
+  function iniciaGL(){
+    if (semMovimento) return false;
+    try { gl = tela.getContext("webgl", { alpha:false, antialias:false, depth:false, stencil:false }) || tela.getContext("experimental-webgl"); } catch(e){ gl = null; }
+    if (!gl) return false;
+    var vs = compila(gl.VERTEX_SHADER, VERT), fs = compila(gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) { gl = null; return false; }
+    prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { gl = null; return false; }
+    gl.useProgram(prog);
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    var a = gl.getAttribLocation(prog, "aPos");
+    gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+    ["uT1","uT2","uProg","uRes","uS1","uS2"].forEach(function(n){ loc[n] = gl.getUniformLocation(prog, n); });
+    gl.uniform1i(loc.uT1, 0); gl.uniform1i(loc.uT2, 1);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    return true;
+  }
+  function criaTex(img){
+    var t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    return t;
+  }
+  var fila = {};
+  function pega(i, cb){
+    if (tex[i]) { cb(true); return; }
+    if (fila[i]) { fila[i].push(cb); return; }
+    fila[i] = [cb];
+    var im = new Image();
+    im.decoding = "async";
+    im.onload = function(){
+      /* Aberto direto da pasta (file://), o navegador trata a foto como de
+         outra origem e o texImage2D lanca SecurityError. Sem o try, o erro
+         matava a fila e o palco ficava parado na primeira foto pra sempre
+         (achado em 30/09/2026). Com ele, cai na dissolucao e segue girando. */
+      if (gl) {
+        try { tex[i] = criaTex(im); tam[i] = [im.naturalWidth, im.naturalHeight]; }
+        catch(e) { tex[i] = null; }
+      }
+      var f = fila[i]; fila[i] = null; f.forEach(function(k){ k(!!tex[i]); });
+    };
+    im.onerror = function(){ var f = fila[i]; fila[i] = null; f.forEach(function(k){ k(false); }); };
+    im.src = itens[i].getAttribute("data-img");
+  }
+  function enfileira(i){
+    if (i >= itens.length) return;
+    pega(i, function(){
+      if (window.requestIdleCallback) requestIdleCallback(function(){ enfileira(i + 1); }, { timeout: 2000 });
+      else setTimeout(function(){ enfileira(i + 1); }, 300);
+    });
+  }
+  function ajusta(){
+    if (!gl) return;
+    var r = Math.min(window.devicePixelRatio || 1, 2);
+    var w = Math.max(1, Math.round(quadro.clientWidth * r)), h = Math.max(1, Math.round(quadro.clientHeight * r));
+    if (tela.width === w && tela.height === h) return;
+    tela.width = w; tela.height = h; gl.viewport(0, 0, w, h); res = [w, h];
+    desenha(0, atual, atual);
+  }
+  function desenha(p, a, b){
+    if (!gl || !tex[a] || !tex[b]) return;
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex[a]);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tex[b]);
+    gl.uniform1f(loc.uProg, p); gl.uniform2f(loc.uRes, res[0], res[1]);
+    gl.uniform2f(loc.uS1, tam[a][0], tam[a][1]); gl.uniform2f(loc.uS2, tam[b][0], tam[b][1]);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+  function suave(p){ return p < .5 ? 4*p*p*p : 1 - Math.pow(-2*p + 2, 3)/2; }
+
+  function marca(n){
+    itens.forEach(function(li, i){
+      li.setAttribute("aria-current", i === n ? "true" : "false");
+      var f = li.querySelector(".comodo__linha i");
+      if (f) { f.style.transition = "width .2s ease-out"; f.style.width = "0%"; }
+    });
+    if (elAt) elAt.textContent = pad(n + 1);
+    foto.alt = itens[n].getAttribute("data-alt") || "";
+    /* no celular a lista e uma fila horizontal: traz o ambiente da vez pra
+       vista, sem mexer na rolagem da pagina */
+    var li = itens[n];
+    if (lista.scrollWidth > lista.clientWidth + 4) {
+      var alvo = li.parentNode.offsetLeft - (lista.clientWidth - li.parentNode.offsetWidth) / 2;
+      if (lista.scrollTo) lista.scrollTo({ left: alvo, behavior: semMovimento ? "auto" : "smooth" }); else lista.scrollLeft = alvo;
+    }
+  }
+  function paraRelogio(){ if (relogio) { cancelAnimationFrame(relogio); relogio = null; } t0 = 0; }
+  function ligaRelogio(){
+    paraRelogio();
+    if (semMovimento || !visivel || indo || !pronto) return;
+    var f = itens[atual].querySelector(".comodo__linha i");
+    if (f) f.style.transition = "width .1s linear";
+    relogio = requestAnimationFrame(function tic(t){
+      if (!t0) t0 = t;
+      var p = Math.min((t - t0) / DEMORA, 1);
+      if (f) f.style.width = (p * 100) + "%";
+      if (p < 1) relogio = requestAnimationFrame(tic);
+      else { relogio = null; vai(atual + 1); }
+    });
+  }
+  function fade(n){
+    palco.classList.remove("palco--gl");
+    palco.classList.add("palco--trocando");
+    setTimeout(function(){
+      foto.src = itens[n].getAttribute("data-img");
+      palco.classList.remove("palco--trocando");
+      indo = false;
+      if (visivel) ligaRelogio();
+    }, semMovimento ? 0 : 300);
+  }
+  function vai(n){
+    n = (n + itens.length) % itens.length;
+    if (indo || n === atual) return;
+    var de = atual;
+    indo = true; paraRelogio(); marca(n); atual = n;
+    if (!gl) { fade(n); return; }
+    pega(n, function(ok){
+      if (!ok || !tex[de]) { gl = null; fade(n); return; }
+      var ini = 0;
+      requestAnimationFrame(function passo(t){
+        if (!ini) ini = t;
+        var p = Math.min((t - ini) / TROCA, 1);
+        desenha(suave(p), de, n);
+        if (p < 1) { requestAnimationFrame(passo); return; }
+        desenha(0, n, n);
+        indo = false;
+        if (visivel) ligaRelogio();
+      });
+    });
+  }
+
+  itens.forEach(function(li, i){
+    li.addEventListener("click", function(){ paraRelogio(); vai(i); });
+    li.setAttribute("aria-current", i === 0 ? "true" : "false");
+  });
+  var ant = palco.querySelector("[data-ant]"), prox = palco.querySelector("[data-prox]");
+  if (ant) ant.addEventListener("click", function(){ paraRelogio(); vai(atual - 1); });
+  if (prox) prox.addEventListener("click", function(){ paraRelogio(); vai(atual + 1); });
+  /* pausa so na LISTA (onde a pessoa le), nunca no quadro grande */
+  lista.addEventListener("mouseenter", paraRelogio);
+  lista.addEventListener("mouseleave", function(){ if (!indo) ligaRelogio(); });
+  palco.addEventListener("focusin", paraRelogio);
+  document.addEventListener("visibilitychange", function(){ if (document.hidden) paraRelogio(); else if (visivel && !indo) ligaRelogio(); });
+  var x0 = null, y0 = null;
+  quadro.addEventListener("touchstart", function(e){ x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  quadro.addEventListener("touchend", function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) { paraRelogio(); vai(atual + (dx < 0 ? 1 : -1)); }
+    x0 = y0 = null;
+  }, { passive: true });
+  var esperaR = null;
+  addEventListener("resize", function(){
+    clearTimeout(esperaR);
+    esperaR = setTimeout(function(){ ajusta(); if (!indo) desenha(0, atual, atual); }, 150);
+  });
+
+  function libera(){ pronto = true; if (visivel && !indo) ligaRelogio(); }
+  function prepara(){
+    if (preparado) return;
+    preparado = true;
+    if (!iniciaGL()) { libera(); return; }
+    ajusta();
+    pega(0, function(ok){
+      if (!ok) { gl = null; libera(); return; }
+      ajusta(); desenha(0, 0, 0);
+      palco.classList.add("palco--gl");
+      libera(); enfileira(1);
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function(is){
+      is.forEach(function(e){
+        visivel = e.isIntersecting;
+        if (visivel) { prepara(); if (!indo) ligaRelogio(); } else paraRelogio();
+      });
+    }, { threshold: 0.25, rootMargin: "200px 0px" }).observe(quadro);
+  } else { visivel = true; prepara(); ligaRelogio(); }
+})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dentist",
+  "name": "WA Orofacial Institute",
+  "alternateName": "WA Orofacial",
+  "description": "Odontologia e harmonização facial em Itabira/MG.",
+  "url": "https://marcel0gs.github.io/wa-orofacial/",
+  "image": "https://marcel0gs.github.io/wa-orofacial/assets/img/og-capa.jpg",
+  "logo": "https://marcel0gs.github.io/wa-orofacial/apple-touch-icon.png",
+  "telephone": "+55-31-3840-3975",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Rua Armindo Costa Lage, 138, Major Lage de Baixo",
+    "addressLocality": "Itabira",
+    "addressRegion": "MG",
+    "postalCode": "35900-212",
+    "addressCountry": "BR"
+  },
+  "geo": { "@type": "GeoCoordinates", "latitude": -19.6307026, "longitude": -43.2257782 },
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:30", "closes": "19:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "09:00", "closes": "13:00" }
+  ],
+  "founder": { "@type": "Person", "name": "Welleynne Ananda Dias", "jobTitle": "Cirurgiã-dentista" },
+  "sameAs": ["https://www.instagram.com/wa.institute/", "https://www.instagram.com/dra.welleynne/"]
+}
+</script>
+</body>
+</html>
