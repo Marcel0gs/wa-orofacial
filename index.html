@@ -527,7 +527,11 @@ main > section:not(.hero),.rodape{position:relative;z-index:1}
      (--margem). Rola com o dedo, com o trackpad ou pelas setas.
    - SETAS NAS PONTAS E NO MEIO DA ALTURA DA FOTO: preferencia dele, a
      mesma do palco. O top delas e calculado da largura do card.
-   - Abas: levam ao primeiro card da familia e acendem conforme a rolagem.
+   - DUAS FILEIRAS, uma por familia (01/10/2026: "separe a harmonizacao
+     facial da odontologia. Nao deixe tudo em uma fileira"). Cada fileira e
+     uma vitrine independente. A que cabe inteira na tela ganha
+     vitrine--parada: sem setas e sem contador (no desktop, a de harmonizacao,
+     com quatro cards). Teve abas no lugar disso; sairam junto.
    - Entrada em cortina (a foto sobe de baixo, o zoom assenta, o texto vem
      depois), card a card. Excecao EXPLICITA a regra de nao esconder
      conteudo esperando a rolagem, como o leque: ele pediu animacao aqui.
@@ -542,30 +546,26 @@ main > section:not(.hero),.rodape{position:relative;z-index:1}
     radial-gradient(50% 40% at 0% 100%,rgba(28,63,59,.35),transparent 70%),
     var(--noite);
 }
-.trat-cab{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.6rem 3rem;margin-bottom:clamp(1.6rem,3.4vw,2.4rem)}
-.trat-cab .cabeca{margin-bottom:0}
-
-.abas{position:relative;display:inline-flex;gap:.25rem;padding:.3rem;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(201,174,120,.28)}
-.aba{
-  position:relative;z-index:1;display:inline-flex;align-items:center;gap:.45rem;min-height:44px;padding:0 1.15rem;
-  border-radius:999px;font-size:.9rem;font-weight:500;letter-spacing:.02em;white-space:nowrap;text-decoration:none;
-  color:var(--claro-suave);transition:color .4s ease;
+/* o titulo de cada fileira: icone dourado, nome da familia e a frase dela,
+   com um filete que separa uma familia da outra */
+.familia + .familia{margin-top:clamp(2.8rem,6vw,4.4rem)}
+.familia__cab{
+  display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:.5rem 2.5rem;
+  padding-bottom:1.1rem;border-bottom:1px solid rgba(201,174,120,.22);
 }
-.aba b{font-size:.7rem;font-weight:500;color:var(--ouro);transition:color .4s ease}
-.aba:hover{color:var(--claro)}
-.aba[aria-current="true"],.aba[aria-current="true"] b{color:var(--noite)}
-/* a pilula dourada que corre de uma aba pra outra (posicionada pelo JS) */
-.abas__marca{
-  position:absolute;z-index:0;left:0;top:.3rem;bottom:.3rem;width:0;border-radius:999px;
-  background:linear-gradient(135deg,var(--ouro-vivo),var(--ouro));box-shadow:0 8px 22px rgba(201,174,120,.28);
-  transition:transform .6s var(--suave),width .6s var(--suave);
-}
-/* sem JS a pilula nao anda: a aba acesa ganha o fundo ela mesma */
-html:not(.js) .aba[aria-current="true"]{background:var(--ouro)}
-@media (max-width:420px){.aba{padding:0 .9rem;font-size:.84rem}.aba b{display:none}}
+.familia__titulo{display:flex;align-items:center;gap:.9rem}
+.familia__titulo .i{width:32px;height:32px;color:var(--ouro)}
+.familia__titulo h3{font-size:clamp(1.9rem,3.2vw,2.4rem);font-weight:500;color:var(--claro)}
+.familia__txt{margin:0;max-width:52ch;font-size:.98rem;color:var(--claro-suave)}
 
 .vitrine{
-  --larg:clamp(236px,23vw,300px);
+  /* Quatro cards fecham EXATAMENTE a largura da coluna do site (a mesma do
+     filete do titulo da familia): a fileira de harmonizacao, com quatro, fica
+     inteira e alinhada. Os 17px sao a barra de rolagem do Windows, que o
+     100vw inclui e a coluna nao (no Mac sobra uma folga de 17px, sem estouro).
+     Com 23vw fixo o quarto card saia cortado a 1280px e passava 80px do
+     filete a 1440px */
+  --larg:clamp(220px,calc((min(1180px,100vw - 2.5rem - 17px) - 3 * var(--vao)) / 4),300px);
   --vao:clamp(.9rem,1.5vw,1.3rem);
   --margem:max(1.25rem,calc((100% - 1180px) / 2));
   position:relative;
@@ -667,6 +667,10 @@ html:not(.js) .aba[aria-current="true"]{background:var(--ouro)}
 
 .vitrine__rodape{display:none;align-items:center;gap:1.1rem;margin-top:.2rem}
 .js .vitrine__rodape{display:flex}
+/* fileira que cabe inteira na tela: nada pra rolar, entao sem setas, sem
+   contador e sem rolagem de sobra (so o respiro da margem direita rolaria) */
+.vitrine--parada .vitrine__seta,.vitrine--parada .vitrine__rodape{display:none}
+.vitrine--parada .vitrine__trilho{overflow-x:hidden}
 .vitrine__conta{font-size:.76rem;letter-spacing:.18em;color:var(--claro-suave);white-space:nowrap}
 .vitrine__conta b{font-weight:500;color:var(--claro)}
 .vitrine__barra{position:relative;flex:1;height:2px;border-radius:2px;overflow:hidden;background:rgba(201,174,120,.18)}
@@ -1184,7 +1188,6 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   .tcard__brilho{display:none}
   .tcard__a:hover{transform:none}
   .tcard__a:hover .tcard__midia img{scale:1}
-  .abas__marca{transition:none}
 }
 </style>
 </head>
@@ -1412,188 +1415,207 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
      Regiao dos olhos e radiografia nao tem foto: a radiografia foi pra frase
      da clinica geral; a regiao dos olhos volta quando houver foto.
      Cada card abre o WhatsApp com o nome do tratamento ja escrito. Sem preco
-     e sem promessa: regra do CFO. -->
+     e sem promessa: regra do CFO.
+     01/10/2026: virou DUAS fileiras (harmonizacao e odontologia), e as abas
+     sairam junto. -->
 <section class="secao secao--noite tratamentos" id="tratamentos">
   <div class="env">
-    <div class="trat-cab">
-      <div class="cabeca">
-        <span class="olho">Tratamentos</span>
-        <h2>Odontologia e harmonização facial, <em>no mesmo espaço.</em></h2>
-        <p class="chamada">Tudo começa com uma avaliação. A partir dela, o plano é montado para você, com o que faz sentido para o seu rosto e para o seu sorriso.</p>
-      </div>
-      <!-- Sem JS sao ancoras pro primeiro card de cada familia; com JS rolam
-           so a vitrine, e a aba acesa acompanha a rolagem -->
-      <nav class="abas" aria-label="Famílias de tratamento" data-abas>
-        <a class="aba" href="#t-hof" data-aba="hof" aria-current="true">Harmonização facial<b>4</b></a>
-        <a class="aba" href="#t-odonto" data-aba="odonto">Odontologia<b>6</b></a>
-        <span class="abas__marca" aria-hidden="true"></span>
-      </nav>
+    <div class="cabeca">
+      <span class="olho">Tratamentos</span>
+      <h2>Odontologia e harmonização facial, <em>no mesmo espaço.</em></h2>
+      <p class="chamada">Tudo começa com uma avaliação. A partir dela, o plano é montado para você, com o que faz sentido para o seu rosto e para o seu sorriso.</p>
     </div>
   </div>
 
-  <div class="vitrine" data-vitrine>
-    <ul class="vitrine__trilho" data-v-trilho aria-label="Tratamentos">
-      <li class="tcard" data-cat="hof" id="t-hof">
-        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20toxina%20botul%C3%ADnica." target="_blank" rel="noopener">
-          <span class="tcard__midia"><img src="assets/img/trat-toxina.webp" width="600" height="800" loading="lazy" decoding="async" alt="Aplicação de toxina botulínica na testa de uma paciente, com luvas rosa"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">01</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Harmonização facial</span>
-            <h3>Toxina botulínica</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Indicada para linhas de expressão da testa e ao redor dos olhos, com dose planejada para cada rosto.</p>
-              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-      <li class="tcard" data-cat="hof">
-        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20preenchimento%20labial." target="_blank" rel="noopener">
-          <span class="tcard__midia"><img src="assets/img/trat-labial.webp" width="600" height="800" loading="lazy" decoding="async" alt="Profissional da WA examinando os lábios de uma paciente"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">02</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Harmonização facial</span>
-            <h3>Preenchimento labial</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Contorno e volume dos lábios, em proporção com o restante do rosto.</p>
-              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-      <li class="tcard" data-cat="hof">
-        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20rinomodela%C3%A7%C3%A3o." target="_blank" rel="noopener">
-          <span class="tcard__midia"><img src="assets/img/trat-rino.webp" width="600" height="800" loading="lazy" decoding="async" alt="Avaliação do nariz de uma paciente para rinomodelação"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">03</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Harmonização facial</span>
-            <h3>Rinomodelação</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Ajuste do contorno do nariz sem cirurgia, planejado em harmonia com o rosto.</p>
-              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-      <li class="tcard" data-cat="hof">
-        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20contorno%20facial." target="_blank" rel="noopener">
-          <span class="tcard__midia"><img src="assets/img/trat-contorno.webp" width="600" height="800" loading="lazy" decoding="async" alt="Paciente com marcações no rosto para o planejamento do contorno facial"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">04</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Harmonização facial</span>
-            <h3>Contorno facial</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Queixo, mandíbula e proporções do rosto, pensados em conjunto.</p>
-              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-      <li class="tcard" data-cat="odonto" id="t-odonto">
-        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20lentes%20em%20resina." target="_blank" rel="noopener">
-          <span class="tcard__midia"><img src="assets/img/trat-lentes.webp" width="600" height="800" loading="lazy" decoding="async" alt="Paciente sorrindo, mostrando as lentes em resina"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">05</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Odontologia</span>
-            <h3>Lentes em resina</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Forma, cor e alinhamento dos dentes redesenhados com resina, planejados junto com você.</p>
-              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-      <li class="tcard" data-cat="odonto">
-        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20a%20cl%C3%ADnica%20geral." target="_blank" rel="noopener">
-          <span class="tcard__midia"><img src="assets/img/trat-clinica.webp" width="600" height="800" loading="lazy" decoding="async" alt="Atendimento odontológico no consultório da WA"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">06</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Odontologia</span>
-            <h3>Clínica geral</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Consultas, limpeza e prevenção, com radiografia feita na própria clínica.</p>
-              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-      <li class="tcard" data-cat="odonto">
-        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20implantes%20dent%C3%A1rios." target="_blank" rel="noopener">
-          <span class="tcard__midia"><img src="assets/img/trat-implantes.webp" width="600" height="800" loading="lazy" decoding="async" alt="Dentista da WA em procedimento, com os instrumentos sobre a bancada"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">07</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Odontologia</span>
-            <h3>Implantes dentários</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Reposição de dentes perdidos, planejada a partir da avaliação e dos exames.</p>
-              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-      <li class="tcard" data-cat="odonto">
-        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20aparelhos%20ortod%C3%B4nticos." target="_blank" rel="noopener">
-          <span class="tcard__midia"><img src="assets/img/trat-ortodontia.webp" width="600" height="800" loading="lazy" decoding="async" alt="Dentista atendendo um paciente na cadeira odontológica"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">08</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Odontologia</span>
-            <h3>Aparelhos ortodônticos</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Alinhamento dos dentes e da mordida, com acompanhamento em cada etapa.</p>
-              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-      <li class="tcard" data-cat="odonto">
-        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20o%20atendimento%20infantil." target="_blank" rel="noopener">
-          <span class="tcard__midia"><img src="assets/img/trat-infantil.webp" width="600" height="800" loading="lazy" decoding="async" alt="Dentista da WA atendendo uma criança, que segura uma escova de dentes"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">09</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Odontologia</span>
-            <h3>Atendimento infantil</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Consultas para crianças, com calma e cuidado desde a primeira visita ao dentista.</p>
-              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-      <li class="tcard" data-cat="odonto">
-        <a class="tcard__a" href="#clinica">
-          <span class="tcard__midia"><img src="assets/img/trat-bio.webp" width="600" height="800" loading="lazy" decoding="async" alt="Materiais esterilizados e selados em embalagem individual, ao lado da autoclave"></span>
-          <span class="tcard__brilho" aria-hidden="true"></span>
-          <span class="tcard__n" aria-hidden="true">10</span>
-          <div class="tcard__corpo">
-            <span class="tcard__cat">Estrutura</span>
-            <h3>Biossegurança</h3>
-            <div class="tcard__mais"><div>
-              <p class="tcard__txt">Central de esterilização com autoclave e materiais selados em embalagem individual.</p>
-              <span class="tcard__cta">Conhecer a clínica<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
-            </div></div>
-          </div>
-        </a>
-      </li>
-    </ul>
-    <button class="vitrine__seta vitrine__seta--ant" type="button" data-v-ant aria-label="Ver tratamentos anteriores"><svg class="i" aria-hidden="true"><use href="#i-esq"/></svg></button>
-    <button class="vitrine__seta vitrine__seta--prox" type="button" data-v-prox aria-label="Ver próximos tratamentos"><svg class="i" aria-hidden="true"><use href="#i-dir"/></svg></button>
+  <!-- Duas fileiras, uma por familia (pedido de 01/10/2026: "nao deixe tudo
+       em uma fileira"). Cada uma e uma vitrine independente: setas, contador,
+       entrada e parallax proprios. A que cabe inteira na tela fica parada,
+       sem setas (no desktop, a de harmonizacao). -->
+  <div class="familia" id="t-hof">
+    <div class="env familia__cab">
+      <div class="familia__titulo"><svg class="i" aria-hidden="true"><use href="#i-brilho"/></svg><h3>Harmonização facial</h3></div>
+      <p class="familia__txt">Procedimentos planejados a partir dos seus traços, respeitando quem você é.</p>
+    </div>
+    <div class="vitrine" data-vitrine>
+      <ul class="vitrine__trilho" data-v-trilho aria-label="Harmonização facial">
+        <li class="tcard" data-cat="hof">
+          <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20toxina%20botul%C3%ADnica." target="_blank" rel="noopener">
+            <span class="tcard__midia"><img src="assets/img/trat-toxina.webp" width="600" height="800" loading="lazy" decoding="async" alt="Aplicação de toxina botulínica na testa de uma paciente, com luvas rosa"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">01</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Harmonização facial</span>
+              <h3>Toxina botulínica</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Indicada para linhas de expressão da testa e ao redor dos olhos, com dose planejada para cada rosto.</p>
+                <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+        <li class="tcard" data-cat="hof">
+          <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20preenchimento%20labial." target="_blank" rel="noopener">
+            <span class="tcard__midia"><img src="assets/img/trat-labial.webp" width="600" height="800" loading="lazy" decoding="async" alt="Profissional da WA examinando os lábios de uma paciente"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">02</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Harmonização facial</span>
+              <h3>Preenchimento labial</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Contorno e volume dos lábios, em proporção com o restante do rosto.</p>
+                <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+        <li class="tcard" data-cat="hof">
+          <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20rinomodela%C3%A7%C3%A3o." target="_blank" rel="noopener">
+            <span class="tcard__midia"><img src="assets/img/trat-rino.webp" width="600" height="800" loading="lazy" decoding="async" alt="Avaliação do nariz de uma paciente para rinomodelação"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">03</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Harmonização facial</span>
+              <h3>Rinomodelação</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Ajuste do contorno do nariz sem cirurgia, planejado em harmonia com o rosto.</p>
+                <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+        <li class="tcard" data-cat="hof">
+          <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20contorno%20facial." target="_blank" rel="noopener">
+            <span class="tcard__midia"><img src="assets/img/trat-contorno.webp" width="600" height="800" loading="lazy" decoding="async" alt="Paciente com marcações no rosto para o planejamento do contorno facial"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">04</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Harmonização facial</span>
+              <h3>Contorno facial</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Queixo, mandíbula e proporções do rosto, pensados em conjunto.</p>
+                <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+      </ul>
+      <button class="vitrine__seta vitrine__seta--ant" type="button" data-v-ant aria-label="Ver os anteriores em harmonização facial"><svg class="i" aria-hidden="true"><use href="#i-esq"/></svg></button>
+      <button class="vitrine__seta vitrine__seta--prox" type="button" data-v-prox aria-label="Ver os próximos em harmonização facial"><svg class="i" aria-hidden="true"><use href="#i-dir"/></svg></button>
+      <div class="env vitrine__rodape" aria-hidden="true">
+        <span class="vitrine__conta"><b data-v-atual>01</b> / 04</span>
+        <span class="vitrine__barra"><i data-v-barra></i></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="familia" id="t-odonto">
+    <div class="env familia__cab">
+      <div class="familia__titulo"><svg class="i" aria-hidden="true"><use href="#i-sorriso"/></svg><h3>Odontologia</h3></div>
+      <p class="familia__txt">Do cuidado de rotina ao sorriso novo, com estrutura completa dentro da clínica.</p>
+    </div>
+    <div class="vitrine" data-vitrine>
+      <ul class="vitrine__trilho" data-v-trilho aria-label="Odontologia">
+        <li class="tcard" data-cat="odonto">
+          <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20lentes%20em%20resina." target="_blank" rel="noopener">
+            <span class="tcard__midia"><img src="assets/img/trat-lentes.webp" width="600" height="800" loading="lazy" decoding="async" alt="Paciente sorrindo, mostrando as lentes em resina"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">01</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Odontologia</span>
+              <h3>Lentes em resina</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Forma, cor e alinhamento dos dentes redesenhados com resina, planejados junto com você.</p>
+                <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+        <li class="tcard" data-cat="odonto">
+          <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20a%20cl%C3%ADnica%20geral." target="_blank" rel="noopener">
+            <span class="tcard__midia"><img src="assets/img/trat-clinica.webp" width="600" height="800" loading="lazy" decoding="async" alt="Atendimento odontológico no consultório da WA"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">02</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Odontologia</span>
+              <h3>Clínica geral</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Consultas, limpeza e prevenção, com radiografia feita na própria clínica.</p>
+                <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+        <li class="tcard" data-cat="odonto">
+          <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20implantes%20dent%C3%A1rios." target="_blank" rel="noopener">
+            <span class="tcard__midia"><img src="assets/img/trat-implantes.webp" width="600" height="800" loading="lazy" decoding="async" alt="Dentista da WA em procedimento, com os instrumentos sobre a bancada"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">03</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Odontologia</span>
+              <h3>Implantes dentários</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Reposição de dentes perdidos, planejada a partir da avaliação e dos exames.</p>
+                <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+        <li class="tcard" data-cat="odonto">
+          <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20aparelhos%20ortod%C3%B4nticos." target="_blank" rel="noopener">
+            <span class="tcard__midia"><img src="assets/img/trat-ortodontia.webp" width="600" height="800" loading="lazy" decoding="async" alt="Dentista atendendo um paciente na cadeira odontológica"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">04</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Odontologia</span>
+              <h3>Aparelhos ortodônticos</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Alinhamento dos dentes e da mordida, com acompanhamento em cada etapa.</p>
+                <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+        <li class="tcard" data-cat="odonto">
+          <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20o%20atendimento%20infantil." target="_blank" rel="noopener">
+            <span class="tcard__midia"><img src="assets/img/trat-infantil.webp" width="600" height="800" loading="lazy" decoding="async" alt="Dentista da WA atendendo uma criança, que segura uma escova de dentes"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">05</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Odontologia</span>
+              <h3>Atendimento infantil</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Consultas para crianças, com calma e cuidado desde a primeira visita ao dentista.</p>
+                <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+        <li class="tcard" data-cat="odonto">
+          <a class="tcard__a" href="#clinica">
+            <span class="tcard__midia"><img src="assets/img/trat-bio.webp" width="600" height="800" loading="lazy" decoding="async" alt="Materiais esterilizados e selados em embalagem individual, ao lado da autoclave"></span>
+            <span class="tcard__brilho" aria-hidden="true"></span>
+            <span class="tcard__n" aria-hidden="true">06</span>
+            <div class="tcard__corpo">
+              <span class="tcard__cat">Estrutura</span>
+              <h3>Biossegurança</h3>
+              <div class="tcard__mais"><div>
+                <p class="tcard__txt">Central de esterilização com autoclave e materiais selados em embalagem individual.</p>
+                <span class="tcard__cta">Conhecer a clínica<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+              </div></div>
+            </div>
+          </a>
+        </li>
+      </ul>
+      <button class="vitrine__seta vitrine__seta--ant" type="button" data-v-ant aria-label="Ver os anteriores em odontologia"><svg class="i" aria-hidden="true"><use href="#i-esq"/></svg></button>
+      <button class="vitrine__seta vitrine__seta--prox" type="button" data-v-prox aria-label="Ver os próximos em odontologia"><svg class="i" aria-hidden="true"><use href="#i-dir"/></svg></button>
+      <div class="env vitrine__rodape" aria-hidden="true">
+        <span class="vitrine__conta"><b data-v-atual>01</b> / 06</span>
+        <span class="vitrine__barra"><i data-v-barra></i></span>
+      </div>
+    </div>
   </div>
 
   <div class="env">
-    <div class="vitrine__rodape" aria-hidden="true">
-      <span class="vitrine__conta"><b data-v-atual>01</b> / 10</span>
-      <span class="vitrine__barra"><i data-v-barra></i></span>
-    </div>
-
     <div class="extras">
       <a class="extra" href="#equipe">
         <svg class="i" aria-hidden="true"><use href="#i-flor"/></svg>
@@ -2127,35 +2149,32 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     parallax();
   }
 
-  /* ---------- 5. vitrine dos tratamentos ----------
+  /* ---------- 5. vitrines dos tratamentos (uma por familia) ----------
      A rolagem e NATIVA (dedo, trackpad, teclado e foco ja funcionam sem
-     isto). O script so acrescenta: setas que andam uma "pagina" de cards,
-     abas que levam a familia e acendem conforme a rolagem, contador e
-     barra, o parallax lateral das fotos e a entrada em cortina. */
-  var vit = $("[data-vitrine]");
-  if (vit) {
+     isto). O script so acrescenta, em cada fileira: setas que andam uma
+     "pagina" de cards, contador e barra, o parallax lateral das fotos e a
+     entrada em cortina. Fileira que cabe inteira na tela ganha
+     vitrine--parada (sem setas e sem contador). Uma funcao por fileira: as
+     variaveis de uma nao vazam pra outra (var no script 1 e do escopo todo). */
+  var montaVitrine = function(vit){
     var trilhoV = $("[data-v-trilho]", vit), cartoes = $$(".tcard", vit);
+    if (!trilhoV || !cartoes.length) return;
     var vAnt = $("[data-v-ant]", vit), vProx = $("[data-v-prox]", vit);
-    var abas = $$("[data-aba]"), marcaAba = $(".abas__marca"), vAtual = $("[data-v-atual]"), vBarra = $("[data-v-barra]");
+    var vAtual = $("[data-v-atual]", vit), vBarra = $("[data-v-barra]", vit);
     var fotosV = cartoes.map(function(c){ return $("img", c); });
     var comoRola = reduzido ? "auto" : "smooth";
-    var abaAcesa = null, pedidoV = false;
+    var pedidoV = false;
     /* o trilho e position:relative, entao offsetLeft e medido nele e nao
        muda com a rolagem: o primeiro card esta exatamente na margem */
     var margemV = function(){ return cartoes[0].offsetLeft; };
     var passoV = function(){ return cartoes.length > 1 ? cartoes[1].offsetLeft - cartoes[0].offsetLeft : trilhoV.clientWidth; };
-
-    var acende = function(cat){
-      if (cat === abaAcesa) return;
-      abaAcesa = cat;
-      abas.forEach(function(a){
-        var sim = a.getAttribute("data-aba") === cat;
-        a.setAttribute("aria-current", sim ? "true" : "false");
-        if (sim && marcaAba) { marcaAba.style.width = a.offsetWidth + "px"; marcaAba.style.transform = "translateX(" + a.offsetLeft + "px)"; }
-      });
-    };
     var atualizaV = function(){
       pedidoV = false;
+      /* cabe inteira? o fim do ultimo card dentro da largura visivel */
+      var ultimo = cartoes[cartoes.length - 1];
+      var parada = ultimo.offsetLeft + ultimo.offsetWidth <= trilhoV.clientWidth + 2;
+      vit.classList.toggle("vitrine--parada", parada);
+      if (parada && trilhoV.scrollLeft) trilhoV.scrollLeft = 0;
       var x = trilhoV.scrollLeft, max = trilhoV.scrollWidth - trilhoV.clientWidth, p = passoV();
       var esq = Math.max(0, Math.min(cartoes.length - 1, Math.round(x / p)));
       /* no fim o ultimo card nunca encosta na esquerda: ai conta o ultimo */
@@ -2164,7 +2183,6 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
       if (vBarra) vBarra.style.setProperty("--prog", max > 0 ? (.1 + .9 * x / max).toFixed(3) : 1);
       if (vAnt) vAnt.disabled = x <= 2;
       if (vProx) vProx.disabled = max - x <= 2;
-      acende(cartoes[esq].getAttribute("data-cat"));
       /* parallax: a foto anda ao contrario do trilho, ate 7% da propria
          largura (ela tem 118% do card: sobra 9% de cada lado) */
       if (!reduzido) {
@@ -2179,34 +2197,17 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     };
     var pedeV = function(){ if (!pedidoV) { pedidoV = true; requestAnimationFrame(atualizaV); } };
     trilhoV.addEventListener("scroll", pedeV, { passive: true });
-    addEventListener("resize", function(){ abaAcesa = null; pedeV(); });
-    /* a pilula mede a aba: refaz quando a fonte da web termina de chegar */
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ abaAcesa = null; atualizaV(); });
-
+    addEventListener("resize", pedeV);
     var andaV = function(dir){
       var p = passoV(), cabem = Math.max(1, Math.floor((trilhoV.clientWidth - margemV() + (p - cartoes[0].offsetWidth)) / p));
       trilhoV.scrollBy({ left: dir * cabem * p, behavior: comoRola });
     };
     if (vAnt) vAnt.addEventListener("click", function(){ andaV(-1); });
     if (vProx) vProx.addEventListener("click", function(){ andaV(1); });
-    abas.forEach(function(a){
-      a.addEventListener("click", function(e){
-        var cat = a.getAttribute("data-aba");
-        var alvo = cartoes.filter(function(c){ return c.getAttribute("data-cat") === cat; })[0];
-        if (!alvo) return;
-        e.preventDefault();
-        trilhoV.scrollTo({ left: alvo.offsetLeft - margemV(), behavior: comoRola });
-      });
-    });
-    if (marcaAba) {   /* a primeira posicao da pilula nao anima */
-      marcaAba.style.transition = "none";
-      atualizaV();
-      void marcaAba.offsetWidth;
-      marcaAba.style.transition = "";
-    } else atualizaV();
+    atualizaV();
 
-    /* entrada em cortina, uma vez. So os cards que estao na tela entram em
-       cascata (--o); os de fora ja ficam prontos, sem atrasar ninguem */
+    /* entrada em cortina, uma vez por fileira. So os cards que estao na tela
+       entram em cascata (--o); os de fora ja ficam prontos, sem atrasar ninguem */
     if (temObs && !reduzido) {
       vit.classList.add("vitrine--espera");
       var obsV = new IntersectionObserver(function(is){
@@ -2227,7 +2228,8 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
       }, { threshold: .25 });
       obsV.observe(trilhoV);
     }
-  }
+  };
+  $$("[data-vitrine]").forEach(montaVitrine);
 
   /* ---------- 6. brilho dourado que passa uma vez ---------- */
   var brilhos = $$("[data-brilho]");
