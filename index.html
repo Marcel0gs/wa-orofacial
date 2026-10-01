@@ -718,8 +718,11 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
 .palco--gl .palco__foto{visibility:hidden}
 .palco__conta{position:absolute;left:1.2rem;top:1.05rem;z-index:2;font-size:.78rem;letter-spacing:.18em;color:rgba(255,255,255,.82);text-shadow:0 1px 8px rgba(0,0,0,.6)}
 .palco__conta b{color:#fff;font-weight:500}
+/* Setas nas PONTAS da foto e no MEIO da altura, pedido do usuario em
+   30/09/2026 ("devem ficar nas extremidades, e no meio da imagem"). Eram as
+   duas juntas no canto de baixo. E o mesmo lugar da Realce e da Larissa. */
 .palco__seta{
-  position:absolute;bottom:1rem;z-index:2;width:48px;height:48px;border-radius:50%;
+  position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:48px;height:48px;border-radius:50%;
   display:grid;place-items:center;cursor:pointer;color:#fff;
   background:rgba(20,17,14,.5);border:1px solid rgba(255,255,255,.35);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
@@ -727,8 +730,8 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
 }
 .palco__seta:hover{background:rgba(20,17,14,.78);border-color:var(--ouro-vivo)}
 .palco__seta .i{width:20px;height:20px}
-.palco__seta--ant{right:4.7rem}
-.palco__seta--prox{right:1rem}
+.palco__seta--ant{left:clamp(.6rem,2.5vw,1rem)}
+.palco__seta--prox{right:clamp(.6rem,2.5vw,1rem)}
 /* position:relative e o que faz o offsetLeft dos itens ser medido a partir
    da lista (o script centraliza o ambiente da vez na fila do celular) */
 .comodos{position:relative;list-style:none;margin:0;padding:0;display:none;gap:.1rem}
