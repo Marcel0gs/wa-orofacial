@@ -527,11 +527,13 @@ main > section:not(.hero),.rodape{position:relative;z-index:1}
      (--margem). Rola com o dedo, com o trackpad ou pelas setas.
    - SETAS NAS PONTAS E NO MEIO DA ALTURA DA FOTO: preferencia dele, a
      mesma do palco. O top delas e calculado da largura do card.
-   - DUAS FILEIRAS, uma por familia (01/10/2026: "separe a harmonizacao
-     facial da odontologia. Nao deixe tudo em uma fileira"). Cada fileira e
-     uma vitrine independente. A que cabe inteira na tela ganha
-     vitrine--parada: sem setas e sem contador (no desktop, a de harmonizacao,
-     com quatro cards). Teve abas no lugar disso; sairam junto.
+   - ABAS QUE FILTRAM (01/10/2026): a aba de harmonizacao mostra so os
+     quatro de harmonizacao, a de odontologia so os seis de odontologia. Cada
+     familia e um painel com a sua vitrine, e so o da aba acesa aparece.
+     NAO empilhar as duas fileiras ("nao era pra ficar um em cima do outro"),
+     nem voltar a fileira unica com as dez (a primeira versao). A vitrine que
+     cabe inteira na tela ganha vitrine--parada: sem setas e sem contador (no
+     desktop, a de harmonizacao).
    - Entrada em cortina (a foto sobe de baixo, o zoom assenta, o texto vem
      depois), card a card. Excecao EXPLICITA a regra de nao esconder
      conteudo esperando a rolagem, como o leque: ele pediu animacao aqui.
@@ -546,8 +548,40 @@ main > section:not(.hero),.rodape{position:relative;z-index:1}
     radial-gradient(50% 40% at 0% 100%,rgba(28,63,59,.35),transparent 70%),
     var(--noite);
 }
-/* o titulo de cada fileira: icone dourado, nome da familia e a frase dela,
-   com um filete que separa uma familia da outra */
+.trat-cab{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.6rem 3rem;margin-bottom:clamp(1.6rem,3.4vw,2.4rem)}
+.trat-cab .cabeca{margin-bottom:0}
+
+/* ABAS que FILTRAM (01/10/2026): cada uma mostra so o painel da sua familia.
+   So existem com JS; sem ele os dois paineis aparecem empilhados, com titulo */
+.abas{position:relative;display:none;gap:.25rem;padding:.3rem;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(201,174,120,.28)}
+.js .abas{display:inline-flex}
+.aba{
+  position:relative;z-index:1;display:inline-flex;align-items:center;gap:.45rem;min-height:44px;padding:0 1.15rem;
+  border:0;border-radius:999px;background:none;cursor:pointer;
+  font:500 .9rem/1 var(--sans);letter-spacing:.02em;white-space:nowrap;
+  color:var(--claro-suave);transition:color .4s ease;
+}
+.aba b{font-size:.7rem;font-weight:500;color:var(--ouro);transition:color .4s ease}
+.aba:hover{color:var(--claro)}
+.aba[aria-selected="true"],.aba[aria-selected="true"] b{color:var(--noite)}
+/* a pilula dourada que corre de uma aba pra outra (posicionada pelo JS) */
+.abas__marca{
+  position:absolute;z-index:0;left:0;top:.3rem;bottom:.3rem;width:0;border-radius:999px;
+  background:linear-gradient(135deg,var(--ouro-vivo),var(--ouro));box-shadow:0 8px 22px rgba(201,174,120,.28);
+  transition:transform .6s var(--suave),width .6s var(--suave);
+}
+@media (max-width:420px){.aba{padding:0 .9rem;font-size:.84rem}.aba b{display:none}}
+
+/* PAINEIS: com JS so o da aba acesa aparece ([hidden] no outro), e ele entra
+   com um fade curto a cada troca (sair de display:none reinicia a animacao).
+   O titulo de cada familia so serve pra quem esta sem JS */
+.js .familia__cab{display:none}
+.js .familia + .familia{margin-top:0}
+.js .familia:not([hidden]){animation:painel-entra .55s var(--suave) both}
+@keyframes painel-entra{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* sem JS: o titulo de cada familia (icone dourado, nome e frase) com um
+   filete, e espaco entre uma e outra */
 .familia + .familia{margin-top:clamp(2.8rem,6vw,4.4rem)}
 .familia__cab{
   display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:.5rem 2.5rem;
@@ -669,7 +703,10 @@ main > section:not(.hero),.rodape{position:relative;z-index:1}
 .js .vitrine__rodape{display:flex}
 /* fileira que cabe inteira na tela: nada pra rolar, entao sem setas, sem
    contador e sem rolagem de sobra (so o respiro da margem direita rolaria) */
-.vitrine--parada .vitrine__seta,.vitrine--parada .vitrine__rodape{display:none}
+.vitrine--parada .vitrine__seta{display:none}
+/* visibility e nao display: o contador escondido guarda a altura, e a troca
+   de aba nao faz o resto da pagina pular */
+.vitrine--parada .vitrine__rodape{visibility:hidden}
 .vitrine--parada .vitrine__trilho{overflow-x:hidden}
 .vitrine__conta{font-size:.76rem;letter-spacing:.18em;color:var(--claro-suave);white-space:nowrap}
 .vitrine__conta b{font-weight:500;color:var(--claro)}
@@ -1188,6 +1225,8 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   .tcard__brilho{display:none}
   .tcard__a:hover{transform:none}
   .tcard__a:hover .tcard__midia img{scale:1}
+  .js .familia:not([hidden]){animation:none}
+  .abas__marca{transition:none}
 }
 </style>
 </head>
@@ -1416,22 +1455,35 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
      da clinica geral; a regiao dos olhos volta quando houver foto.
      Cada card abre o WhatsApp com o nome do tratamento ja escrito. Sem preco
      e sem promessa: regra do CFO.
-     01/10/2026: virou DUAS fileiras (harmonizacao e odontologia), e as abas
-     sairam junto. -->
+     01/10/2026: ABAS QUE FILTRAM. Ele quer o modelo das abas, mas "na aba
+     da odontologia, so os servicos da odontologia, e na da harmonizacao, so
+     os da harmonizacao" (a primeira versao era uma fileira so com as dez, e
+     as abas so rolavam ate a familia; teve tambem, por pouco tempo, as duas
+     fileiras uma em cima da outra, reprovadas: "nao era pra ficar um em cima
+     do outro"). -->
 <section class="secao secao--noite tratamentos" id="tratamentos">
   <div class="env">
-    <div class="cabeca">
-      <span class="olho">Tratamentos</span>
-      <h2>Odontologia e harmonização facial, <em>no mesmo espaço.</em></h2>
-      <p class="chamada">Tudo começa com uma avaliação. A partir dela, o plano é montado para você, com o que faz sentido para o seu rosto e para o seu sorriso.</p>
+    <div class="trat-cab">
+      <div class="cabeca">
+        <span class="olho">Tratamentos</span>
+        <h2>Odontologia e harmonização facial, <em>no mesmo espaço.</em></h2>
+        <p class="chamada">Tudo começa com uma avaliação. A partir dela, o plano é montado para você, com o que faz sentido para o seu rosto e para o seu sorriso.</p>
+      </div>
+      <!-- Abas de verdade (tablist): cada uma mostra o SEU painel e esconde o
+           outro. Sem JS as abas somem e os dois paineis aparecem empilhados,
+           cada um com o seu titulo (.familia__cab, que com JS fica escondido) -->
+      <div class="abas" role="tablist" aria-label="Famílias de tratamento">
+        <button class="aba" type="button" role="tab" id="aba-hof" aria-controls="t-hof" aria-selected="true" data-aba>Harmonização facial<b>4</b></button>
+        <button class="aba" type="button" role="tab" id="aba-odonto" aria-controls="t-odonto" aria-selected="false" tabindex="-1" data-aba>Odontologia<b>6</b></button>
+        <span class="abas__marca" aria-hidden="true"></span>
+      </div>
     </div>
   </div>
 
-  <!-- Duas fileiras, uma por familia (pedido de 01/10/2026: "nao deixe tudo
-       em uma fileira"). Cada uma e uma vitrine independente: setas, contador,
-       entrada e parallax proprios. A que cabe inteira na tela fica parada,
-       sem setas (no desktop, a de harmonizacao). -->
-  <div class="familia" id="t-hof">
+  <!-- Um painel por familia, cada um com a sua vitrine (setas, contador,
+       entrada e parallax proprios). A que cabe inteira na tela fica parada,
+       sem setas (no desktop, a de harmonizacao, com quatro). -->
+  <div class="familia" id="t-hof" role="tabpanel" aria-labelledby="aba-hof">
     <div class="env familia__cab">
       <div class="familia__titulo"><svg class="i" aria-hidden="true"><use href="#i-brilho"/></svg><h3>Harmonização facial</h3></div>
       <p class="familia__txt">Procedimentos planejados a partir dos seus traços, respeitando quem você é.</p>
@@ -1508,7 +1560,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     </div>
   </div>
 
-  <div class="familia" id="t-odonto">
+  <div class="familia" id="t-odonto" role="tabpanel" aria-labelledby="aba-odonto">
     <div class="env familia__cab">
       <div class="familia__titulo"><svg class="i" aria-hidden="true"><use href="#i-sorriso"/></svg><h3>Odontologia</h3></div>
       <p class="familia__txt">Do cuidado de rotina ao sorriso novo, com estrutura completa dentro da clínica.</p>
@@ -2204,6 +2256,9 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     };
     if (vAnt) vAnt.addEventListener("click", function(){ andaV(-1); });
     if (vProx) vProx.addEventListener("click", function(){ andaV(1); });
+    /* painel escondido (aba apagada) mede tudo zero: a aba chama isto quando
+       ele aparece, pra refazer o "cabe inteira?", o contador e o parallax */
+    vit.atualizaVitrine = atualizaV;
     atualizaV();
 
     /* entrada em cortina, uma vez por fileira. So os cards que estao na tela
@@ -2230,6 +2285,51 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     }
   };
   $$("[data-vitrine]").forEach(montaVitrine);
+
+  /* ---------- 5b. abas dos tratamentos: cada uma mostra a sua familia ----------
+     Padrao de abas (tablist): clique ou setas do teclado trocam a aba; o
+     painel da aba acesa aparece e o outro ganha hidden. A pilula dourada
+     corre ate a aba acesa. Roda DEPOIS das vitrines: elas se medem com os
+     dois paineis visiveis, e so entao o da aba apagada some. */
+  var abasT = $$("[data-aba]"), marcaAba = $(".abas__marca");
+  if (abasT.length) {
+    var acesaT = function(){ return abasT.filter(function(a){ return a.getAttribute("aria-selected") === "true"; })[0] || abasT[0]; };
+    var pilula = function(anima){
+      if (!marcaAba) return;
+      var a = acesaT();
+      if (!anima) marcaAba.style.transition = "none";
+      marcaAba.style.width = a.offsetWidth + "px";
+      marcaAba.style.transform = "translateX(" + a.offsetLeft + "px)";
+      if (!anima) { void marcaAba.offsetWidth; marcaAba.style.transition = ""; }
+    };
+    var abreAba = function(aba, anima){
+      abasT.forEach(function(a){
+        var sim = a === aba, painel = document.getElementById(a.getAttribute("aria-controls"));
+        a.setAttribute("aria-selected", sim ? "true" : "false");
+        a.tabIndex = sim ? 0 : -1;
+        if (!painel) return;
+        painel.hidden = !sim;
+        var v = sim && $("[data-vitrine]", painel);
+        if (v && v.atualizaVitrine) v.atualizaVitrine();
+      });
+      pilula(anima);
+    };
+    abasT.forEach(function(a, i){
+      a.addEventListener("click", function(){ if (a.getAttribute("aria-selected") !== "true") abreAba(a, true); });
+      a.addEventListener("keydown", function(e){
+        var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        var outra = abasT[(i + d + abasT.length) % abasT.length];
+        outra.focus();
+        abreAba(outra, true);
+      });
+    });
+    abreAba(acesaT(), false);
+    addEventListener("resize", function(){ pilula(false); });
+    /* a pilula mede a aba: refaz quando a fonte da web termina de chegar */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ pilula(false); });
+  }
 
   /* ---------- 6. brilho dourado que passa uma vez ---------- */
   var brilhos = $$("[data-brilho]");
