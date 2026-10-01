@@ -963,6 +963,22 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
 }
 .insta__item img{width:100%;height:100%;object-fit:cover}
 .insta .acoes{justify-content:center;margin-top:1.4rem}
+/* ENTRADA EM LEQUE, pedido do usuario em 30/09/2026 ("esta faltando a
+   animacao na parte no instagram"). E a da Realce: os cinco cards saem
+   empilhados no centro e abrem quando a secao aparece. Excecao EXPLICITA a
+   regra de nao esconder conteudo esperando a rolagem, como foi la. Sem JS
+   ou com "reduzir movimento" eles ja nascem abertos: a classe --entrando so
+   entra pelo script. E o script TIRA a classe quando o leque termina de
+   abrir: a regra do --visivel vem depois do :hover com a mesma
+   especificidade, e se ficasse valendo seguraria o card parado no hover. */
+.insta__item--entrando{
+  transform:translate(-50%,-50%) rotate(0deg) scale(.84);opacity:0;
+  transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .6s ease;
+}
+.insta__leque--visivel .insta__item--entrando{
+  transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r)) scale(1);
+  opacity:1;
+}
 @media (max-width:760px){
   .insta__leque{--passo:70px;--card:138px;--dyf:.5px;height:250px;margin:2rem 0 .5rem}
   .insta__item{border-radius:13px;box-shadow:0 8px 20px rgba(40,30,15,.24)}
@@ -1714,7 +1730,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
       <h2>O dia a dia <em>da clínica</em></h2>
       <p class="chamada">Bastidores, casos e novidades da WA, publicados no perfil oficial da clínica.</p>
     </div>
-    <div class="insta__leque">
+    <div class="insta__leque" data-leque>
       <a class="insta__item" style="--i:-2;--dy:18;--r:-4deg;--n:.86;z-index:10" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><img src="assets/img/instagram/post-1.webp" width="540" height="720" loading="lazy" decoding="async" alt="Publicação do Instagram: consultório odontológico, com a frase “Atendimento personalizado”"></a>
       <a class="insta__item" style="--i:-1;--dy:38;--r:-2deg;--n:.94;z-index:20" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><img src="assets/img/instagram/post-2.webp" width="540" height="720" loading="lazy" decoding="async" alt="Publicação do Instagram: apresentação da esteticista Fernanda Souza"></a>
       <a class="insta__item" style="--i:0;--dy:4;--r:0deg;--n:1;z-index:40" href="https://www.instagram.com/wa.institute/" target="_blank" rel="noopener"><img src="assets/img/instagram/post-3.webp" width="540" height="720" loading="lazy" decoding="async" alt="Publicação do Instagram: fachada da WA Orofacial, com a frase “Bem-vindos à WA”"></a>
@@ -1843,7 +1859,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
 
 <!-- ====================================================================
      SCRIPT 1: o que a pagina inteira usa. Abertura, topo, progresso, hero
-     coberto, parallax, tilt, brilho, placar e carrossel.
+     coberto, parallax, tilt, brilho, placar, leque do Instagram e carrossel.
      Regra: se o JS nao rodar, a pagina continua completa e legivel.
      ==================================================================== -->
 <script>
@@ -1997,7 +2013,33 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     }
   }
 
-  /* ---------- 8. carrossel das avaliacoes ----------
+  /* ---------- 8. leque do instagram (a entrada da Realce) ----------
+     Os cards saem empilhados no centro e abrem um depois do outro quando a
+     secao entra na tela. Sem observador ou com "reduzir movimento", ja
+     nascem abertos. Terminou de abrir, a classe e o atraso saem: o hover
+     volta a ser o rapido de sempre, sem esperar 110ms por card. */
+  var leque = $("[data-leque]");
+  if (leque && temObs && !reduzido) {
+    var cartas = $$(".insta__item", leque);
+    /* empilha SEM animar o fechamento: quem recarrega a pagina parado nesta
+       secao veria os cards se fechando antes de abrir */
+    cartas.forEach(function(c){ c.style.transition = "none"; c.classList.add("insta__item--entrando"); });
+    void leque.offsetWidth;
+    cartas.forEach(function(c, i){ c.style.transition = ""; c.style.transitionDelay = (i * 110) + "ms"; });
+    var obsL = new IntersectionObserver(function(is){
+      is.forEach(function(it){
+        if (!it.isIntersecting) return;
+        obsL.disconnect();
+        leque.classList.add("insta__leque--visivel");
+        setTimeout(function(){
+          cartas.forEach(function(c){ c.classList.remove("insta__item--entrando"); c.style.transitionDelay = ""; });
+        }, cartas.length * 110 + 1000);
+      });
+    }, { threshold: .3 });
+    obsL.observe(leque);
+  }
+
+  /* ---------- 9. carrossel das avaliacoes ----------
      O pausar fica SO na faixa dos controles, nunca no carrossel inteiro: quem
      rola de mouse deixa o cursor parado em cima dele e o giro nunca aconteceria
      (defeito achado e corrigido na Realce). */
