@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- ===================================================================
+     PAGINA SEPARADA DO ANTES E DEPOIS, decisao do usuario em 30/09/2026:
+     "nao vamos colocar no site pra nao ter problema, mas vou informar a dra
+     se ela quiser e assumir eu coloco". Fica FORA do site:
+       - nenhum link do index.html aponta pra ca;
+       - noindex (nao entra no Google) e fora do sitemap.xml.
+     Quem tem o link abre. Se a Dra. decidir que entra, o caminho de volta e
+     colar esta <section> no index.html, o bloco CSS da cortina e o script.
+     Pedacos montados a partir do index.html (scratchpad/monta-ad.js): os
+     pares sao os mesmos, alinhados por correlacao (contas no CLAUDE.md).
+     =================================================================== -->
+<meta name="robots" content="noindex, nofollow">
+<title>Antes e depois | WA Orofacial Institute</title>
+<meta name="description" content="Casos de pacientes publicados pela WA Orofacial Institute, com a responsável técnica Dra. Welleynne Ananda Dias, CRO-MG 54413.">
+<meta name="theme-color" content="#14110E">
+<meta property="og:title" content="Antes e depois | WA Orofacial Institute">
+<meta property="og:image" content="https://marcel0gs.github.io/wa-orofacial/assets/img/og-capa.jpg">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap">
+<style>
+:root{
+  --noite:#14110E;
+  --noite-2:#1B1713;
+  --noite-3:#241E18;
+  --marfim:#FAF7F2;
+  --areia:#F2EBE1;
+  --linho:#E5DACB;
+  --papel:#FFFFFF;
+
+  --ouro:#C9AE78;
+  --ouro-vivo:#E4CE9C;
+  --ouro-aceso:#9C762C;
+  --ouro-texto:#7F5F24;
+  --esmeralda:#1C3F3B;
+  --esmeralda-2:#234C47;
+  --rosa:#C8A6A8;
+
+  --tinta:#1E1A16;
+  --tinta-suave:#6A5F55;
+  --claro:#F4ECE0;
+  --claro-suave:#BDB1A2;
+
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --sans:"Jost",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+
+  --raio:18px;
+  --raio-g:28px;
+  --suave:cubic-bezier(.22,1,.36,1);
+  /* altura da barra do topo: o hero sobe por baixo dela (margin negativa) e
+     devolve o espaco por dentro (padding). Mexeu num, mexe no outro. */
+  --topo-h:78px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+html.com-intro{overflow:hidden}
+body{
+  margin:0;background:var(--marfim);color:var(--tinta);
+  font-family:var(--sans);font-size:17px;line-height:1.65;
+  /* clip e nao hidden: hidden criaria container de rolagem e mataria o
+     sticky do topo e do hero */
+  overflow-x:clip;
+}
+img{max-width:100%;display:block;height:auto}
+a{color:inherit}
+p{margin:0 0 1rem}
+h1,h2,h3,h4{margin:0;font-family:var(--serif);font-weight:500;line-height:1.06;letter-spacing:-.005em}
+h1{font-size:clamp(2.7rem,6.6vw,4.9rem)}
+h2{font-size:clamp(2.2rem,4.8vw,3.5rem)}
+h3{font-size:1.5rem;font-weight:600}
+h1 em,h2 em{font-style:italic;color:var(--ouro-texto)}
+[id]{scroll-margin-top:88px}
+
+.env{width:min(1180px,100% - 2.5rem);margin-inline:auto}
+.secao{position:relative;padding:clamp(4.2rem,9vw,7.5rem) 0;overflow-x:clip}
+.secao--areia{background:var(--areia)}
+.secao--noite{background:var(--noite);color:var(--claro)}
+.secao--noite h2,.secao--noite h3{color:var(--claro)}
+.secao--noite h2 em,.secao--esmeralda h2 em{color:var(--ouro)}
+.secao--esmeralda{background:var(--esmeralda);color:#E7EEEA}
+.secao--esmeralda h2{color:#F3F1EA}
+
+.olho{
+  display:inline-flex;align-items:center;gap:.75rem;margin-bottom:1.1rem;
+  font-size:.74rem;font-weight:500;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ouro-texto);
+}
+.olho::before{content:"";width:30px;height:1px;background:currentColor;opacity:.8}
+.secao--noite .olho,.secao--esmeralda .olho{color:var(--ouro)}
+.chamada{max-width:56ch;color:var(--tinta-suave);font-size:1.08rem;margin-top:1.1rem}
+.secao--noite .chamada{color:var(--claro-suave)}
+.secao--esmeralda .chamada{color:#B8CCC5}
+.cabeca{margin-bottom:clamp(2.2rem,4.6vw,3.6rem)}
+.cabeca--centro{text-align:center}
+.cabeca--centro .olho::after{content:"";width:30px;height:1px;background:currentColor;opacity:.8}
+.cabeca--centro .chamada{margin-inline:auto}
+
+/* ====================== botoes ======================
+   O componente validado em video (templates/componentes/botao-brilho-hover):
+   brilho que atravessa UMA vez no hover. Nada girando, nada em repouso. */
+.btn{
+  position:relative;isolation:isolate;overflow:hidden;
+  display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
+  padding:.95rem 1.7rem;border-radius:999px;
+  background:var(--ouro);color:var(--noite);border:1px solid var(--ouro);
+  font:500 .98rem/1.1 var(--sans);letter-spacing:.02em;text-decoration:none;
+  box-shadow:0 10px 28px rgba(156,118,44,.28);
+  transition:transform .2s ease,box-shadow .3s ease,background .2s ease,border-color .3s ease;
+}
+.btn:hover,.btn:focus-visible{background:var(--ouro-vivo);border-color:var(--ouro-vivo);transform:translateY(-2px);box-shadow:0 16px 36px rgba(156,118,44,.38)}
+.btn::before{
+  content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;z-index:1;
+  background:linear-gradient(115deg,transparent,rgba(255,255,255,.55),transparent);
+  transform:skewX(-20deg);transition:left .65s ease;pointer-events:none;
+}
+.btn:hover::before,.btn:focus-visible::before{left:130%}
+.btn--linha{background:transparent;color:var(--ouro-vivo);border-color:rgba(201,174,120,.5);box-shadow:none}
+.btn--linha:hover,.btn--linha:focus-visible{background:rgba(201,174,120,.1);border-color:var(--ouro);box-shadow:none}
+.btn--escuro{background:transparent;color:var(--tinta);border-color:var(--linho);box-shadow:none}
+.btn--escuro:hover,.btn--escuro:focus-visible{background:var(--papel);border-color:var(--ouro-texto);box-shadow:0 10px 24px rgba(40,30,15,.08)}
+.btn__ico{width:18px;height:18px;flex:none;fill:currentColor}
+.btn .i{width:18px;height:18px}
+.acoes{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
+:focus-visible{outline:2px solid var(--ouro);outline-offset:3px}
+
+/* ====================== icones ======================
+   Lucide (scripts/icone-lucide.js) + WhatsApp, Instagram e labios do site da
+   Larissa. Todos em traco de 1.5: espessura diferente no mesmo jogo e o que
+   mais estraga um conjunto de icones. */
+.i{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+.pular{position:absolute;left:-999px;top:.6rem;z-index:300;background:var(--ouro);color:var(--noite);padding:.6rem 1rem;border-radius:8px}
+.pular:focus{left:.6rem}
+
+/* ====================== topo desta pagina ======================
+   O mesmo topo do site, solido (aqui nao tem foto por baixo). */
+.topo{position:sticky;top:0;z-index:60;background:rgba(20,17,14,.94);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,174,120,.18)}
+.topo__linha{display:flex;align-items:center;gap:1.2rem;min-height:var(--topo-h)}
+.marca{display:flex;align-items:center;gap:.8rem;flex:none;text-decoration:none;color:var(--ouro)}
+.marca__mono{width:59px;height:37px;fill:currentColor}
+.marca__texto{display:flex;flex-direction:column;gap:.34rem}
+.marca__palavra{width:132px;height:19px;fill:currentColor}
+.marca__sub{font-size:.55rem;line-height:1;letter-spacing:.5em;text-transform:uppercase;color:rgba(228,206,156,.9)}
+.voltar{margin-left:auto;display:inline-flex;align-items:center;gap:.4rem;min-height:44px;font-size:.9rem;color:rgba(244,236,224,.86);text-decoration:none}
+.voltar:hover{color:var(--ouro-vivo)}
+.voltar .i{width:18px;height:18px}
+@media (max-width:430px){
+  .marca{gap:.6rem}
+  .marca__mono{width:48px;height:30px}
+  .marca__palavra{width:106px;height:15px}
+  .marca__sub{font-size:.5rem;letter-spacing:.42em}
+}
+
+/* =====================================================================
+   ANTES E DEPOIS: templates/componentes/antes-depois.html, sem alteracao
+   de mecanica. A cortina e um <input type="range"> invisivel.
+   ⚠ Os quatro pares vieram como MONTAGEM (duas fotos coladas). Foram
+   separados nas costuras medidas pixel a pixel e ALINHADOS por correlacao
+   (escala + deslocamento), pra o rosto nao pular quando a linha passa.
+   Contas no CLAUDE.md da pasta. Trocar uma foto sem refazer = par desalinhado.
+   ===================================================================== */
+.ad{
+  --ad-linha:#fff;
+  --ad-selo:rgba(20,17,14,.62);
+  --ad-selo-txt:#fff;
+  --ad-raio:20px;
+  margin:0;
+}
+.ads{display:grid;gap:clamp(1.6rem,3.4vw,2.4rem)}
+@media (min-width:820px){.ads--2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ad__quadro{
+  --p:50%;
+  position:relative;overflow:hidden;border-radius:var(--ad-raio);
+  aspect-ratio:4/3;background:#E8DED3;contain:paint;
+  box-shadow:0 24px 56px rgba(40,30,15,.16);
+}
+.ad__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-drag:none}
+.ad__corte{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--p)) 0 0)}
+.ad__linha{
+  position:absolute;top:0;bottom:0;left:var(--p);width:2px;margin-left:-1px;
+  background:var(--ad-linha);box-shadow:0 0 0 1px rgba(0,0,0,.18);pointer-events:none;
+}
+.ad__alca{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:46px;height:46px;border-radius:50%;
+  background:var(--ad-linha);color:var(--ouro-texto);
+  display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,.3);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.ad__alca svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ad__selo{
+  position:absolute;top:.8rem;padding:.32rem .75rem;border-radius:999px;
+  background:var(--ad-selo);color:var(--ad-selo-txt);
+  font-size:.66rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;
+  pointer-events:none;transition:opacity .2s ease;
+}
+.ad__selo--a{left:.8rem}
+.ad__selo--d{right:.8rem}
+.ad__range{
+  position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;
+  -webkit-appearance:none;appearance:none;background:transparent;
+  touch-action:pan-y;
+}
+.ad__range::-webkit-slider-thumb{-webkit-appearance:none;width:56px;height:100%}
+.ad__range::-moz-range-thumb{width:56px;height:100%;border:0;opacity:0}
+.ad__quadro:hover .ad__alca{transform:translate(-50%,-50%) scale(1.06)}
+.ad__range:active + .ad__linha .ad__alca{transform:translate(-50%,-50%) scale(1.12)}
+.ad__range:focus-visible + .ad__linha .ad__alca{box-shadow:0 0 0 3px var(--ad-linha),0 0 0 6px rgba(0,0,0,.35)}
+.ad__legenda{margin-top:1rem;font-size:.9rem;line-height:1.45;color:var(--tinta-suave)}
+.ad__legenda b{display:block;font:600 1.35rem/1.2 var(--serif);color:var(--tinta)}
+.ad__aviso{margin:clamp(1.6rem,3vw,2.2rem) auto 0;max-width:62ch;text-align:center;font-size:.84rem;color:var(--tinta-suave)}
+
+.rodape-ad{padding:2rem 0 2.6rem;background:var(--noite);color:var(--claro-suave);font-size:.85rem;text-align:center}
+.rodape-ad a{color:var(--ouro-vivo)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="wa-mono" viewBox="36 37 1022 636"><path fill-rule="evenodd" d="M104.5 41C102.3 41.5,98.3 42.4,95.5 43C81.1 46.3,65 53.4,54.2 61.4C45.4 68,38 75,38 76.9C38 79.6,51.8 92.7,53.4 91.5C54.1 90.9,57.5 88.2,60.9 85.3C77.4 71.3,97.5 63.7,119 63.6C136.9 63.5,151.2 67.5,165.2 76.7C183.2 88.5,189.1 97.2,207 138.5C223.4 176.3,226.1 182.6,227.9 186.5C228.9 188.7,232.1 195.9,235 202.5C237.9 209.1,241.1 216.5,242.2 219C243.3 221.5,246.9 229.6,250.2 237C253.4 244.4,256.8 252,257.7 253.9C258.5 255.8,260.5 260.3,262 263.9C263.6 267.5,271 284.5,278.5 301.5C292.2 332.6,306.5 365,312.5 379C314.3 383.1,318.6 392.8,322 400.5C325.4 408.2,330.2 419.2,332.7 425C335.2 430.8,338.3 438,339.7 441C343.7 449.7,362.9 493.7,366.7 502.5C371.1 512.9,372.4 514,380.9 514C384.8 514,388.3 513.5,389.2 512.8C390.1 512.1,398 493.5,406.8 471.5C420.5 437.4,437.5 395.4,442.6 383.1C444.5 378.6,445.4 379.6,450.7 392C453 397.2,460.3 414.1,467 429.5C473.8 444.9,481.2 462,483.5 467.5C485.9 473,489.7 481.7,491.9 486.9C494.2 492.1,496 497.3,496 498.4C496 499.6,491.7 511.1,486.4 524C468.4 568.1,468.9 566.9,471.1 568.1C473.1 569.1,492.6 568.7,493.7 567.6C494 567.4,501.9 547.9,511.4 524.3L528.5 481.5 609.7 481.2C679 481,691.1 481.2,692.3 482.4C693.1 483.2,696.8 491,700.5 499.7C720.9 547.5,737 583.5,741.1 590.8C758 620.2,789.9 647,823 659.3C854.8 671.2,891 670.6,920.5 657.8C950 645.1,957 635.8,960.9 605C963.6 582.9,964 579.1,964 572.8C964 564.3,966.1 553.7,969.8 543C977 522.6,976.4 514.3,967.1 502.6C965.4 500.5,964 497.8,964 496.7C964 495.7,966.5 492.1,969.5 488.8C976.3 481.5,978 477.6,978 469.5C978 462,976.3 457.6,969.2 446.7C963.7 438.2,962.4 434.1,963.5 428.3C964.3 423.9,965.9 421.6,976.8 408.6C999.9 381.2,999.6 374.3,974 355.5C969.6 352.2,961.5 346.1,956.2 341.9C924 316.7,906.1 284.8,902.5 246.5C901.3 233.6,899.8 224.6,897.3 215C893.6 200.8,888.9 189.9,879.6 174C875.9 167.6,876.2 166.6,882.8 163.7C895.6 158,905.1 157.1,928.5 159.4C951.9 161.7,962.3 163.7,981.5 169.5C996.8 174.2,1021.9 185.9,1034.7 194.4C1042.6 199.7,1050.1 198.5,1053.4 191.6C1055.4 187.4,1055.4 185.7,1053.5 182C1049.8 174.8,1013.5 155.9,987.5 147.7C957.9 138.2,912.2 134.2,883.3 138.5C864.3 141.3,857 138.3,839.5 120.4C825.9 106.5,818.6 100,804.5 89.6C774.8 67.4,741.7 52.4,706.4 45.1C685.2 40.7,674.4 39.7,657.5 40.3C634.9 41.1,621.2 44.4,602.1 53.8C586.7 61.3,577.7 69.6,571.7 81.9L567.6 90.5 567.6 103C567.7 114,568 116.3,570.3 122.2C578.9 144.5,594.8 157.8,631.3 173.4C653.9 183,677.9 188.3,707.3 190.2C738.8 192.2,769.5 188.9,828.7 177C837 175.4,844.6 174,845.4 174C848.8 174,854.9 181.2,859.3 190.3C867.6 207.4,872.3 223.7,875.4 246C879.4 274.1,880.5 280,883.2 288.5C894.8 323.8,913.5 347,948.5 369.4C958.7 376,963 379.7,963 381.9C963 383.5,959.4 388.1,947.9 401.4C944.2 405.6,939.5 412.3,937.4 416.3C934 422.8,933.6 424.2,933.6 431C933.7 439.8,937.3 448.9,945.9 461.3C948.7 465.3,951 469,951 469.4C951 469.8,949.2 472.9,947 476.3C941.8 484.2,940.6 488.6,940.7 498.4C940.8 505.8,941.1 507,945.5 515.7C950.8 526.2,950.8 527.2,944.8 534.8C939.9 540.9,935.1 552,933.9 560.2C932.7 567.7,933.4 580.5,936 598.5C938.5 615.7,938.5 615.7,935.7 619.3C930.8 625.8,911.3 636.7,896.2 641.4C885.5 644.7,866.7 645.1,855.5 642.1C840.3 638.1,826.7 630,816.4 618.6C808.8 610.3,805.2 604.3,797.6 586.8C794.1 578.9,790.6 570.9,789.7 569C788.9 567.1,777.9 542.1,765.5 513.5C753 484.9,734 441.5,723.3 417C712.5 392.5,701.6 367.6,699 361.5C696.4 355.5,693.3 348.5,692.2 346C691.1 343.5,686.3 332.5,681.5 321.5C676.7 310.5,669 293,664.4 282.5C659.9 272.1,650.8 251.4,644.3 236.5L632.5 209.5 624.8 209.2C617.1 208.9,617 209,610.8 213.2C592.6 225.7,585 231.4,585 232.6C585 233.3,585.9 236,587.1 238.7C591.3 248.6,592.2 250.5,593.1 252.2C595.2 256.3,597.4 250.6,550.5 366C541.9 387.2,533 409.1,530.8 414.8C528.5 420.4,526.1 425,525.5 425C524.8 425,523.1 422.4,521.7 419.3C520.4 416.1,515.2 404.3,510.2 393C505.3 381.7,496.3 361.3,490.2 347.5C484.2 333.8,477.8 319.2,476 315.1L472.8 307.7 478.9 292.6C482.2 284.3,487.3 271.9,490.1 265C498.1 245.4,521.5 187.6,530.6 165C535.2 153.4,538.4 144.1,537.9 143.6C536.6 142.2,515.8 142.8,514.4 144.3C513.7 144.9,505.5 164.6,496.2 188C482.4 222.4,463.9 268.4,461.3 274.8C460.3 277.2,459.2 275.9,455.7 267.8C453.7 263.2,450.1 255,447.7 249.5C445.3 244,435.1 220.8,425 198C401.2 143.7,400.9 143,399.6 143C388.5 142.7,343.6 143.1,343.2 143.5C342.6 144,345 150.3,349.8 161C351.1 164,352.8 167.9,353.5 169.5C364.8 195.4,369.6 206.5,371.6 211.2C372.9 214.3,375.4 219.9,377.1 223.7C378.8 227.4,383.5 238.2,387.5 247.5C391.6 256.9,402.4 281.6,411.5 302.5C420.7 323.4,428.9 342.4,429.7 344.6L431.3 348.8 424.2 366.6C409.8 402.7,397.9 431.5,397 432.4C396.5 432.9,395.9 433.2,395.7 432.9C395.3 432.5,371.1 377,366.7 366.5C365.3 363.2,361.6 354.7,358.5 347.5C355.4 340.4,350.2 328.4,347 321C343.8 313.6,339.3 303.2,337 298C334.6 292.8,331.7 286,330.5 283C329.2 280,321.4 261.8,313 242.5C304.6 223.3,296.5 204.6,295 201C261.8 122,254.5 108.5,233 87C210.5 64.5,183.7 49.7,153 42.9C142.4 40.5,111.8 39.3,104.5 41M640 67.5C614.2 71.9,590.4 90.7,592.3 105.1C596.8 139.1,664.1 166.7,734.5 163.5C742.8 163.1,756.7 161.9,765.5 160.8C781.9 158.8,784.5 158.4,803.5 155.5C809.6 154.6,818.6 153.3,823.5 152.6C835 151.1,834.9 150.6,822.2 138.1C784.3 101.4,744.5 79.3,700.5 70.6C678.8 66.3,654.4 65,640 67.5M606.1 290.1C605.6 291.4,602.6 298.8,599.5 306.5C596.3 314.2,593 322.5,592 325C589.4 331.8,568.3 383.9,566.1 389C565 391.5,561.7 399.6,558.7 407C555.7 414.4,550 428.7,545.9 438.7C541.9 448.7,538.8 457.2,539.1 457.4C540 458.3,680.3 458.1,681.1 457.3C681.5 456.9,678 447.7,673.3 437C668.7 426.3,661.6 409.9,657.5 400.5C653.5 391.2,649.1 381,647.7 378C646.3 375,640.8 362.4,635.5 350C630.2 337.6,624.3 324.1,622.5 320C620.7 315.9,617.1 307.6,614.5 301.5C608.9 288.4,607.5 286.6,606.1 290.1"/></symbol>
+  <symbol id="wa-palavra" viewBox="-3 -2 2120 305"><path fill-rule="evenodd" d="M0 10C0 16.4,0.3 18,1.5 18C4.5 18,13.7 22.9,19.1 27.3C25 32.3,30.6 39.7,33.8 47C36.6 53.4,41.6 64.8,50.3 84.5C54.4 93.9,62.6 112.5,68.5 126C74.4 139.5,83.4 160,88.5 171.5C93.6 183.1,107.1 213.9,118.5 240C130 266.1,140 288.1,140.9 288.8C142.8 290.4,150.5 290.4,151.7 288.8C152.3 288.1,157.4 276,163 262C168.6 248,175.6 230.7,178.5 223.5C181.4 216.4,184.3 210.5,185 210.5C185.7 210.5,188.4 215.5,191 221.5C193.6 227.6,198.7 239.5,202.5 248C206.2 256.5,210.8 267.1,212.7 271.5C218.1 284.3,220.2 288.5,221.4 289.2C222.8 290.2,230.2 290.2,231.6 289.2C232.3 288.8,236.2 280,240.5 269.5C244.7 259.1,251.6 242.2,255.7 232C259.8 221.8,266 206.5,269.5 198C273 189.5,281 169.7,287.3 154C305.1 109.8,313.4 89.5,318.4 77.3C320.9 71.2,323 65.6,323 65C323 64.3,320.3 64,314.9 64.2L306.9 64.5 272.1 151.5C252.9 199.4,236.7 238.5,236.1 238.5C235.4 238.5,232.6 233.3,229.9 227C227.1 220.7,219.9 204.4,213.9 190.8C207.9 177.1,203 165.1,203 164.1C203 163,203.9 160,205.1 157.3C206.2 154.7,211.6 141.5,217 128C222.5 114.5,230.3 95.2,234.4 85.1C238.6 74.9,242 66,242 65.3C242 64.4,240 64,234.7 64L227.3 64 225.7 67.8C223.1 73.5,200.1 130.8,197.7 137.3C196.6 140.4,195.1 143,194.5 143C193.8 143,188.9 133,183.5 120.8C166.4 82,159.5 66.5,158.7 65.3C157.8 63.8,123 63.4,123 64.8C123 65.6,136 96.3,141.8 109C142.9 111.5,146.8 120.5,150.5 129C154.2 137.5,158.3 146.8,159.5 149.5C167.9 168.3,176 187.9,176 189.2C176 191,158.2 235.9,156.7 237.8C155.2 239.7,154.5 239.3,152.8 234.8C151.9 232.4,148.4 224.2,145 216.5C141.6 208.8,136.9 198,134.5 192.5C132.2 187,125.6 171.9,120 159C114.4 146.1,108.5 132.6,107 129C101.6 116.3,78.2 62.4,76 57.5C64.5 32.3,38.8 11.1,11.3 4.1C-0.6 1,0 0.7,0 10M354 66.1C342.4 74.4,342.6 74,346.1 81.3C347.7 84.7,349 88.3,349 89.3C349 90.9,343.2 105.6,306.5 196.5C277.1 269.2,272 282.3,272 284.1C272 285.9,272.6 286.1,279.2 285.8L286.4 285.5 296.6 260.1C302.2 246.1,307.3 233.8,307.9 232.8C309 231.1,311.7 231,360.2 231.2L411.4 231.5 412.7 234C413.4 235.4,415.1 239,416.4 242C428.3 269.6,432.4 279,433.8 282L435.5 285.5 453.3 285.8C468.1 286,471 285.8,471 284.6C471 283.3,465.7 270.7,452.7 241C449.7 234.1,443.8 220.6,439.6 211C435.4 201.4,431.3 192.2,430.5 190.5C428.2 185.4,396.8 114,387.5 92.5C385.1 87,381 77.6,378.3 71.5L373.3 60.5 367.9 60.2C362.7 60,362.2 60.2,354 66.1M676 61C663 62.6,642.9 69.7,631.5 76.5C628.3 78.4,625.6 80,625.3 80C624.5 80,614.2 88.5,608.6 93.8C589.1 112.6,578.2 133.9,574.4 160.8C567.8 207.9,593.2 254,637.9 276.5C664.8 289.9,693.8 293.3,722.6 286.4C758.7 277.8,789.1 253.5,804.3 221.2C810.9 207,814 192.3,814 174.8C814 159.4,813.5 156.3,809 141.4C797.3 103.5,765.2 74,724 63.6C712.4 60.6,688.6 59.3,676 61M1084.3 61C1042.6 66.9,1005.4 95,990.2 132.1C984 147.2,981.7 158.8,981.8 175.5C981.8 192,983.7 201.7,990 217.4C1011 270.4,1074.8 301,1133 285.9C1174.5 275.1,1206.3 245.3,1217.9 206.3C1223.7 186.7,1224.2 167.9,1219.4 148.5C1208.9 106.1,1175.4 74.2,1129.6 62.9C1120.3 60.6,1094.6 59.5,1084.3 61M1419.4 64.3C1416.1 66.6,1411.6 69.9,1409.5 71.6L1405.6 74.7 1408.8 81.4C1410.6 85.1,1412 88.6,1412 89.2C1412 90.2,1400.3 120.2,1397.1 127.5C1396.1 129.6,1392.3 139.1,1363.9 210C1354 234.5,1345.6 255.4,1345.1 256.5C1341.9 263.5,1334.8 281.8,1334.6 283.5C1334.5 285.3,1335.2 285.5,1341.1 285.8C1345.7 286,1348 285.7,1348.8 284.7C1349.4 284,1354.6 271.7,1360.4 257.4L1370.8 231.5 1422.3 231.2C1462.7 231,1473.9 231.3,1474.7 232.2C1475.2 232.9,1477.4 237.6,1479.4 242.5C1481.5 247.5,1484 253.3,1485 255.5C1486 257.7,1488.9 264.5,1491.4 270.5C1498.7 287.6,1496.1 286,1516.5 286C1529.9 286,1534 285.7,1534 284.7C1534 284,1531.9 278.8,1529.4 273C1526.9 267.2,1521 253.7,1516.3 243C1511.7 232.3,1506.3 219.9,1504.3 215.5C1502.3 211.1,1499.9 205.7,1499 203.5C1498 201.3,1489 180.9,1479 158.1C1469.1 135.3,1460.1 114.8,1459.1 112.6C1454.1 101.5,1437.7 64.2,1436.9 62.3C1436.2 60.3,1435.3 60,1430.8 60C1426.2 60,1424.7 60.6,1419.4 64.3M1626 61.1C1619.5 61.9,1617.4 62.4,1605 66.3C1576.7 75.1,1549.1 98.7,1535.6 125.8C1517.8 161.2,1521 204.4,1543.8 237.9C1562.7 265.7,1595.3 284.8,1631 289C1668.5 293.4,1701.9 278.2,1722.6 247.2C1725.7 242.6,1727.9 238.3,1727.7 237.6C1727.2 236.3,1718.5 231,1716.9 231C1716.4 231,1713.9 234.3,1711.3 238.3C1702.1 252.2,1687.7 264.4,1674 269.8C1656 277,1630.6 276.7,1613.5 269.1C1589.8 258.6,1571.3 234.9,1563.5 205C1559.9 191.1,1558.9 168.2,1561.4 154.5C1569.8 109.1,1597.5 79.4,1635.6 74.9C1666.5 71.2,1696.2 86.3,1712.7 114C1714.2 116.4,1715.9 118,1717 118C1719 118,1726 114.3,1727.2 112.6C1729.7 108.9,1708.8 84,1696 75.3C1686 68.5,1671.7 62.9,1660 61C1652.5 59.9,1635.5 59.9,1626 61.1M1876.7 62C1875.3 63.1,1873.7 64,1873.1 64C1872.5 64,1872 64.3,1872 64.8C1872 65.2,1870 66.7,1867.7 68.2C1859.5 73.4,1859.4 73.8,1862.9 81.8C1864.6 85.7,1866 89.2,1866 89.5C1866 90.4,1859.7 106.4,1856.6 113.5C1855.3 116.3,1853.8 120.1,1853.1 122C1852.4 123.9,1851.4 126.4,1850.9 127.5C1850.4 128.6,1847.2 136.7,1843.6 145.5C1840.1 154.3,1829.2 181.3,1819.5 205.5C1809.7 229.7,1801.1 251.1,1800.4 253C1799.7 254.9,1796.6 262.6,1793.5 269.9C1790.5 277.3,1788.2 284,1788.5 284.7C1788.8 285.7,1790.8 286,1795.7 285.8L1802.5 285.5 1804.7 281C1805.9 278.5,1807.8 274,1808.9 271C1810 268,1814 257.9,1817.8 248.5L1824.7 231.5 1876.6 231.5L1928.5 231.5 1932.5 240.6C1934.7 245.5,1937.3 251.4,1938.2 253.6C1943.7 266.4,1949.9 280.9,1951 283.3L1952.3 286 1970.2 286C1983.5 286,1988 285.7,1988 284.8C1988 283.8,1967 235.1,1955.9 210.5C1954.9 208.3,1951.6 200.7,1948.5 193.5C1945.4 186.4,1938.8 171.5,1934 160.5C1929.2 149.5,1922.6 134.7,1919.5 127.5C1916.4 120.4,1912.9 112.5,1911.8 110C1910.7 107.5,1906 97,1901.5 86.5C1888.8 57.4,1890.5 60,1884.5 60C1880.8 60,1878.5 60.6,1876.7 62M828.6 65.5C827.9 67.5,827.9 279.6,828.7 283.3L829.2 286 845.6 286C854.6 286,862 285.7,862 285.3C862.1 284.8,862.2 260.6,862.3 231.3C862.4 202.1,862.8 177.8,863.2 177.4C864.1 176.5,872 175.9,874.1 176.6C875 176.8,880.7 184.1,886.8 192.8C908.9 224.1,950.2 281.6,952.3 283.8C954.3 285.9,954.9 286,973.1 286C983.4 286,992.1 285.6,992.4 285.1C992.7 284.6,989.6 279.6,985.5 273.9C978.2 263.7,955.5 232.2,944.2 216.7C941.1 212.4,937.8 207.8,937 206.6C932.2 199.5,922 185.8,918.2 181.2C915.8 178.3,914 175.7,914.2 175.4C914.5 175.2,918.2 174.1,922.6 173C933.4 170.2,947.4 163.3,953.7 157.6C968.7 144,974.3 124.6,968.5 106.1C961.8 85,944.6 70.7,919.7 65.5C908.9 63.3,829.5 63.3,828.6 65.5M1237.2 174.7L1237.5 285.5 1253.5 285.5L1269.5 285.5 1269.8 232.1C1269.9 195,1270.4 178.3,1271.1 177.4C1272 176.3,1277 176,1293.9 176.1C1305.8 176.1,1316.5 176.1,1317.8 176.1C1320 176,1320.1 175.7,1319.8 169.3L1319.5 162.5 1295.5 162.2C1277.9 162,1271.4 161.6,1270.8 160.7C1269.4 158.5,1269.8 80.2,1271.3 79.3C1271.9 78.9,1291 78.3,1313.5 78L1354.5 77.5 1354.5 71L1354.5 64.5 1295.7 64.2L1237 64 1237.2 174.7M1749.2 174.8L1749.5 285.5 1765.8 285.8L1782 286.1 1782 175L1782 64 1765.5 64L1749 64 1749.2 174.8M1993.6 65.6C1992.4 68.7,1993 283.2,1994.1 284.7C1995 285.7,2006.6 286,2054.6 286L2114 286 2114.5 283.7C2114.8 282.5,2115 279.4,2114.8 277L2114.5 272.5 2071.9 272.2C2037.8 272,2029 271.7,2028.1 270.6C2027.3 269.7,2026.9 240.1,2026.8 166.9L2026.5 64.5 2010.4 64.2C1996.2 64,1994.2 64.1,1993.6 65.6M683 74.9C663.1 77.8,644.7 88.7,632.1 105C587.9 162.1,610.5 255.3,672.7 272.6C681.7 275.1,701.2 275.6,710.7 273.5C742.2 266.6,765.7 241.2,775.2 203.7C778.1 192.6,778.3 190.1,778.4 175C778.4 158,778 154.8,773.3 139C764.2 107.9,742.2 84.7,715 77.2C706.5 74.8,691.2 73.8,683 74.9M1090.5 75C1055.6 80.5,1030 107.2,1019.8 148.9C1016.9 160.6,1016.7 187.7,1019.3 199C1026.3 229,1039.8 250,1060.6 263.3C1068.3 268.1,1075.2 271.1,1085 273.6C1093.8 275.8,1115.8 275.1,1124.5 272.2C1151 263.7,1170.9 242.6,1180.9 212.5C1200 154.5,1172 89.7,1122.3 76.9C1113.3 74.6,1098.7 73.8,1090.5 75M863.1 79.8C861.7 82.4,861.7 157.6,863.1 160.1C864 161.9,865.4 162,881.8 162C909.7 162,918 158.8,929.3 143.9C933.6 138.2,935.5 130.9,935.5 119.9C935.5 109.8,935.4 109.1,931.8 101.9C925.6 89.4,916.6 82.3,903.3 79.5C899 78.6,890.5 78,880.3 78C865.5 78,864 78.2,863.1 79.8M351.3 123.7C348.5 130.7,339.2 154,330.6 175.4C322 196.7,315.3 214.6,315.6 215.1C316.4 216.4,404 216.3,404 214.9C404 214.4,402.8 211.3,401.4 208.2C400 205.1,398 200.5,397 198C388.4 176.9,358.8 111.4,357.7 111.2C356.8 111,354.7 115.1,351.3 123.7M1416.7 117.3C1403.6 149.2,1378 213.8,1378 214.9C1378 216.2,1465.6 216.5,1466.4 215.1C1466.7 214.7,1464.8 209.4,1462.1 203.4C1459.5 197.4,1454 185.1,1450 176C1446 166.9,1441.9 157.6,1440.9 155.3C1439.9 153,1439 150.9,1439 150.6C1439 150.4,1437.5 146.9,1435.6 142.8C1433.8 138.8,1429.9 130,1427 123.3C1424.1 116.5,1421.1 111,1420.5 111C1419.8 111,1418.1 113.8,1416.7 117.3M1872.3 112.8C1872 113.7,1862.7 136.8,1851.8 164C1840.9 191.2,1832 214,1832 214.7C1832 215.7,1840.7 216,1876 216C1918.3 216,1920 215.9,1920 214.1C1920 212.5,1916 202.8,1908.8 187C1906.9 183,1898.6 164,1889.5 143C1875.1 109.7,1874.1 107.9,1872.3 112.8"/></symbol>
+  <symbol id="i-esq" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+</svg>
+
+<header class="topo">
+  <div class="env topo__linha">
+    <a class="marca" href="../" aria-label="WA Orofacial Institute, voltar ao site">
+      <svg class="marca__mono" aria-hidden="true"><use href="#wa-mono"/></svg>
+      <span class="marca__texto">
+        <svg class="marca__palavra" aria-hidden="true"><use href="#wa-palavra"/></svg>
+        <span class="marca__sub">Institute</span>
+      </span>
+    </a>
+    <a class="voltar" href="../"><svg class="i" aria-hidden="true"><use href="#i-esq"/></svg>Voltar ao site</a>
+  </div>
+</header>
+
+<main>
+<section class="secao secao--areia" id="resultados">
+  <div class="env">
+    <div class="cabeca cabeca--centro">
+      <span class="olho">Antes e depois</span>
+      <h2>Arraste e veja <em>de perto.</em></h2>
+      <p class="chamada">Casos de pacientes da WA, publicados pela própria clínica. Arraste a linha sobre cada foto para comparar.</p>
+    </div>
+
+    <div class="ads ads--2">
+      <figure class="ad" data-ad>
+        <!-- A foto de BAIXO e a DEPOIS; a cortada por cima e a ANTES (aparece a esquerda).
+             ⚠ ORDEM DESTE PAR DEFINIDA PELO USUARIO em 30/09/2026: o ANTES e a foto
+             da blusa vermelha (lado DIREITO da montagem original). A leitura da
+             montagem apontava o contrario (labio mais cheio e mandibula mais marcada
+             nessa foto). Confirmar com a Dra. na reuniao: antes e depois trocado e
+             propaganda enganosa. Desfazer = trocar os dois nomes de arquivo. -->
+        <div class="ad__quadro">
+          <img class="ad__img" src="../assets/img/ad-rosto-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois do procedimento: rosto de frente">
+          <div class="ad__corte">
+            <img class="ad__img" src="../assets/img/ad-rosto-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes do procedimento: rosto de frente">
+          </div>
+          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
+          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
+          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
+          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: harmonização facial, vista de frente. Arraste ou use as setas do teclado">
+        </div>
+        <figcaption class="ad__legenda"><b>Harmonização facial</b>Vista de frente · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
+      </figure>
+
+      <figure class="ad" data-ad>
+        <div class="ad__quadro">
+          <img class="ad__img" src="../assets/img/ad-perfil-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois: perfil do rosto, com queixo e linha da mandíbula mais definidos">
+          <div class="ad__corte">
+            <img class="ad__img" src="../assets/img/ad-perfil-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes: perfil do rosto, antes do procedimento">
+          </div>
+          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
+          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
+          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
+          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: perfil, região do queixo e da mandíbula. Arraste ou use as setas do teclado">
+        </div>
+        <figcaption class="ad__legenda"><b>Perfil</b>Região do queixo e da mandíbula · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
+      </figure>
+
+      <figure class="ad" data-ad>
+        <div class="ad__quadro">
+          <img class="ad__img" src="../assets/img/ad-olhar-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois: região dos olhos com olheiras mais suaves">
+          <div class="ad__corte">
+            <img class="ad__img" src="../assets/img/ad-olhar-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes: região dos olhos com olheiras marcadas">
+          </div>
+          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
+          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
+          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
+          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: região dos olhos. Arraste ou use as setas do teclado">
+        </div>
+        <figcaption class="ad__legenda"><b>Região dos olhos</b>Olheiras · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
+      </figure>
+
+      <figure class="ad" data-ad>
+        <div class="ad__quadro">
+          <img class="ad__img" src="../assets/img/ad-sorriso-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois: sorriso com lentes em resina, dentes com forma e cor uniformes">
+          <div class="ad__corte">
+            <img class="ad__img" src="../assets/img/ad-sorriso-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes: sorriso com dentes de formatos e tons diferentes">
+          </div>
+          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
+          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
+          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
+          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: lentes em resina. Arraste ou use as setas do teclado">
+        </div>
+        <figcaption class="ad__legenda"><b>Lentes em resina</b>Forma e cor dos dentes · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
+      </figure>
+    </div>
+
+    <!-- ⚠ Regra 4 do componente. Nao apagar. -->
+    <p class="ad__aviso">Resultados variam de pessoa para pessoa e dependem de avaliação individual. Responsável técnica: Dra. Welleynne Ananda Dias, CRO-MG 54413.</p>
+  </div>
+</section>
+</main>
+
+<footer class="rodape-ad">
+  <div class="env">WA Orofacial Institute · Itabira/MG · Responsável técnica: Dra. Welleynne Ananda Dias, CRO-MG 54413 · <a href="../">voltar ao site</a></div>
+</footer>
+
+<!-- O script da cortina, igual ao do site (templates/componentes/antes-depois.html) -->
+<script>
+(function(){
+  "use strict";
+  var pares = document.querySelectorAll("[data-ad]");
+  if (!pares.length) return;
+  var mq = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  var semMovimento = !!(mq && mq.matches);
+
+  Array.prototype.forEach.call(pares, function(ad){
+    var quadro = ad.querySelector(".ad__quadro");
+    var range  = ad.querySelector(".ad__range");
+    var selA   = ad.querySelector("[data-selo-a]");
+    var selD   = ad.querySelector("[data-selo-d]");
+    if (!quadro || !range) return;
+
+    function pinta(v){
+      quadro.style.setProperty("--p", v + "%");
+      if (selA) selA.style.opacity = v < 16 ? 0 : 1;
+      if (selD) selD.style.opacity = v > 84 ? 0 : 1;
+    }
+    range.addEventListener("input", function(){ pinta(range.value); });
+    pinta(range.value);
+
+    if (semMovimento || !("IntersectionObserver" in window)) return;
+    var obs = new IntersectionObserver(function(itens){
+      itens.forEach(function(e){
+        if (!e.isIntersecting) return;
+        obs.disconnect();
+        var ini = null, DUR = 1600;
+        requestAnimationFrame(function passo(t){
+          if (!ini) ini = t;
+          var p = Math.min((t - ini) / DUR, 1);
+          var v = 50 + Math.sin(p * Math.PI * 2) * 18 * (1 - p);
+          range.value = v; pinta(v);
+          if (p < 1) requestAnimationFrame(passo);
+          else { range.value = 50; pinta(50); }
+        });
+      });
+    }, { threshold: 0.5 });
+    obs.observe(quadro);
+  });
+})();
+</script>
+</body>
+</html>

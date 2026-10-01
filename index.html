@@ -6,7 +6,7 @@
 <!-- Roda ANTES de o CSS pintar, por dois motivos:
      1. a classe `js`: sem ela a barra do topo nasce solida e nada depende de script;
      2. a abertura: so aparece na PRIMEIRA visita da sessao, e nunca pra quem chega
-        por um link de ancora (#resultados). Com "reduzir movimento" ligado ela
+        por um link de ancora (#tratamentos). Com "reduzir movimento" ligado ela
         continua existindo, mas na versao calma (so dissolve, sem portas e sem traco).
      Quem ja viu a abertura ganha `pronto` aqui mesmo, e o topo anima sem esperar. -->
 <script>
@@ -519,54 +519,168 @@ main > section:not(.hero),.rodape{position:relative;z-index:1}
   .compo__selo strong{font-size:1.9rem}
 }
 
-/* ====================== tratamentos ====================== */
+/* =====================================================================
+   TRATAMENTOS: VITRINE DE FOTOS (30/09/2026, pedido do usuario com o print
+   da vitrine da Onodera: "semelhante, mas melhor, design mais moderno e
+   animacao melhor"). Fotos reais da clinica, recortadas 3:4.
+   - Trilho de ponta a ponta da tela, alinhado a coluna do site na esquerda
+     (--margem). Rola com o dedo, com o trackpad ou pelas setas.
+   - SETAS NAS PONTAS E NO MEIO DA ALTURA DA FOTO: preferencia dele, a
+     mesma do palco. O top delas e calculado da largura do card.
+   - Abas: levam ao primeiro card da familia e acendem conforme a rolagem.
+   - Entrada em cortina (a foto sobe de baixo, o zoom assenta, o texto vem
+     depois), card a card. Excecao EXPLICITA a regra de nao esconder
+     conteudo esperando a rolagem, como o leque: ele pediu animacao aqui.
+     As classes de espera saem quando a entrada termina.
+   - Parallax lateral: a foto anda mais devagar que o card quando o trilho
+     corre (a imagem tem 118% da largura do card, folga de 9% de cada lado).
+   - No desktop o texto e o "Agendar" sobem no hover; no toque ficam a mostra.
+   ===================================================================== */
 .tratamentos{
   background:
     radial-gradient(60% 50% at 100% 0%,rgba(201,174,120,.12),transparent 70%),
     radial-gradient(50% 40% at 0% 100%,rgba(28,63,59,.35),transparent 70%),
     var(--noite);
 }
-.familias{display:grid;gap:clamp(1.4rem,3vw,2.2rem)}
-@media (min-width:1000px){.familias{grid-template-columns:1fr 1fr}}
-.familia{
-  border-radius:var(--raio-g);padding:clamp(1.3rem,3vw,2.1rem);
-  background:linear-gradient(160deg,rgba(201,174,120,.1),rgba(201,174,120,.02) 60%);
-  border:1px solid rgba(201,174,120,.22);
+.trat-cab{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.6rem 3rem;margin-bottom:clamp(1.6rem,3.4vw,2.4rem)}
+.trat-cab .cabeca{margin-bottom:0}
+
+.abas{position:relative;display:inline-flex;gap:.25rem;padding:.3rem;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(201,174,120,.28)}
+.aba{
+  position:relative;z-index:1;display:inline-flex;align-items:center;gap:.45rem;min-height:44px;padding:0 1.15rem;
+  border-radius:999px;font-size:.9rem;font-weight:500;letter-spacing:.02em;white-space:nowrap;text-decoration:none;
+  color:var(--claro-suave);transition:color .4s ease;
 }
-.familia__cab{display:flex;align-items:center;gap:1rem;margin-bottom:.6rem}
-.familia__cab .i{width:30px;height:30px;color:var(--ouro)}
-.familia__cab h3{font-size:clamp(1.7rem,3vw,2.1rem);font-weight:500;color:var(--claro)}
-.familia__txt{color:var(--claro-suave);font-size:.98rem;margin:0 0 1.4rem}
-.trats{display:grid;gap:.85rem}
-@media (min-width:560px){.trats{grid-template-columns:1fr 1fr}}
-.trat{
-  position:relative;overflow:hidden;padding:1.25rem 1.15rem 1.3rem;border-radius:var(--raio);
-  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);
-  transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
-  transition:transform .3s ease-out,border-color .3s ease,background .3s ease;
+.aba b{font-size:.7rem;font-weight:500;color:var(--ouro);transition:color .4s ease}
+.aba:hover{color:var(--claro)}
+.aba[aria-current="true"],.aba[aria-current="true"] b{color:var(--noite)}
+/* a pilula dourada que corre de uma aba pra outra (posicionada pelo JS) */
+.abas__marca{
+  position:absolute;z-index:0;left:0;top:.3rem;bottom:.3rem;width:0;border-radius:999px;
+  background:linear-gradient(135deg,var(--ouro-vivo),var(--ouro));box-shadow:0 8px 22px rgba(201,174,120,.28);
+  transition:transform .6s var(--suave),width .6s var(--suave);
 }
-.trat::after{
-  content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
-  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(228,206,156,.2),transparent 55%);
+/* sem JS a pilula nao anda: a aba acesa ganha o fundo ela mesma */
+html:not(.js) .aba[aria-current="true"]{background:var(--ouro)}
+@media (max-width:420px){.aba{padding:0 .9rem;font-size:.84rem}.aba b{display:none}}
+
+.vitrine{
+  --larg:clamp(236px,23vw,300px);
+  --vao:clamp(.9rem,1.5vw,1.3rem);
+  --margem:max(1.25rem,calc((100% - 1180px) / 2));
+  position:relative;
 }
-.trat:hover{border-color:rgba(201,174,120,.45);background:rgba(255,255,255,.05)}
-.trat:hover::after{opacity:1}
-.trat__ico{
-  width:46px;height:46px;border-radius:13px;display:grid;place-items:center;margin-bottom:.95rem;
-  color:var(--ouro-vivo);background:rgba(201,174,120,.1);border:1px solid rgba(201,174,120,.32);
-  transition:transform .45s var(--suave),background .3s ease;
+@media (max-width:600px){.vitrine{--larg:min(74vw,300px)}}
+/* position:relative: e nele que o JS mede o offsetLeft dos cards */
+.vitrine__trilho{
+  position:relative;display:flex;gap:var(--vao);margin:0;list-style:none;
+  padding:.8rem var(--margem) 1.8rem;
+  overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--margem);
+  scrollbar-width:none;
 }
-.trat:hover .trat__ico{transform:translateY(-3px) rotate(-7deg);background:rgba(201,174,120,.18)}
-.trat h4{font:600 1.32rem/1.15 var(--serif);color:var(--claro);margin:0 0 .35rem}
-.trat p{margin:0;font-size:.93rem;line-height:1.55;color:var(--claro-suave)}
-/* no celular o card deita: icone ao lado do texto. Empilhado, a secao
-   passava de 2.600px de altura so com oito cards */
-@media (max-width:559px){
-  .trat{display:grid;grid-template-columns:auto 1fr;column-gap:.95rem;align-items:start;padding:1.05rem 1rem}
-  .trat__ico{grid-row:span 2;margin:0;width:42px;height:42px}
-  .trat h4{font-size:1.22rem;margin-top:.1rem}
+.vitrine__trilho::-webkit-scrollbar{display:none}
+.tcard{flex:0 0 var(--larg);scroll-snap-align:start}
+
+.tcard__a{
+  position:relative;isolation:isolate;display:block;aspect-ratio:3/4;overflow:hidden;
+  border-radius:22px;background:#2A231C;color:#fff;text-decoration:none;
+  box-shadow:0 22px 48px rgba(0,0,0,.42);
+  transition:transform .6s var(--suave),box-shadow .6s var(--suave);
 }
-.extras{display:grid;gap:.85rem;margin-top:clamp(1.4rem,3vw,2.2rem)}
+/* display:block e obrigatorio: e um <span>. Absoluto ele vira bloco
+   sozinho, mas no celular ele e relativo, e span em linha ignora o
+   aspect-ratio (a foto sumia, card com 190px de altura) */
+.tcard__midia{display:block;position:absolute;inset:0;z-index:-2;overflow:hidden}
+.tcard__midia img{
+  position:absolute;top:0;left:-9%;width:118%;max-width:none;height:100%;object-fit:cover;
+  transition:scale 1.2s var(--suave);
+}
+/* veu: a base escurece pro texto, o alto fica limpo */
+.tcard__a::after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(14,11,9,.28) 0%,rgba(14,11,9,0) 22%,rgba(14,11,9,0) 46%,rgba(14,11,9,.62) 72%,rgba(14,11,9,.94) 100%);
+}
+/* filete dourado por dentro da borda, que acende no hover */
+.tcard__a::before{
+  content:"";position:absolute;inset:0;z-index:3;border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(228,206,156,.14);transition:box-shadow .5s ease;
+}
+.tcard__brilho{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,240,210,.2) 50%,transparent 65%);
+  translate:-130% 0;transition:translate 1.1s var(--suave);
+}
+.tcard__n{
+  position:absolute;left:1rem;top:1rem;z-index:2;padding:.28rem .7rem;border-radius:999px;
+  font:italic 500 .95rem/1.2 var(--serif);letter-spacing:.08em;color:#fff;
+  background:rgba(20,17,14,.4);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.tcard__corpo{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:1.2rem 1.25rem 1.3rem}
+.tcard__cat{display:block;margin-bottom:.4rem;font-size:.64rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--ouro-vivo)}
+.tcard h3{font-size:clamp(1.55rem,2.1vw,1.8rem);font-weight:500;line-height:1.08;color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.45)}
+.tcard__txt{margin:.6rem 0 0;font-size:.88rem;line-height:1.5;color:rgba(255,255,255,.84)}
+.tcard__cta{display:inline-flex;align-items:center;gap:.4rem;margin-top:.75rem;font-size:.78rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ouro-vivo)}
+.tcard__cta .i{width:16px;height:16px;transition:transform .45s var(--suave)}
+/* com mouse: titulo sempre, o resto sobe no hover (0fr -> 1fr anima a altura
+   de verdade, sem chutar max-height). No toque nao tem hover: fica a mostra */
+@media (hover:hover) and (pointer:fine){
+  .tcard__mais{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .6s var(--suave),opacity .45s ease}
+  .tcard__mais > div{overflow:hidden}
+  .tcard__a:hover .tcard__mais,.tcard__a:focus-visible .tcard__mais{grid-template-rows:1fr;opacity:1}
+  .tcard__a:hover{transform:translateY(-8px);box-shadow:0 34px 70px rgba(0,0,0,.55)}
+  .tcard__a:hover::before{box-shadow:inset 0 0 0 1px rgba(228,206,156,.65)}
+  .tcard__a:hover .tcard__midia img{scale:1.07}
+  .tcard__a:hover .tcard__brilho{translate:130% 0}
+  .tcard__a:hover .tcard__cta .i{transform:translate(3px,-3px)}
+}
+.tcard__a:focus-visible{outline:2px solid var(--ouro-vivo);outline-offset:4px}
+/* CELULAR: o texto desce pra uma faixa ABAIXO da foto, como no print da
+   Onodera. Sobre a foto, a legenda inteira (sem hover, fica sempre a
+   mostra) subia ate o meio do card e batia nas setas, que tem que ficar no
+   meio da altura da foto. Os cards se igualam pela altura do maior. */
+@media (max-width:600px){
+  .tcard{display:flex}
+  .tcard__a{flex:1;aspect-ratio:auto;background:#1E1915}
+  .tcard__midia{position:relative;inset:auto;z-index:0;aspect-ratio:3/4}
+  .tcard__a::after{display:none}
+  .tcard__corpo{position:relative;padding:1rem 1.1rem 1.2rem}
+  .tcard h3{font-size:1.5rem;text-shadow:none}
+  .tcard__txt{font-size:.86rem}
+}
+
+/* setas nas pontas, no meio da altura da FOTO (.8rem do padding + metade de 4/3) */
+.vitrine__seta{
+  position:absolute;z-index:4;top:calc(.8rem + var(--larg) * 2 / 3);translate:0 -50%;
+  width:52px;height:52px;border-radius:50%;display:none;place-items:center;cursor:pointer;color:#fff;
+  background:rgba(20,17,14,.55);border:1px solid rgba(228,206,156,.45);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 12px 30px rgba(0,0,0,.4);
+  transition:opacity .3s ease,background .2s ease,border-color .2s ease,scale .2s ease;
+}
+.js .vitrine__seta{display:grid}
+.vitrine__seta:hover{background:rgba(20,17,14,.85);border-color:var(--ouro-vivo)}
+.vitrine__seta:active{scale:.94}
+.vitrine__seta:disabled{opacity:.28;cursor:default}
+.vitrine__seta .i{width:22px;height:22px}
+.vitrine__seta--ant{left:max(.6rem,calc((100% - 1180px) / 2 - 26px))}
+.vitrine__seta--prox{right:max(.6rem,calc((100% - 1180px) / 2 - 26px))}
+@media (max-width:600px){.vitrine__seta{width:44px;height:44px}.vitrine__seta .i{width:20px;height:20px}}
+
+.vitrine__rodape{display:none;align-items:center;gap:1.1rem;margin-top:.2rem}
+.js .vitrine__rodape{display:flex}
+.vitrine__conta{font-size:.76rem;letter-spacing:.18em;color:var(--claro-suave);white-space:nowrap}
+.vitrine__conta b{font-weight:500;color:var(--claro)}
+.vitrine__barra{position:relative;flex:1;height:2px;border-radius:2px;overflow:hidden;background:rgba(201,174,120,.18)}
+.vitrine__barra i{position:absolute;inset:0;transform-origin:0 50%;transform:scaleX(var(--prog,.1));background:linear-gradient(90deg,var(--ouro-aceso),var(--ouro-vivo));transition:transform .3s ease-out}
+
+/* entrada em cortina. --o = ordem do card na tela (o JS escreve) */
+.vitrine--espera .tcard__a{clip-path:inset(100% 0 0 0 round 22px);box-shadow:none}
+.vitrine--espera .tcard__midia img{scale:1.28}
+.vitrine--espera .tcard__corpo,.vitrine--espera .tcard__n{opacity:0;translate:0 22px}
+.vitrine--entra .tcard__a{clip-path:inset(0 0 0 0 round 22px);transition:clip-path 1.05s var(--suave) calc(var(--o,0) * 110ms)}
+.vitrine--entra .tcard__midia img{scale:1;transition:scale 1.5s var(--suave) calc(var(--o,0) * 110ms)}
+.vitrine--entra .tcard__corpo,.vitrine--entra .tcard__n{opacity:1;translate:0 0;transition:opacity .7s ease calc(var(--o,0) * 110ms + .4s),translate .9s var(--suave) calc(var(--o,0) * 110ms + .4s)}
+
+.extras{display:grid;gap:.85rem;margin-top:clamp(1.6rem,3.2vw,2.4rem)}
 @media (min-width:760px){.extras{grid-template-columns:1fr 1fr}}
 .extra{
   display:flex;align-items:center;gap:1rem;padding:1.15rem 1.3rem;border-radius:var(--raio);
@@ -583,65 +697,6 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   .extra{position:relative;flex-direction:column;align-items:flex-start;gap:.6rem;padding-right:3rem}
   .extra__seta{position:absolute;right:1.1rem;top:1.2rem}
 }
-
-/* =====================================================================
-   ANTES E DEPOIS: templates/componentes/antes-depois.html, sem alteracao
-   de mecanica. A cortina e um <input type="range"> invisivel.
-   ⚠ Os quatro pares vieram como MONTAGEM (duas fotos coladas). Foram
-   separados nas costuras medidas pixel a pixel e ALINHADOS por correlacao
-   (escala + deslocamento), pra o rosto nao pular quando a linha passa.
-   Contas no CLAUDE.md da pasta. Trocar uma foto sem refazer = par desalinhado.
-   ===================================================================== */
-.ad{
-  --ad-linha:#fff;
-  --ad-selo:rgba(20,17,14,.62);
-  --ad-selo-txt:#fff;
-  --ad-raio:20px;
-  margin:0;
-}
-.ads{display:grid;gap:clamp(1.6rem,3.4vw,2.4rem)}
-@media (min-width:820px){.ads--2{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.ad__quadro{
-  --p:50%;
-  position:relative;overflow:hidden;border-radius:var(--ad-raio);
-  aspect-ratio:4/3;background:#E8DED3;contain:paint;
-  box-shadow:0 24px 56px rgba(40,30,15,.16);
-}
-.ad__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-drag:none}
-.ad__corte{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--p)) 0 0)}
-.ad__linha{
-  position:absolute;top:0;bottom:0;left:var(--p);width:2px;margin-left:-1px;
-  background:var(--ad-linha);box-shadow:0 0 0 1px rgba(0,0,0,.18);pointer-events:none;
-}
-.ad__alca{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:46px;height:46px;border-radius:50%;
-  background:var(--ad-linha);color:var(--ouro-texto);
-  display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,.3);
-  transition:transform .18s ease,box-shadow .18s ease;
-}
-.ad__alca svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ad__selo{
-  position:absolute;top:.8rem;padding:.32rem .75rem;border-radius:999px;
-  background:var(--ad-selo);color:var(--ad-selo-txt);
-  font-size:.66rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;
-  pointer-events:none;transition:opacity .2s ease;
-}
-.ad__selo--a{left:.8rem}
-.ad__selo--d{right:.8rem}
-.ad__range{
-  position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;
-  -webkit-appearance:none;appearance:none;background:transparent;
-  touch-action:pan-y;
-}
-.ad__range::-webkit-slider-thumb{-webkit-appearance:none;width:56px;height:100%}
-.ad__range::-moz-range-thumb{width:56px;height:100%;border:0;opacity:0}
-.ad__quadro:hover .ad__alca{transform:translate(-50%,-50%) scale(1.06)}
-.ad__range:active + .ad__linha .ad__alca{transform:translate(-50%,-50%) scale(1.12)}
-.ad__range:focus-visible + .ad__linha .ad__alca{box-shadow:0 0 0 3px var(--ad-linha),0 0 0 6px rgba(0,0,0,.35)}
-.ad__legenda{margin-top:1rem;font-size:.9rem;line-height:1.45;color:var(--tinta-suave)}
-.ad__legenda b{display:block;font:600 1.35rem/1.2 var(--serif);color:var(--tinta)}
-.ad__aviso{margin:clamp(1.6rem,3vw,2.2rem) auto 0;max-width:62ch;text-align:center;font-size:.84rem;color:var(--tinta-suave)}
 
 /* =====================================================================
    "VIVA A EXPERIENCIA WA": degrade escuro, o monograma gigante em linha
@@ -854,11 +909,71 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
    espaco: sem ele ela passaria da coluna e abriria rolagem lateral no
    celular.
    ===================================================================== */
-.time{display:grid;gap:3.4rem clamp(1.4rem,3vw,2.6rem)}
-@media (min-width:700px){.time{grid-template-columns:repeat(3,minmax(0,1fr))}}
-/* o do meio desce: ritmo de revista, em vez de tres cartoes em fila */
-@media (min-width:980px){.membro:nth-child(2){margin-top:4.5rem}}
-@media (max-width:699px){.time{max-width:420px;margin-inline:auto}}
+/* Quatro desde 30/09/2026 (a Ana Claudia entrou). Duas colunas no tablet,
+   quatro a partir de 1100px. Os pares descem: ritmo de revista, em vez de
+   cartoes em fila */
+.time{display:grid;gap:3.4rem clamp(1.2rem,2.6vw,2.4rem)}
+@media (min-width:700px){.time{grid-template-columns:repeat(2,minmax(0,1fr))}.membro:nth-child(even){margin-top:3.5rem}}
+@media (min-width:1100px){.time{grid-template-columns:repeat(4,minmax(0,1fr))}.membro:nth-child(even){margin-top:4.5rem}}
+/* CELULAR: CARROSSEL, pedido do usuario em 30/09/2026 (empilhadas, as
+   quatro davam mais de 3.000px de rolagem). Trilho de ponta a ponta com a
+   pessoa da vez no centro e as vizinhas aparecendo nas bordas, apagadas: e o
+   que mostra que da pra deslizar. As informacoes so aparecem na pessoa do
+   centro, e entram quando ela chega (classe membro--ativo, posta pelo JS).
+   Setas nas pontas e no meio da altura da FOTO (preferencia dele, a mesma da
+   vitrine e do palco). Sem JS: trilho rolavel, todas acesas, sem setas. */
+.time-wrap{position:relative;--larg-m:min(76vw,330px)}
+.time__seta,.time__pontos{display:none}
+@media (max-width:699px){
+  .time{
+    position:relative;display:flex;gap:.9rem;margin-inline:-1.25rem;
+    padding:.4rem calc((100% + 2.5rem - var(--larg-m)) / 2) 1.2rem;
+    overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;
+  }
+  .time::-webkit-scrollbar{display:none}
+  /* a altura acompanha a pessoa do centro (o JS escreve): esticado pela
+     maior (a Fernanda Souza, com cinco servicos), sobrava um vao embaixo
+     das outras. overflow-y:hidden corta so o pe das vizinhas, que estao com
+     as informacoes apagadas */
+  .js .time{align-items:flex-start;overflow-y:hidden;transition:height .5s var(--suave)}
+  .membro{flex:0 0 var(--larg-m);scroll-snap-align:center}
+  /* o espaco entre a foto e o nome e onde ficam os pontinhos. ".time" na
+     frente de proposito: a regra base da .membro__foto vem DEPOIS no CSS e,
+     com o mesmo peso, venceria (os pontinhos caiam em cima do nome) */
+  .time .membro__foto{margin-bottom:4.2rem}
+  .js .membro{opacity:.42;scale:.93;transition:opacity .5s ease,scale .6s var(--suave)}
+  .js .membro--ativo{opacity:1;scale:1}
+  .js .membro > :not(.membro__foto){opacity:0;translate:0 14px;transition:opacity .45s ease,translate .6s var(--suave)}
+  .js .membro--ativo > :not(.membro__foto){opacity:1;translate:0 0}
+  .js .membro--ativo > :nth-child(3){transition-delay:.07s}
+  .js .membro--ativo > :nth-child(4){transition-delay:.14s}
+  .js .membro--ativo > :nth-child(5){transition-delay:.21s}
+  .js .time__seta{
+    display:grid;place-items:center;position:absolute;z-index:3;
+    top:calc(.4rem + (var(--larg-m) - 18px) * 2 / 3);translate:0 -50%;
+    width:44px;height:44px;border-radius:50%;cursor:pointer;color:#fff;
+    background:rgba(20,17,14,.52);border:1px solid rgba(255,255,255,.45);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    transition:opacity .3s ease,background .2s ease;
+  }
+  .time__seta .i{width:20px;height:20px}
+  .time__seta--ant{left:-.75rem}
+  .time__seta--prox{right:-.75rem}
+  .time__seta:disabled{opacity:.3;cursor:default}
+  /* pontinhos logo abaixo da foto (como no Instagram), parados no mesmo
+     lugar enquanto a altura do carrossel muda. Centro a 48px do pe da foto:
+     a moldura dourada fica a 18px e anda ate ~20px com o parallax */
+  .js .time__pontos{
+    display:flex;justify-content:center;gap:.2rem;position:absolute;left:0;right:0;z-index:2;
+    top:calc(.4rem + (var(--larg-m) - 18px) * 4 / 3 + 33px);
+  }
+  .time__ponto{position:relative;width:30px;height:30px;padding:0;border:0;background:none;cursor:pointer}
+  .time__ponto::before{
+    content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:999px;translate:-50% -50%;
+    background:var(--linho);transition:width .45s var(--suave),background .3s ease;
+  }
+  .time__ponto[aria-current="true"]::before{width:24px;background:var(--ouro-aceso)}
+}
 .membro{position:relative;margin:0}
 .membro__foto{position:relative;aspect-ratio:3/4;margin:0 18px 2.2rem 0}
 .membro__moldura{
@@ -1066,6 +1181,10 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   .poeira,.hero__rolar::after{display:none}
   .entrada .hero__conteudo > *{animation:none}
   .brilho{animation:none !important}
+  .tcard__brilho{display:none}
+  .tcard__a:hover{transform:none}
+  .tcard__a:hover .tcard__midia img{scale:1}
+  .abas__marca{transition:none}
 }
 </style>
 </head>
@@ -1097,15 +1216,10 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   <symbol id="wa-mono" viewBox="36 37 1022 636"><path fill-rule="evenodd" d="M104.5 41C102.3 41.5,98.3 42.4,95.5 43C81.1 46.3,65 53.4,54.2 61.4C45.4 68,38 75,38 76.9C38 79.6,51.8 92.7,53.4 91.5C54.1 90.9,57.5 88.2,60.9 85.3C77.4 71.3,97.5 63.7,119 63.6C136.9 63.5,151.2 67.5,165.2 76.7C183.2 88.5,189.1 97.2,207 138.5C223.4 176.3,226.1 182.6,227.9 186.5C228.9 188.7,232.1 195.9,235 202.5C237.9 209.1,241.1 216.5,242.2 219C243.3 221.5,246.9 229.6,250.2 237C253.4 244.4,256.8 252,257.7 253.9C258.5 255.8,260.5 260.3,262 263.9C263.6 267.5,271 284.5,278.5 301.5C292.2 332.6,306.5 365,312.5 379C314.3 383.1,318.6 392.8,322 400.5C325.4 408.2,330.2 419.2,332.7 425C335.2 430.8,338.3 438,339.7 441C343.7 449.7,362.9 493.7,366.7 502.5C371.1 512.9,372.4 514,380.9 514C384.8 514,388.3 513.5,389.2 512.8C390.1 512.1,398 493.5,406.8 471.5C420.5 437.4,437.5 395.4,442.6 383.1C444.5 378.6,445.4 379.6,450.7 392C453 397.2,460.3 414.1,467 429.5C473.8 444.9,481.2 462,483.5 467.5C485.9 473,489.7 481.7,491.9 486.9C494.2 492.1,496 497.3,496 498.4C496 499.6,491.7 511.1,486.4 524C468.4 568.1,468.9 566.9,471.1 568.1C473.1 569.1,492.6 568.7,493.7 567.6C494 567.4,501.9 547.9,511.4 524.3L528.5 481.5 609.7 481.2C679 481,691.1 481.2,692.3 482.4C693.1 483.2,696.8 491,700.5 499.7C720.9 547.5,737 583.5,741.1 590.8C758 620.2,789.9 647,823 659.3C854.8 671.2,891 670.6,920.5 657.8C950 645.1,957 635.8,960.9 605C963.6 582.9,964 579.1,964 572.8C964 564.3,966.1 553.7,969.8 543C977 522.6,976.4 514.3,967.1 502.6C965.4 500.5,964 497.8,964 496.7C964 495.7,966.5 492.1,969.5 488.8C976.3 481.5,978 477.6,978 469.5C978 462,976.3 457.6,969.2 446.7C963.7 438.2,962.4 434.1,963.5 428.3C964.3 423.9,965.9 421.6,976.8 408.6C999.9 381.2,999.6 374.3,974 355.5C969.6 352.2,961.5 346.1,956.2 341.9C924 316.7,906.1 284.8,902.5 246.5C901.3 233.6,899.8 224.6,897.3 215C893.6 200.8,888.9 189.9,879.6 174C875.9 167.6,876.2 166.6,882.8 163.7C895.6 158,905.1 157.1,928.5 159.4C951.9 161.7,962.3 163.7,981.5 169.5C996.8 174.2,1021.9 185.9,1034.7 194.4C1042.6 199.7,1050.1 198.5,1053.4 191.6C1055.4 187.4,1055.4 185.7,1053.5 182C1049.8 174.8,1013.5 155.9,987.5 147.7C957.9 138.2,912.2 134.2,883.3 138.5C864.3 141.3,857 138.3,839.5 120.4C825.9 106.5,818.6 100,804.5 89.6C774.8 67.4,741.7 52.4,706.4 45.1C685.2 40.7,674.4 39.7,657.5 40.3C634.9 41.1,621.2 44.4,602.1 53.8C586.7 61.3,577.7 69.6,571.7 81.9L567.6 90.5 567.6 103C567.7 114,568 116.3,570.3 122.2C578.9 144.5,594.8 157.8,631.3 173.4C653.9 183,677.9 188.3,707.3 190.2C738.8 192.2,769.5 188.9,828.7 177C837 175.4,844.6 174,845.4 174C848.8 174,854.9 181.2,859.3 190.3C867.6 207.4,872.3 223.7,875.4 246C879.4 274.1,880.5 280,883.2 288.5C894.8 323.8,913.5 347,948.5 369.4C958.7 376,963 379.7,963 381.9C963 383.5,959.4 388.1,947.9 401.4C944.2 405.6,939.5 412.3,937.4 416.3C934 422.8,933.6 424.2,933.6 431C933.7 439.8,937.3 448.9,945.9 461.3C948.7 465.3,951 469,951 469.4C951 469.8,949.2 472.9,947 476.3C941.8 484.2,940.6 488.6,940.7 498.4C940.8 505.8,941.1 507,945.5 515.7C950.8 526.2,950.8 527.2,944.8 534.8C939.9 540.9,935.1 552,933.9 560.2C932.7 567.7,933.4 580.5,936 598.5C938.5 615.7,938.5 615.7,935.7 619.3C930.8 625.8,911.3 636.7,896.2 641.4C885.5 644.7,866.7 645.1,855.5 642.1C840.3 638.1,826.7 630,816.4 618.6C808.8 610.3,805.2 604.3,797.6 586.8C794.1 578.9,790.6 570.9,789.7 569C788.9 567.1,777.9 542.1,765.5 513.5C753 484.9,734 441.5,723.3 417C712.5 392.5,701.6 367.6,699 361.5C696.4 355.5,693.3 348.5,692.2 346C691.1 343.5,686.3 332.5,681.5 321.5C676.7 310.5,669 293,664.4 282.5C659.9 272.1,650.8 251.4,644.3 236.5L632.5 209.5 624.8 209.2C617.1 208.9,617 209,610.8 213.2C592.6 225.7,585 231.4,585 232.6C585 233.3,585.9 236,587.1 238.7C591.3 248.6,592.2 250.5,593.1 252.2C595.2 256.3,597.4 250.6,550.5 366C541.9 387.2,533 409.1,530.8 414.8C528.5 420.4,526.1 425,525.5 425C524.8 425,523.1 422.4,521.7 419.3C520.4 416.1,515.2 404.3,510.2 393C505.3 381.7,496.3 361.3,490.2 347.5C484.2 333.8,477.8 319.2,476 315.1L472.8 307.7 478.9 292.6C482.2 284.3,487.3 271.9,490.1 265C498.1 245.4,521.5 187.6,530.6 165C535.2 153.4,538.4 144.1,537.9 143.6C536.6 142.2,515.8 142.8,514.4 144.3C513.7 144.9,505.5 164.6,496.2 188C482.4 222.4,463.9 268.4,461.3 274.8C460.3 277.2,459.2 275.9,455.7 267.8C453.7 263.2,450.1 255,447.7 249.5C445.3 244,435.1 220.8,425 198C401.2 143.7,400.9 143,399.6 143C388.5 142.7,343.6 143.1,343.2 143.5C342.6 144,345 150.3,349.8 161C351.1 164,352.8 167.9,353.5 169.5C364.8 195.4,369.6 206.5,371.6 211.2C372.9 214.3,375.4 219.9,377.1 223.7C378.8 227.4,383.5 238.2,387.5 247.5C391.6 256.9,402.4 281.6,411.5 302.5C420.7 323.4,428.9 342.4,429.7 344.6L431.3 348.8 424.2 366.6C409.8 402.7,397.9 431.5,397 432.4C396.5 432.9,395.9 433.2,395.7 432.9C395.3 432.5,371.1 377,366.7 366.5C365.3 363.2,361.6 354.7,358.5 347.5C355.4 340.4,350.2 328.4,347 321C343.8 313.6,339.3 303.2,337 298C334.6 292.8,331.7 286,330.5 283C329.2 280,321.4 261.8,313 242.5C304.6 223.3,296.5 204.6,295 201C261.8 122,254.5 108.5,233 87C210.5 64.5,183.7 49.7,153 42.9C142.4 40.5,111.8 39.3,104.5 41M640 67.5C614.2 71.9,590.4 90.7,592.3 105.1C596.8 139.1,664.1 166.7,734.5 163.5C742.8 163.1,756.7 161.9,765.5 160.8C781.9 158.8,784.5 158.4,803.5 155.5C809.6 154.6,818.6 153.3,823.5 152.6C835 151.1,834.9 150.6,822.2 138.1C784.3 101.4,744.5 79.3,700.5 70.6C678.8 66.3,654.4 65,640 67.5M606.1 290.1C605.6 291.4,602.6 298.8,599.5 306.5C596.3 314.2,593 322.5,592 325C589.4 331.8,568.3 383.9,566.1 389C565 391.5,561.7 399.6,558.7 407C555.7 414.4,550 428.7,545.9 438.7C541.9 448.7,538.8 457.2,539.1 457.4C540 458.3,680.3 458.1,681.1 457.3C681.5 456.9,678 447.7,673.3 437C668.7 426.3,661.6 409.9,657.5 400.5C653.5 391.2,649.1 381,647.7 378C646.3 375,640.8 362.4,635.5 350C630.2 337.6,624.3 324.1,622.5 320C620.7 315.9,617.1 307.6,614.5 301.5C608.9 288.4,607.5 286.6,606.1 290.1"/></symbol>
   <symbol id="wa-palavra" viewBox="-3 -2 2120 305"><path fill-rule="evenodd" d="M0 10C0 16.4,0.3 18,1.5 18C4.5 18,13.7 22.9,19.1 27.3C25 32.3,30.6 39.7,33.8 47C36.6 53.4,41.6 64.8,50.3 84.5C54.4 93.9,62.6 112.5,68.5 126C74.4 139.5,83.4 160,88.5 171.5C93.6 183.1,107.1 213.9,118.5 240C130 266.1,140 288.1,140.9 288.8C142.8 290.4,150.5 290.4,151.7 288.8C152.3 288.1,157.4 276,163 262C168.6 248,175.6 230.7,178.5 223.5C181.4 216.4,184.3 210.5,185 210.5C185.7 210.5,188.4 215.5,191 221.5C193.6 227.6,198.7 239.5,202.5 248C206.2 256.5,210.8 267.1,212.7 271.5C218.1 284.3,220.2 288.5,221.4 289.2C222.8 290.2,230.2 290.2,231.6 289.2C232.3 288.8,236.2 280,240.5 269.5C244.7 259.1,251.6 242.2,255.7 232C259.8 221.8,266 206.5,269.5 198C273 189.5,281 169.7,287.3 154C305.1 109.8,313.4 89.5,318.4 77.3C320.9 71.2,323 65.6,323 65C323 64.3,320.3 64,314.9 64.2L306.9 64.5 272.1 151.5C252.9 199.4,236.7 238.5,236.1 238.5C235.4 238.5,232.6 233.3,229.9 227C227.1 220.7,219.9 204.4,213.9 190.8C207.9 177.1,203 165.1,203 164.1C203 163,203.9 160,205.1 157.3C206.2 154.7,211.6 141.5,217 128C222.5 114.5,230.3 95.2,234.4 85.1C238.6 74.9,242 66,242 65.3C242 64.4,240 64,234.7 64L227.3 64 225.7 67.8C223.1 73.5,200.1 130.8,197.7 137.3C196.6 140.4,195.1 143,194.5 143C193.8 143,188.9 133,183.5 120.8C166.4 82,159.5 66.5,158.7 65.3C157.8 63.8,123 63.4,123 64.8C123 65.6,136 96.3,141.8 109C142.9 111.5,146.8 120.5,150.5 129C154.2 137.5,158.3 146.8,159.5 149.5C167.9 168.3,176 187.9,176 189.2C176 191,158.2 235.9,156.7 237.8C155.2 239.7,154.5 239.3,152.8 234.8C151.9 232.4,148.4 224.2,145 216.5C141.6 208.8,136.9 198,134.5 192.5C132.2 187,125.6 171.9,120 159C114.4 146.1,108.5 132.6,107 129C101.6 116.3,78.2 62.4,76 57.5C64.5 32.3,38.8 11.1,11.3 4.1C-0.6 1,0 0.7,0 10M354 66.1C342.4 74.4,342.6 74,346.1 81.3C347.7 84.7,349 88.3,349 89.3C349 90.9,343.2 105.6,306.5 196.5C277.1 269.2,272 282.3,272 284.1C272 285.9,272.6 286.1,279.2 285.8L286.4 285.5 296.6 260.1C302.2 246.1,307.3 233.8,307.9 232.8C309 231.1,311.7 231,360.2 231.2L411.4 231.5 412.7 234C413.4 235.4,415.1 239,416.4 242C428.3 269.6,432.4 279,433.8 282L435.5 285.5 453.3 285.8C468.1 286,471 285.8,471 284.6C471 283.3,465.7 270.7,452.7 241C449.7 234.1,443.8 220.6,439.6 211C435.4 201.4,431.3 192.2,430.5 190.5C428.2 185.4,396.8 114,387.5 92.5C385.1 87,381 77.6,378.3 71.5L373.3 60.5 367.9 60.2C362.7 60,362.2 60.2,354 66.1M676 61C663 62.6,642.9 69.7,631.5 76.5C628.3 78.4,625.6 80,625.3 80C624.5 80,614.2 88.5,608.6 93.8C589.1 112.6,578.2 133.9,574.4 160.8C567.8 207.9,593.2 254,637.9 276.5C664.8 289.9,693.8 293.3,722.6 286.4C758.7 277.8,789.1 253.5,804.3 221.2C810.9 207,814 192.3,814 174.8C814 159.4,813.5 156.3,809 141.4C797.3 103.5,765.2 74,724 63.6C712.4 60.6,688.6 59.3,676 61M1084.3 61C1042.6 66.9,1005.4 95,990.2 132.1C984 147.2,981.7 158.8,981.8 175.5C981.8 192,983.7 201.7,990 217.4C1011 270.4,1074.8 301,1133 285.9C1174.5 275.1,1206.3 245.3,1217.9 206.3C1223.7 186.7,1224.2 167.9,1219.4 148.5C1208.9 106.1,1175.4 74.2,1129.6 62.9C1120.3 60.6,1094.6 59.5,1084.3 61M1419.4 64.3C1416.1 66.6,1411.6 69.9,1409.5 71.6L1405.6 74.7 1408.8 81.4C1410.6 85.1,1412 88.6,1412 89.2C1412 90.2,1400.3 120.2,1397.1 127.5C1396.1 129.6,1392.3 139.1,1363.9 210C1354 234.5,1345.6 255.4,1345.1 256.5C1341.9 263.5,1334.8 281.8,1334.6 283.5C1334.5 285.3,1335.2 285.5,1341.1 285.8C1345.7 286,1348 285.7,1348.8 284.7C1349.4 284,1354.6 271.7,1360.4 257.4L1370.8 231.5 1422.3 231.2C1462.7 231,1473.9 231.3,1474.7 232.2C1475.2 232.9,1477.4 237.6,1479.4 242.5C1481.5 247.5,1484 253.3,1485 255.5C1486 257.7,1488.9 264.5,1491.4 270.5C1498.7 287.6,1496.1 286,1516.5 286C1529.9 286,1534 285.7,1534 284.7C1534 284,1531.9 278.8,1529.4 273C1526.9 267.2,1521 253.7,1516.3 243C1511.7 232.3,1506.3 219.9,1504.3 215.5C1502.3 211.1,1499.9 205.7,1499 203.5C1498 201.3,1489 180.9,1479 158.1C1469.1 135.3,1460.1 114.8,1459.1 112.6C1454.1 101.5,1437.7 64.2,1436.9 62.3C1436.2 60.3,1435.3 60,1430.8 60C1426.2 60,1424.7 60.6,1419.4 64.3M1626 61.1C1619.5 61.9,1617.4 62.4,1605 66.3C1576.7 75.1,1549.1 98.7,1535.6 125.8C1517.8 161.2,1521 204.4,1543.8 237.9C1562.7 265.7,1595.3 284.8,1631 289C1668.5 293.4,1701.9 278.2,1722.6 247.2C1725.7 242.6,1727.9 238.3,1727.7 237.6C1727.2 236.3,1718.5 231,1716.9 231C1716.4 231,1713.9 234.3,1711.3 238.3C1702.1 252.2,1687.7 264.4,1674 269.8C1656 277,1630.6 276.7,1613.5 269.1C1589.8 258.6,1571.3 234.9,1563.5 205C1559.9 191.1,1558.9 168.2,1561.4 154.5C1569.8 109.1,1597.5 79.4,1635.6 74.9C1666.5 71.2,1696.2 86.3,1712.7 114C1714.2 116.4,1715.9 118,1717 118C1719 118,1726 114.3,1727.2 112.6C1729.7 108.9,1708.8 84,1696 75.3C1686 68.5,1671.7 62.9,1660 61C1652.5 59.9,1635.5 59.9,1626 61.1M1876.7 62C1875.3 63.1,1873.7 64,1873.1 64C1872.5 64,1872 64.3,1872 64.8C1872 65.2,1870 66.7,1867.7 68.2C1859.5 73.4,1859.4 73.8,1862.9 81.8C1864.6 85.7,1866 89.2,1866 89.5C1866 90.4,1859.7 106.4,1856.6 113.5C1855.3 116.3,1853.8 120.1,1853.1 122C1852.4 123.9,1851.4 126.4,1850.9 127.5C1850.4 128.6,1847.2 136.7,1843.6 145.5C1840.1 154.3,1829.2 181.3,1819.5 205.5C1809.7 229.7,1801.1 251.1,1800.4 253C1799.7 254.9,1796.6 262.6,1793.5 269.9C1790.5 277.3,1788.2 284,1788.5 284.7C1788.8 285.7,1790.8 286,1795.7 285.8L1802.5 285.5 1804.7 281C1805.9 278.5,1807.8 274,1808.9 271C1810 268,1814 257.9,1817.8 248.5L1824.7 231.5 1876.6 231.5L1928.5 231.5 1932.5 240.6C1934.7 245.5,1937.3 251.4,1938.2 253.6C1943.7 266.4,1949.9 280.9,1951 283.3L1952.3 286 1970.2 286C1983.5 286,1988 285.7,1988 284.8C1988 283.8,1967 235.1,1955.9 210.5C1954.9 208.3,1951.6 200.7,1948.5 193.5C1945.4 186.4,1938.8 171.5,1934 160.5C1929.2 149.5,1922.6 134.7,1919.5 127.5C1916.4 120.4,1912.9 112.5,1911.8 110C1910.7 107.5,1906 97,1901.5 86.5C1888.8 57.4,1890.5 60,1884.5 60C1880.8 60,1878.5 60.6,1876.7 62M828.6 65.5C827.9 67.5,827.9 279.6,828.7 283.3L829.2 286 845.6 286C854.6 286,862 285.7,862 285.3C862.1 284.8,862.2 260.6,862.3 231.3C862.4 202.1,862.8 177.8,863.2 177.4C864.1 176.5,872 175.9,874.1 176.6C875 176.8,880.7 184.1,886.8 192.8C908.9 224.1,950.2 281.6,952.3 283.8C954.3 285.9,954.9 286,973.1 286C983.4 286,992.1 285.6,992.4 285.1C992.7 284.6,989.6 279.6,985.5 273.9C978.2 263.7,955.5 232.2,944.2 216.7C941.1 212.4,937.8 207.8,937 206.6C932.2 199.5,922 185.8,918.2 181.2C915.8 178.3,914 175.7,914.2 175.4C914.5 175.2,918.2 174.1,922.6 173C933.4 170.2,947.4 163.3,953.7 157.6C968.7 144,974.3 124.6,968.5 106.1C961.8 85,944.6 70.7,919.7 65.5C908.9 63.3,829.5 63.3,828.6 65.5M1237.2 174.7L1237.5 285.5 1253.5 285.5L1269.5 285.5 1269.8 232.1C1269.9 195,1270.4 178.3,1271.1 177.4C1272 176.3,1277 176,1293.9 176.1C1305.8 176.1,1316.5 176.1,1317.8 176.1C1320 176,1320.1 175.7,1319.8 169.3L1319.5 162.5 1295.5 162.2C1277.9 162,1271.4 161.6,1270.8 160.7C1269.4 158.5,1269.8 80.2,1271.3 79.3C1271.9 78.9,1291 78.3,1313.5 78L1354.5 77.5 1354.5 71L1354.5 64.5 1295.7 64.2L1237 64 1237.2 174.7M1749.2 174.8L1749.5 285.5 1765.8 285.8L1782 286.1 1782 175L1782 64 1765.5 64L1749 64 1749.2 174.8M1993.6 65.6C1992.4 68.7,1993 283.2,1994.1 284.7C1995 285.7,2006.6 286,2054.6 286L2114 286 2114.5 283.7C2114.8 282.5,2115 279.4,2114.8 277L2114.5 272.5 2071.9 272.2C2037.8 272,2029 271.7,2028.1 270.6C2027.3 269.7,2026.9 240.1,2026.8 166.9L2026.5 64.5 2010.4 64.2C1996.2 64,1994.2 64.1,1993.6 65.6M683 74.9C663.1 77.8,644.7 88.7,632.1 105C587.9 162.1,610.5 255.3,672.7 272.6C681.7 275.1,701.2 275.6,710.7 273.5C742.2 266.6,765.7 241.2,775.2 203.7C778.1 192.6,778.3 190.1,778.4 175C778.4 158,778 154.8,773.3 139C764.2 107.9,742.2 84.7,715 77.2C706.5 74.8,691.2 73.8,683 74.9M1090.5 75C1055.6 80.5,1030 107.2,1019.8 148.9C1016.9 160.6,1016.7 187.7,1019.3 199C1026.3 229,1039.8 250,1060.6 263.3C1068.3 268.1,1075.2 271.1,1085 273.6C1093.8 275.8,1115.8 275.1,1124.5 272.2C1151 263.7,1170.9 242.6,1180.9 212.5C1200 154.5,1172 89.7,1122.3 76.9C1113.3 74.6,1098.7 73.8,1090.5 75M863.1 79.8C861.7 82.4,861.7 157.6,863.1 160.1C864 161.9,865.4 162,881.8 162C909.7 162,918 158.8,929.3 143.9C933.6 138.2,935.5 130.9,935.5 119.9C935.5 109.8,935.4 109.1,931.8 101.9C925.6 89.4,916.6 82.3,903.3 79.5C899 78.6,890.5 78,880.3 78C865.5 78,864 78.2,863.1 79.8M351.3 123.7C348.5 130.7,339.2 154,330.6 175.4C322 196.7,315.3 214.6,315.6 215.1C316.4 216.4,404 216.3,404 214.9C404 214.4,402.8 211.3,401.4 208.2C400 205.1,398 200.5,397 198C388.4 176.9,358.8 111.4,357.7 111.2C356.8 111,354.7 115.1,351.3 123.7M1416.7 117.3C1403.6 149.2,1378 213.8,1378 214.9C1378 216.2,1465.6 216.5,1466.4 215.1C1466.7 214.7,1464.8 209.4,1462.1 203.4C1459.5 197.4,1454 185.1,1450 176C1446 166.9,1441.9 157.6,1440.9 155.3C1439.9 153,1439 150.9,1439 150.6C1439 150.4,1437.5 146.9,1435.6 142.8C1433.8 138.8,1429.9 130,1427 123.3C1424.1 116.5,1421.1 111,1420.5 111C1419.8 111,1418.1 113.8,1416.7 117.3M1872.3 112.8C1872 113.7,1862.7 136.8,1851.8 164C1840.9 191.2,1832 214,1832 214.7C1832 215.7,1840.7 216,1876 216C1918.3 216,1920 215.9,1920 214.1C1920 212.5,1916 202.8,1908.8 187C1906.9 183,1898.6 164,1889.5 143C1875.1 109.7,1874.1 107.9,1872.3 112.8"/></symbol>
   <symbol id="i-sorriso" viewBox="0 0 24 24"><path d="M15 10V9"/><path d="M16.472 15a6 6 0 01-8.943 0"/><path d="M9 10V9"/><circle cx="12" cy="12" r="10"/></symbol>
-  <symbol id="i-escova" viewBox="0 0 24 24"><path d="M10 3H8"/><path d="M14.586 11.414 22 4"/><path d="M15 11a8 8 0 01-.429.4"/><path d="m2 22 7-7c1.857-1.857 3.714-1.99 5.571-3.6l-1.985-1.986A2 2 0 0114 6a2 2 0 012-2 2 2 0 013.262-1.552l2.152 2.138"/><path d="M20 15v4"/><path d="M22 17h-4"/><path d="M4 5v4"/><path d="M6 7H2"/><path d="M9 2v2"/></symbol>
   <symbol id="i-brilho" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol>
-  <symbol id="i-rosto" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></symbol>
-  <symbol id="i-olho" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="i-gema" viewBox="0 0 24 24"><path d="M10.5 3 8 9l4 13 4-13-2.5-6"/><path d="M17 3a2 2 0 0 1 1.6.8l3 4a2 2 0 0 1 .013 2.382l-7.99 10.986a2 2 0 0 1-3.247 0l-7.99-10.986A2 2 0 0 1 2.4 7.8l2.998-3.997A2 2 0 0 1 7 3z"/><path d="M2 9h20"/></symbol>
   <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
   <symbol id="i-digital" viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></symbol>
   <symbol id="i-maos" viewBox="0 0 24 24"><path d="M11 14h2a2 2 0 0 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16"/><path d="m14.45 13.39 5.05-4.694C20.196 8 21 6.85 21 5.75a2.75 2.75 0 0 0-4.797-1.837.276.276 0 0 1-.406 0A2.75 2.75 0 0 0 11 5.75c0 1.2.802 2.248 1.5 2.946L16 11.95"/><path d="m2 15 6 6"/><path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a1 1 0 0 0-2.75-2.91"/></symbol>
-  <symbol id="i-agenda" viewBox="0 0 24 24"><path d="M12.127 21H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5.125"/><path d="M14.62 17.8A2.25 2.25 0 1118 14.836a2.25 2.25 0 113.38 2.966l-2.626 2.856a.998.998 0 01-1.507 0z"/><path d="M16 2v3"/><path d="M3 9h18"/><path d="M8 2v3"/></symbol>
   <symbol id="i-premio" viewBox="0 0 24 24"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></symbol>
   <symbol id="i-aula" viewBox="0 0 24 24"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></symbol>
   <symbol id="i-acessivel" viewBox="0 0 24 24"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 0 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/></symbol>
@@ -1116,18 +1230,14 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   <symbol id="i-dir" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
   <symbol id="i-estrela" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
   <symbol id="i-aspas" viewBox="0 0 24 24"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z"/></symbol>
-  <symbol id="i-raiox" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></symbol>
   <symbol id="i-sofa" viewBox="0 0 24 24"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/><path d="M4 18v2"/><path d="M20 18v2"/><path d="M12 4v9"/></symbol>
   <symbol id="i-seta" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
   <symbol id="i-mais" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
   <symbol id="i-flor" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1"/><circle cx="12" cy="8" r="2"/><path d="M12 10v12"/><path d="M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z"/><path d="M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z"/></symbol>
-  <symbol id="i-estetos" viewBox="0 0 24 24"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></symbol>
   <symbol id="i-coroa" viewBox="0 0 24 24"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></symbol>
   <symbol id="i-zap" viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.7.1s-.8 1-.9 1.2c-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5 4.4.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3ZM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.2-.4-4.5-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-labios" viewBox="0 0 24 24"><path d="M3.6 11.4c2.4-2.9 4.4-4 6-4 1.2 0 1.8.7 2.4 1.3.6-.6 1.2-1.3 2.4-1.3 1.6 0 3.6 1.1 6 4"/><path d="M3.6 11.4c1.4 3.4 4.6 5.2 8.4 5.2s7-1.8 8.4-5.2"/><path d="M6.8 11.6h10.4"/></symbol>
   <symbol id="i-mao" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></symbol>
-  <symbol id="i-gota" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></symbol>
 </svg>
 
 <!-- ===== abertura (remover: apagar este bloco, o CSS "ABERTURA" e o bloco 1 do script) ===== -->
@@ -1171,7 +1281,6 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     </a>
     <nav class="menu" aria-label="Seções">
       <a href="#tratamentos">Tratamentos</a>
-      <a href="#resultados">Antes e depois</a>
       <a href="#clinica">A clínica</a>
       <a href="#quem-cuida">Quem cuida</a>
       <a href="#equipe">Equipe</a>
@@ -1289,75 +1398,200 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   </div>
 </section>
 
-<!-- ===== tratamentos =====
-     ⚠ Lista montada do que a clinica MOSTRA publicamente: "Odontologia e
-     Harmonizacao Facial" no letreiro, destaques BOTOX e Labios no Instagram,
-     o par de olheiras, o post das lentes em resina, a sala de raio-x e a
-     esterilizacao nas fotos, "clinico geral" na ficha do Google. Nenhum
-     procedimento foi inventado, mas a lista completa CONFIRMA-SE COM ELA na
-     reuniao (pendencia no CLAUDE.md). Sem preco e sem promessa: regra do CFO. -->
+<!-- ===== tratamentos: vitrine de fotos =====
+     Pedido do usuario em 30/09/2026: "imagens semelhante ao print 2 (a
+     vitrine da Onodera), mas melhor, com um design mais moderno e uma
+     animacao melhor". Titulo trocado por ele: "no mesmo espaco".
+     ⚠ AS FOTOS SAO DA PROPRIA CLINICA: quadros dos videos do Instagram dela,
+     trazidos pelo usuario em Fotos e Imagens/Tratamentos/. Cada uma tem o
+     recorte anotado no CLAUDE.md. Tres tinham coisa por cima: coracoes
+     (apagados, sem IA), marca d'agua WA e legenda (os dois ficaram fora do
+     recorte).
+     ⚠ IMPLANTES, APARELHOS ORTODONTICOS, ATENDIMENTO INFANTIL E
+     RINOMODELACAO entraram pela lista de fotos dele: confirmar com a Dra.
+     Regiao dos olhos e radiografia nao tem foto: a radiografia foi pra frase
+     da clinica geral; a regiao dos olhos volta quando houver foto.
+     Cada card abre o WhatsApp com o nome do tratamento ja escrito. Sem preco
+     e sem promessa: regra do CFO. -->
 <section class="secao secao--noite tratamentos" id="tratamentos">
   <div class="env">
-    <div class="cabeca">
-      <span class="olho">Tratamentos</span>
-      <h2>Odontologia e harmonização facial, <em>no mesmo endereço.</em></h2>
-      <p class="chamada">Tudo começa com uma avaliação. A partir dela, o plano é montado para você, com o que faz sentido para o seu rosto e para o seu sorriso.</p>
+    <div class="trat-cab">
+      <div class="cabeca">
+        <span class="olho">Tratamentos</span>
+        <h2>Odontologia e harmonização facial, <em>no mesmo espaço.</em></h2>
+        <p class="chamada">Tudo começa com uma avaliação. A partir dela, o plano é montado para você, com o que faz sentido para o seu rosto e para o seu sorriso.</p>
+      </div>
+      <!-- Sem JS sao ancoras pro primeiro card de cada familia; com JS rolam
+           so a vitrine, e a aba acesa acompanha a rolagem -->
+      <nav class="abas" aria-label="Famílias de tratamento" data-abas>
+        <a class="aba" href="#t-hof" data-aba="hof" aria-current="true">Harmonização facial<b>4</b></a>
+        <a class="aba" href="#t-odonto" data-aba="odonto">Odontologia<b>6</b></a>
+        <span class="abas__marca" aria-hidden="true"></span>
+      </nav>
     </div>
+  </div>
 
-    <div class="familias">
-      <div class="familia">
-        <div class="familia__cab"><svg class="i" aria-hidden="true"><use href="#i-brilho"/></svg><h3>Harmonização facial</h3></div>
-        <p class="familia__txt">Procedimentos planejados a partir dos seus traços, respeitando quem você é.</p>
-        <div class="trats">
-          <article class="trat" data-tilt>
-            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-gota"/></svg></span>
-            <h4>Toxina botulínica</h4>
-            <p>Indicada para linhas de expressão da testa e ao redor dos olhos, com dose planejada para cada rosto.</p>
-          </article>
-          <article class="trat" data-tilt>
-            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-labios"/></svg></span>
-            <h4>Preenchimento labial</h4>
-            <p>Contorno e volume dos lábios, em proporção com o restante do rosto.</p>
-          </article>
-          <article class="trat" data-tilt>
-            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-olho"/></svg></span>
-            <h4>Região dos olhos</h4>
-            <p>Avaliação e tratamento das olheiras e da região ao redor dos olhos.</p>
-          </article>
-          <article class="trat" data-tilt>
-            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-rosto"/></svg></span>
-            <h4>Contorno facial</h4>
-            <p>Queixo, mandíbula e proporções do rosto, pensados em conjunto.</p>
-          </article>
-        </div>
-      </div>
+  <div class="vitrine" data-vitrine>
+    <ul class="vitrine__trilho" data-v-trilho aria-label="Tratamentos">
+      <li class="tcard" data-cat="hof" id="t-hof">
+        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20toxina%20botul%C3%ADnica." target="_blank" rel="noopener">
+          <span class="tcard__midia"><img src="assets/img/trat-toxina.webp" width="600" height="800" loading="lazy" decoding="async" alt="Aplicação de toxina botulínica na testa de uma paciente, com luvas rosa"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">01</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Harmonização facial</span>
+            <h3>Toxina botulínica</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Indicada para linhas de expressão da testa e ao redor dos olhos, com dose planejada para cada rosto.</p>
+              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+      <li class="tcard" data-cat="hof">
+        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20preenchimento%20labial." target="_blank" rel="noopener">
+          <span class="tcard__midia"><img src="assets/img/trat-labial.webp" width="600" height="800" loading="lazy" decoding="async" alt="Profissional da WA examinando os lábios de uma paciente"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">02</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Harmonização facial</span>
+            <h3>Preenchimento labial</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Contorno e volume dos lábios, em proporção com o restante do rosto.</p>
+              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+      <li class="tcard" data-cat="hof">
+        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20rinomodela%C3%A7%C3%A3o." target="_blank" rel="noopener">
+          <span class="tcard__midia"><img src="assets/img/trat-rino.webp" width="600" height="800" loading="lazy" decoding="async" alt="Avaliação do nariz de uma paciente para rinomodelação"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">03</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Harmonização facial</span>
+            <h3>Rinomodelação</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Ajuste do contorno do nariz sem cirurgia, planejado em harmonia com o rosto.</p>
+              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+      <li class="tcard" data-cat="hof">
+        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20contorno%20facial." target="_blank" rel="noopener">
+          <span class="tcard__midia"><img src="assets/img/trat-contorno.webp" width="600" height="800" loading="lazy" decoding="async" alt="Paciente com marcações no rosto para o planejamento do contorno facial"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">04</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Harmonização facial</span>
+            <h3>Contorno facial</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Queixo, mandíbula e proporções do rosto, pensados em conjunto.</p>
+              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+      <li class="tcard" data-cat="odonto" id="t-odonto">
+        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20lentes%20em%20resina." target="_blank" rel="noopener">
+          <span class="tcard__midia"><img src="assets/img/trat-lentes.webp" width="600" height="800" loading="lazy" decoding="async" alt="Paciente sorrindo, mostrando as lentes em resina"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">05</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Odontologia</span>
+            <h3>Lentes em resina</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Forma, cor e alinhamento dos dentes redesenhados com resina, planejados junto com você.</p>
+              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+      <li class="tcard" data-cat="odonto">
+        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20a%20cl%C3%ADnica%20geral." target="_blank" rel="noopener">
+          <span class="tcard__midia"><img src="assets/img/trat-clinica.webp" width="600" height="800" loading="lazy" decoding="async" alt="Atendimento odontológico no consultório da WA"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">06</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Odontologia</span>
+            <h3>Clínica geral</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Consultas, limpeza e prevenção, com radiografia feita na própria clínica.</p>
+              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+      <li class="tcard" data-cat="odonto">
+        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20implantes%20dent%C3%A1rios." target="_blank" rel="noopener">
+          <span class="tcard__midia"><img src="assets/img/trat-implantes.webp" width="600" height="800" loading="lazy" decoding="async" alt="Dentista da WA em procedimento, com os instrumentos sobre a bancada"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">07</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Odontologia</span>
+            <h3>Implantes dentários</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Reposição de dentes perdidos, planejada a partir da avaliação e dos exames.</p>
+              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+      <li class="tcard" data-cat="odonto">
+        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20aparelhos%20ortod%C3%B4nticos." target="_blank" rel="noopener">
+          <span class="tcard__midia"><img src="assets/img/trat-ortodontia.webp" width="600" height="800" loading="lazy" decoding="async" alt="Dentista atendendo um paciente na cadeira odontológica"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">08</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Odontologia</span>
+            <h3>Aparelhos ortodônticos</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Alinhamento dos dentes e da mordida, com acompanhamento em cada etapa.</p>
+              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+      <li class="tcard" data-cat="odonto">
+        <a class="tcard__a" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20saber%20mais%20sobre%20o%20atendimento%20infantil." target="_blank" rel="noopener">
+          <span class="tcard__midia"><img src="assets/img/trat-infantil.webp" width="600" height="800" loading="lazy" decoding="async" alt="Dentista da WA atendendo uma criança, que segura uma escova de dentes"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">09</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Odontologia</span>
+            <h3>Atendimento infantil</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Consultas para crianças, com calma e cuidado desde a primeira visita ao dentista.</p>
+              <span class="tcard__cta">Agendar avaliação<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+      <li class="tcard" data-cat="odonto">
+        <a class="tcard__a" href="#clinica">
+          <span class="tcard__midia"><img src="assets/img/trat-bio.webp" width="600" height="800" loading="lazy" decoding="async" alt="Materiais esterilizados e selados em embalagem individual, ao lado da autoclave"></span>
+          <span class="tcard__brilho" aria-hidden="true"></span>
+          <span class="tcard__n" aria-hidden="true">10</span>
+          <div class="tcard__corpo">
+            <span class="tcard__cat">Estrutura</span>
+            <h3>Biossegurança</h3>
+            <div class="tcard__mais"><div>
+              <p class="tcard__txt">Central de esterilização com autoclave e materiais selados em embalagem individual.</p>
+              <span class="tcard__cta">Conhecer a clínica<svg class="i" aria-hidden="true"><use href="#i-seta"/></svg></span>
+            </div></div>
+          </div>
+        </a>
+      </li>
+    </ul>
+    <button class="vitrine__seta vitrine__seta--ant" type="button" data-v-ant aria-label="Ver tratamentos anteriores"><svg class="i" aria-hidden="true"><use href="#i-esq"/></svg></button>
+    <button class="vitrine__seta vitrine__seta--prox" type="button" data-v-prox aria-label="Ver próximos tratamentos"><svg class="i" aria-hidden="true"><use href="#i-dir"/></svg></button>
+  </div>
 
-      <div class="familia">
-        <div class="familia__cab"><svg class="i" aria-hidden="true"><use href="#i-sorriso"/></svg><h3>Odontologia</h3></div>
-        <p class="familia__txt">Do cuidado de rotina ao sorriso novo, com estrutura completa dentro da clínica.</p>
-        <div class="trats">
-          <article class="trat" data-tilt>
-            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-gema"/></svg></span>
-            <h4>Lentes em resina</h4>
-            <p>Forma, cor e alinhamento dos dentes redesenhados com resina, planejados junto com você.</p>
-          </article>
-          <article class="trat" data-tilt>
-            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-escova"/></svg></span>
-            <h4>Clínica geral</h4>
-            <p>Consultas, limpeza e prevenção para manter a saúde da boca em dia.</p>
-          </article>
-          <article class="trat" data-tilt>
-            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-raiox"/></svg></span>
-            <h4>Radiografia na clínica</h4>
-            <p>Sala própria de raio X: o exame é feito ali mesmo, sem sair da clínica.</p>
-          </article>
-          <article class="trat" data-tilt>
-            <span class="trat__ico"><svg class="i" aria-hidden="true"><use href="#i-escudo"/></svg></span>
-            <h4>Biossegurança</h4>
-            <p>Central de esterilização com autoclave e materiais selados em embalagem individual.</p>
-          </article>
-        </div>
-      </div>
+  <div class="env">
+    <div class="vitrine__rodape" aria-hidden="true">
+      <span class="vitrine__conta"><b data-v-atual>01</b> / 10</span>
+      <span class="vitrine__barra"><i data-v-barra></i></span>
     </div>
 
     <div class="extras">
@@ -1370,114 +1604,6 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
         <svg class="i" aria-hidden="true"><use href="#i-aula"/></svg>
         <div><b>Para profissionais</b>Imersão presencial em HOF com a Dra. Welleynne. Entre na lista de interesse.</div>
         <svg class="i extra__seta" aria-hidden="true"><use href="#i-seta"/></svg>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- ===== antes e depois =====
-     ⚠ DECISAO DO USUARIO em 30/09/2026: "vamos colocar o antes e depois... se
-     elas nao gostarem, a gente remove". O risco de conselho foi levantado na
-     Realce (Art. 44 do Codigo de Etica Odontologica x Res. CFO-196/2019) e
-     continua valendo aqui. O que reduz: os quatro pares ja estao publicados
-     pela propria clinica no Instagram; o de olheiras tem o "pode repostar" da
-     paciente por escrito; nome e CRO da RT em cada legenda; so antes e depois,
-     nunca durante; e o aviso de que resultado varia. Confirmar com ela a
-     autorizacao dos outros tres. -->
-<section class="secao secao--areia" id="resultados">
-  <div class="env">
-    <div class="cabeca cabeca--centro">
-      <span class="olho">Antes e depois</span>
-      <h2>Arraste e veja <em>de perto.</em></h2>
-      <p class="chamada">Casos de pacientes da WA, publicados pela própria clínica. Arraste a linha sobre cada foto para comparar.</p>
-    </div>
-
-    <div class="ads ads--2">
-      <figure class="ad" data-ad>
-        <!-- A foto de BAIXO e a DEPOIS; a cortada por cima e a ANTES (aparece a esquerda).
-             ⚠ ORDEM DESTE PAR DEFINIDA PELO USUARIO em 30/09/2026: o ANTES e a foto
-             da blusa vermelha (lado DIREITO da montagem original). A leitura da
-             montagem apontava o contrario (labio mais cheio e mandibula mais marcada
-             nessa foto). Confirmar com a Dra. na reuniao: antes e depois trocado e
-             propaganda enganosa. Desfazer = trocar os dois nomes de arquivo. -->
-        <div class="ad__quadro">
-          <img class="ad__img" src="assets/img/ad-rosto-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois do procedimento: rosto de frente">
-          <div class="ad__corte">
-            <img class="ad__img" src="assets/img/ad-rosto-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes do procedimento: rosto de frente">
-          </div>
-          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
-          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
-          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
-          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: harmonização facial, vista de frente. Arraste ou use as setas do teclado">
-        </div>
-        <figcaption class="ad__legenda"><b>Harmonização facial</b>Vista de frente · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
-      </figure>
-
-      <figure class="ad" data-ad>
-        <div class="ad__quadro">
-          <img class="ad__img" src="assets/img/ad-perfil-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois: perfil do rosto, com queixo e linha da mandíbula mais definidos">
-          <div class="ad__corte">
-            <img class="ad__img" src="assets/img/ad-perfil-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes: perfil do rosto, antes do procedimento">
-          </div>
-          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
-          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
-          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
-          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: perfil, região do queixo e da mandíbula. Arraste ou use as setas do teclado">
-        </div>
-        <figcaption class="ad__legenda"><b>Perfil</b>Região do queixo e da mandíbula · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
-      </figure>
-
-      <figure class="ad" data-ad>
-        <div class="ad__quadro">
-          <img class="ad__img" src="assets/img/ad-olhar-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois: região dos olhos com olheiras mais suaves">
-          <div class="ad__corte">
-            <img class="ad__img" src="assets/img/ad-olhar-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes: região dos olhos com olheiras marcadas">
-          </div>
-          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
-          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
-          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
-          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: região dos olhos. Arraste ou use as setas do teclado">
-        </div>
-        <figcaption class="ad__legenda"><b>Região dos olhos</b>Olheiras · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
-      </figure>
-
-      <figure class="ad" data-ad>
-        <div class="ad__quadro">
-          <img class="ad__img" src="assets/img/ad-sorriso-depois.webp" width="800" height="600" loading="lazy" decoding="async" alt="Depois: sorriso com lentes em resina, dentes com forma e cor uniformes">
-          <div class="ad__corte">
-            <img class="ad__img" src="assets/img/ad-sorriso-antes.webp" width="800" height="600" loading="lazy" decoding="async" alt="Antes: sorriso com dentes de formatos e tons diferentes">
-          </div>
-          <span class="ad__selo ad__selo--d" data-selo-d>Depois</span>
-          <span class="ad__selo ad__selo--a" data-selo-a>Antes</span>
-          <div class="ad__linha" aria-hidden="true"><span class="ad__alca"><svg viewBox="0 0 24 24"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg></span></div>
-          <input class="ad__range" type="range" min="0" max="100" step="0.1" value="50" aria-label="Comparar antes e depois: lentes em resina. Arraste ou use as setas do teclado">
-        </div>
-        <figcaption class="ad__legenda"><b>Lentes em resina</b>Forma e cor dos dentes · Dra. Welleynne Ananda Dias, CRO-MG 54413</figcaption>
-      </figure>
-    </div>
-
-    <!-- ⚠ Regra 4 do componente. Nao apagar. -->
-    <p class="ad__aviso">Resultados variam de pessoa para pessoa e dependem de avaliação individual. Responsável técnica: Dra. Welleynne Ananda Dias, CRO-MG 54413.</p>
-  </div>
-</section>
-
-<!-- ===== viva a experiencia WA: a faixa de parallax ===== -->
-<section class="exp" id="experiencia" data-px-pai>
-  <svg class="exp__mono" data-px="-0.1" aria-hidden="true"><use href="#wa-mono"/></svg>
-  <div class="poeira" aria-hidden="true">
-    <i style="--x:12%;--y:62%;--d:7s;--a:.2s"></i><i style="--x:22%;--y:30%;--d:9s;--a:1.4s;--t:2px"></i>
-    <i style="--x:34%;--y:78%;--d:8s;--a:2.6s"></i><i style="--x:46%;--y:18%;--d:10s;--a:.8s;--t:2px"></i>
-    <i style="--x:58%;--y:70%;--d:7.5s;--a:3.1s"></i><i style="--x:67%;--y:26%;--d:9.5s;--a:1.9s;--t:4px"></i>
-    <i style="--x:78%;--y:58%;--d:8.5s;--a:.5s;--t:2px"></i><i style="--x:88%;--y:36%;--d:7s;--a:2.2s"></i>
-    <i style="--x:40%;--y:48%;--d:11s;--a:4s;--t:2px"></i><i style="--x:62%;--y:88%;--d:9s;--a:3.6s"></i>
-  </div>
-  <div class="exp__texto">
-    <!-- as duas frases sao da bio do @wa.institute -->
-    <h2>Viva a experiência <em class="brilho" data-brilho>WA</em></h2>
-    <p>Seu sorriso, sua beleza, sua saúde e seu bem-estar.</p>
-    <div class="acoes">
-      <a class="btn" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">
-        <svg class="btn__ico" aria-hidden="true"><use href="#i-zap"/></svg>Agendar minha avaliação
       </a>
     </div>
   </div>
@@ -1580,6 +1706,9 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
      - Livinha: "responsavel por auxiliar nos procedimentos de harmonizacao,
        proporcionando ainda mais conforto para voces". ⚠ O POST E DE 14/08/2023:
        confirmar se ela continua na equipe e o nome que ela quer no site
+     - Ana Claudia (entrou em 30/09/2026, print do post): "e ela quem auxilia
+       nos procedimentos odontologicos e cuida de toda a organizacao".
+       ⚠ O POST E DE 21/08/2023: mesma confirmacao da Livinha
      A chamada e a legenda do post da Fernanda Diniz. Faltam os dentistas da
      equipe (citados numa avaliacao, sem nome nem foto ainda). -->
 <section class="secao" id="equipe">
@@ -1590,7 +1719,11 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
       <p class="chamada">A WA cresce, evolui e segue reunindo profissionais que compartilham do mesmo propósito. Conheça quem cuida de você ao lado da Dra. Welleynne.</p>
     </div>
 
-    <div class="time">
+    <!-- No celular a grade vira carrossel (pedido de 30/09/2026: "senao vai
+         deixar o site muito extenso"). As setas e os pontinhos so aparecem
+         la; no computador continua a grade de quatro. -->
+    <div class="time-wrap">
+    <div class="time" data-time>
       <article class="membro" data-px-pai>
         <div class="membro__foto">
           <span class="membro__moldura" data-px="0.06" aria-hidden="true"></span>
@@ -1630,6 +1763,43 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
         <p class="membro__cargo"><svg class="i" aria-hidden="true"><use href="#i-brilho"/></svg>Equipe de harmonização</p>
         <p class="membro__txt">Auxilia nos procedimentos de harmonização, proporcionando ainda mais conforto para você.</p>
       </article>
+
+      <article class="membro" data-px-pai>
+        <div class="membro__foto">
+          <span class="membro__moldura" data-px="0.1" aria-hidden="true"></span>
+          <div class="membro__img"><img src="assets/img/equipe-ana.webp" width="600" height="800" loading="lazy" decoding="async" alt="Ana Claudia, da equipe de odontologia da WA Orofacial"></div>
+          <span class="membro__n" aria-hidden="true">04</span>
+        </div>
+        <h3>Ana Claudia</h3>
+        <p class="membro__cargo"><svg class="i" aria-hidden="true"><use href="#i-sorriso"/></svg>Equipe de odontologia</p>
+        <p class="membro__txt">Auxilia nos procedimentos odontológicos e cuida de toda a organização da clínica.</p>
+      </article>
+    </div>
+    <button class="time__seta time__seta--ant" type="button" data-t-ant aria-label="Ver a pessoa anterior da equipe"><svg class="i" aria-hidden="true"><use href="#i-esq"/></svg></button>
+    <button class="time__seta time__seta--prox" type="button" data-t-prox aria-label="Ver a próxima pessoa da equipe"><svg class="i" aria-hidden="true"><use href="#i-dir"/></svg></button>
+    <div class="time__pontos" data-t-pontos></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== viva a experiencia WA: a faixa de parallax ===== -->
+<section class="exp" id="experiencia" data-px-pai>
+  <svg class="exp__mono" data-px="-0.1" aria-hidden="true"><use href="#wa-mono"/></svg>
+  <div class="poeira" aria-hidden="true">
+    <i style="--x:12%;--y:62%;--d:7s;--a:.2s"></i><i style="--x:22%;--y:30%;--d:9s;--a:1.4s;--t:2px"></i>
+    <i style="--x:34%;--y:78%;--d:8s;--a:2.6s"></i><i style="--x:46%;--y:18%;--d:10s;--a:.8s;--t:2px"></i>
+    <i style="--x:58%;--y:70%;--d:7.5s;--a:3.1s"></i><i style="--x:67%;--y:26%;--d:9.5s;--a:1.9s;--t:4px"></i>
+    <i style="--x:78%;--y:58%;--d:8.5s;--a:.5s;--t:2px"></i><i style="--x:88%;--y:36%;--d:7s;--a:2.2s"></i>
+    <i style="--x:40%;--y:48%;--d:11s;--a:4s;--t:2px"></i><i style="--x:62%;--y:88%;--d:9s;--a:3.6s"></i>
+  </div>
+  <div class="exp__texto">
+    <!-- as duas frases sao da bio do @wa.institute -->
+    <h2>Viva a experiência <em class="brilho" data-brilho>WA</em></h2>
+    <p>Seu sorriso, sua beleza, sua saúde e seu bem-estar.</p>
+    <div class="acoes">
+      <a class="btn" href="https://wa.me/553138403975?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20agendar%20uma%20avalia%C3%A7%C3%A3o." target="_blank" rel="noopener">
+        <svg class="btn__ico" aria-hidden="true"><use href="#i-zap"/></svg>Agendar minha avaliação
+      </a>
     </div>
   </div>
 </section>
@@ -1838,7 +2008,6 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
       <h4>Navegue</h4>
       <ul class="rodape__lista">
         <li><a href="#tratamentos">Tratamentos</a></li>
-        <li><a href="#resultados">Antes e depois</a></li>
         <li><a href="#clinica">A clínica</a></li>
         <li><a href="#quem-cuida">Quem cuida</a></li>
         <li><a href="#equipe">Equipe</a></li>
@@ -1859,7 +2028,8 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
 
 <!-- ====================================================================
      SCRIPT 1: o que a pagina inteira usa. Abertura, topo, progresso, hero
-     coberto, parallax, tilt, brilho, placar, leque do Instagram e carrossel.
+     coberto, parallax, vitrine dos tratamentos, brilho, placar, leque do
+     Instagram, equipe em carrossel no celular e carrossel das avaliacoes.
      Regra: se o JS nao rodar, a pagina continua completa e legivel.
      ==================================================================== -->
 <script>
@@ -1867,7 +2037,6 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   "use strict";
   var d = document.documentElement;
   var reduzido = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-  var mouse = !!(window.matchMedia && matchMedia("(hover: hover) and (pointer: fine)").matches);
   var temObs = "IntersectionObserver" in window;
   function $(s, r){ return (r || document).querySelector(s); }
   function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -1958,21 +2127,106 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     parallax();
   }
 
-  /* ---------- 5. tilt 3D nos cards de tratamento (so com mouse) ---------- */
-  if (mouse && !reduzido) {
-    $$("[data-tilt]").forEach(function(el){
-      el.addEventListener("pointermove", function(e){
-        var r = el.getBoundingClientRect();
-        var x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-        el.style.setProperty("--ry", ((x - .5) * 10).toFixed(2) + "deg");
-        el.style.setProperty("--rx", ((.5 - y) * 10).toFixed(2) + "deg");
-        el.style.setProperty("--mx", (x * 100).toFixed(1) + "%");
-        el.style.setProperty("--my", (y * 100).toFixed(1) + "%");
+  /* ---------- 5. vitrine dos tratamentos ----------
+     A rolagem e NATIVA (dedo, trackpad, teclado e foco ja funcionam sem
+     isto). O script so acrescenta: setas que andam uma "pagina" de cards,
+     abas que levam a familia e acendem conforme a rolagem, contador e
+     barra, o parallax lateral das fotos e a entrada em cortina. */
+  var vit = $("[data-vitrine]");
+  if (vit) {
+    var trilhoV = $("[data-v-trilho]", vit), cartoes = $$(".tcard", vit);
+    var vAnt = $("[data-v-ant]", vit), vProx = $("[data-v-prox]", vit);
+    var abas = $$("[data-aba]"), marcaAba = $(".abas__marca"), vAtual = $("[data-v-atual]"), vBarra = $("[data-v-barra]");
+    var fotosV = cartoes.map(function(c){ return $("img", c); });
+    var comoRola = reduzido ? "auto" : "smooth";
+    var abaAcesa = null, pedidoV = false;
+    /* o trilho e position:relative, entao offsetLeft e medido nele e nao
+       muda com a rolagem: o primeiro card esta exatamente na margem */
+    var margemV = function(){ return cartoes[0].offsetLeft; };
+    var passoV = function(){ return cartoes.length > 1 ? cartoes[1].offsetLeft - cartoes[0].offsetLeft : trilhoV.clientWidth; };
+
+    var acende = function(cat){
+      if (cat === abaAcesa) return;
+      abaAcesa = cat;
+      abas.forEach(function(a){
+        var sim = a.getAttribute("data-aba") === cat;
+        a.setAttribute("aria-current", sim ? "true" : "false");
+        if (sim && marcaAba) { marcaAba.style.width = a.offsetWidth + "px"; marcaAba.style.transform = "translateX(" + a.offsetLeft + "px)"; }
       });
-      el.addEventListener("pointerleave", function(){
-        el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg");
+    };
+    var atualizaV = function(){
+      pedidoV = false;
+      var x = trilhoV.scrollLeft, max = trilhoV.scrollWidth - trilhoV.clientWidth, p = passoV();
+      var esq = Math.max(0, Math.min(cartoes.length - 1, Math.round(x / p)));
+      /* no fim o ultimo card nunca encosta na esquerda: ai conta o ultimo */
+      var n = max > 0 && x >= max - 2 ? cartoes.length : esq + 1;
+      if (vAtual) vAtual.textContent = (n < 10 ? "0" : "") + n;
+      if (vBarra) vBarra.style.setProperty("--prog", max > 0 ? (.1 + .9 * x / max).toFixed(3) : 1);
+      if (vAnt) vAnt.disabled = x <= 2;
+      if (vProx) vProx.disabled = max - x <= 2;
+      acende(cartoes[esq].getAttribute("data-cat"));
+      /* parallax: a foto anda ao contrario do trilho, ate 7% da propria
+         largura (ela tem 118% do card: sobra 9% de cada lado) */
+      if (!reduzido) {
+        var caixa = trilhoV.getBoundingClientRect(), meio = caixa.left + caixa.width / 2;
+        cartoes.forEach(function(c, k){
+          var r = c.getBoundingClientRect();
+          var d = (r.left + r.width / 2 - meio) / caixa.width;
+          d = d < -1 ? -1 : d > 1 ? 1 : d;
+          if (fotosV[k]) fotosV[k].style.translate = (d * -7).toFixed(2) + "% 0";
+        });
+      }
+    };
+    var pedeV = function(){ if (!pedidoV) { pedidoV = true; requestAnimationFrame(atualizaV); } };
+    trilhoV.addEventListener("scroll", pedeV, { passive: true });
+    addEventListener("resize", function(){ abaAcesa = null; pedeV(); });
+    /* a pilula mede a aba: refaz quando a fonte da web termina de chegar */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ abaAcesa = null; atualizaV(); });
+
+    var andaV = function(dir){
+      var p = passoV(), cabem = Math.max(1, Math.floor((trilhoV.clientWidth - margemV() + (p - cartoes[0].offsetWidth)) / p));
+      trilhoV.scrollBy({ left: dir * cabem * p, behavior: comoRola });
+    };
+    if (vAnt) vAnt.addEventListener("click", function(){ andaV(-1); });
+    if (vProx) vProx.addEventListener("click", function(){ andaV(1); });
+    abas.forEach(function(a){
+      a.addEventListener("click", function(e){
+        var cat = a.getAttribute("data-aba");
+        var alvo = cartoes.filter(function(c){ return c.getAttribute("data-cat") === cat; })[0];
+        if (!alvo) return;
+        e.preventDefault();
+        trilhoV.scrollTo({ left: alvo.offsetLeft - margemV(), behavior: comoRola });
       });
     });
+    if (marcaAba) {   /* a primeira posicao da pilula nao anima */
+      marcaAba.style.transition = "none";
+      atualizaV();
+      void marcaAba.offsetWidth;
+      marcaAba.style.transition = "";
+    } else atualizaV();
+
+    /* entrada em cortina, uma vez. So os cards que estao na tela entram em
+       cascata (--o); os de fora ja ficam prontos, sem atrasar ninguem */
+    if (temObs && !reduzido) {
+      vit.classList.add("vitrine--espera");
+      var obsV = new IntersectionObserver(function(is){
+        is.forEach(function(it){
+          if (!it.isIntersecting) return;
+          obsV.disconnect();
+          var caixa = trilhoV.getBoundingClientRect(), ordem = 0;
+          cartoes.forEach(function(c){
+            var r = c.getBoundingClientRect();
+            c.style.setProperty("--o", r.right > caixa.left && r.left < caixa.right ? ordem++ : 0);
+          });
+          vit.classList.add("vitrine--entra");
+          setTimeout(function(){
+            vit.classList.remove("vitrine--espera", "vitrine--entra");
+            cartoes.forEach(function(c){ c.style.removeProperty("--o"); });
+          }, ordem * 110 + 1700);
+        });
+      }, { threshold: .25 });
+      obsV.observe(trilhoV);
+    }
   }
 
   /* ---------- 6. brilho dourado que passa uma vez ---------- */
@@ -2039,7 +2293,62 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     obsL.observe(leque);
   }
 
-  /* ---------- 9. carrossel das avaliacoes ----------
+  /* ---------- 9. equipe: carrossel no celular ----------
+     Abaixo de 700px a grade vira trilho de rolagem nativa (so CSS). Aqui:
+     quem esta no centro ganha membro--ativo (as informacoes dela aparecem),
+     setas e pontinhos. A rolagem e calculada no proprio trilho, e nao com
+     scrollIntoView: aquele tambem rola a PAGINA pra mostrar o card inteiro.
+     Acima de 700px o JS roda igual, mas o CSS nao usa nada disso. */
+  var timeT = $("[data-time]");
+  if (timeT) {
+    var membros = $$(".membro", timeT);
+    var tAnt = $("[data-t-ant]"), tProx = $("[data-t-prox]"), tPontos = $("[data-t-pontos]");
+    var ativoT = -1, pedidoT = false;
+    var celularT = window.matchMedia ? matchMedia("(max-width: 699px)") : null;
+    /* no celular o trilho tem a altura da pessoa do centro; fora dele, a da grade */
+    var alturaT = function(){
+      if (celularT && celularT.matches && ativoT >= 0) {
+        var cs = getComputedStyle(timeT);
+        timeT.style.height = (membros[ativoT].offsetHeight + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)) + "px";
+      } else timeT.style.height = "";
+    };
+    var centraT = function(i){
+      var m = membros[i];
+      timeT.scrollTo({ left: m.offsetLeft - (timeT.clientWidth - m.offsetWidth) / 2, behavior: reduzido ? "auto" : "smooth" });
+    };
+    var pontosT = membros.map(function(m, i){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "time__ponto";
+      b.setAttribute("aria-label", $("h3", m).textContent);
+      b.addEventListener("click", function(){ centraT(i); });
+      if (tPontos) tPontos.appendChild(b);
+      return b;
+    });
+    var olhaT = function(){
+      pedidoT = false;
+      var c = timeT.getBoundingClientRect(), meio = c.left + c.width / 2, melhor = 0, dist = Infinity;
+      membros.forEach(function(m, k){
+        var r = m.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - meio);
+        if (d < dist) { dist = d; melhor = k; }
+      });
+      if (melhor === ativoT) return;
+      ativoT = melhor;
+      membros.forEach(function(m, k){ m.classList.toggle("membro--ativo", k === melhor); });
+      pontosT.forEach(function(p, k){ p.setAttribute("aria-current", k === melhor ? "true" : "false"); });
+      if (tAnt) tAnt.disabled = melhor === 0;
+      if (tProx) tProx.disabled = melhor === membros.length - 1;
+      alturaT();
+    };
+    timeT.addEventListener("scroll", function(){ if (!pedidoT) { pedidoT = true; requestAnimationFrame(olhaT); } }, { passive: true });
+    addEventListener("resize", function(){ ativoT = -1; olhaT(); });
+    /* a fonte da web muda a altura do texto: remede quando ela chega */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ ativoT = -1; olhaT(); });
+    if (tAnt) tAnt.addEventListener("click", function(){ centraT(Math.max(0, ativoT - 1)); });
+    if (tProx) tProx.addEventListener("click", function(){ centraT(Math.min(membros.length - 1, ativoT + 1)); });
+    olhaT();
+  }
+
+  /* ---------- 10. carrossel das avaliacoes ----------
      O pausar fica SO na faixa dos controles, nunca no carrossel inteiro: quem
      rola de mouse deixa o cursor parado em cima dele e o giro nunca aconteceria
      (defeito achado e corrigido na Realce). */
@@ -2088,56 +2397,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
 </script>
 
 <!-- ====================================================================
-     SCRIPT 2: antes e depois (templates/componentes/antes-depois.html).
-     O JS nao anima a cortina: copia o valor do range pra variavel --p.
-     O empurraozinho da primeira vez e o que ensina que da pra arrastar.
-     ==================================================================== -->
-<script>
-(function(){
-  "use strict";
-  var pares = document.querySelectorAll("[data-ad]");
-  if (!pares.length) return;
-  var mq = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
-  var semMovimento = !!(mq && mq.matches);
-
-  Array.prototype.forEach.call(pares, function(ad){
-    var quadro = ad.querySelector(".ad__quadro");
-    var range  = ad.querySelector(".ad__range");
-    var selA   = ad.querySelector("[data-selo-a]");
-    var selD   = ad.querySelector("[data-selo-d]");
-    if (!quadro || !range) return;
-
-    function pinta(v){
-      quadro.style.setProperty("--p", v + "%");
-      if (selA) selA.style.opacity = v < 16 ? 0 : 1;
-      if (selD) selD.style.opacity = v > 84 ? 0 : 1;
-    }
-    range.addEventListener("input", function(){ pinta(range.value); });
-    pinta(range.value);
-
-    if (semMovimento || !("IntersectionObserver" in window)) return;
-    var obs = new IntersectionObserver(function(itens){
-      itens.forEach(function(e){
-        if (!e.isIntersecting) return;
-        obs.disconnect();
-        var ini = null, DUR = 1600;
-        requestAnimationFrame(function passo(t){
-          if (!ini) ini = t;
-          var p = Math.min((t - ini) / DUR, 1);
-          var v = 50 + Math.sin(p * Math.PI * 2) * 18 * (1 - p);
-          range.value = v; pinta(v);
-          if (p < 1) requestAnimationFrame(passo);
-          else { range.value = 50; pinta(50); }
-        });
-      });
-    }, { threshold: 0.5 });
-    obs.observe(quadro);
-  });
-})();
-</script>
-
-<!-- ====================================================================
-     SCRIPT 3: o palco "Por dentro da WA". A bolha de vidro e o shader do
+     SCRIPT 2: o palco "Por dentro da WA". A bolha de vidro e o shader do
      site da Larissa, LINHA POR LINHA (mexeu num numero aqui, mexe la tambem,
      ou os dois deixam de ser o mesmo componente). Em bloco proprio porque
      WebGL e a unica parte que depende de driver de video: se cair, cai so.
