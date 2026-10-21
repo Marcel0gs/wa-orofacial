@@ -1228,6 +1228,18 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   .topo{background:rgba(20,17,14,.96)}
   .hero__selo,.tcard__n,.membro__n{background:rgba(20,17,14,.6)}
 }
+/* O "espaco vazio" ao rolar logo na primeira abertura (21/10/2026): o
+   navegador do celular pinta a pagina em blocos e, se o dedo chega antes do
+   bloco ficar pronto, mostra o bloco TRANSPARENTE, e o hero travado aparecia
+   pelo buraco. Secao em camada propria, recortada na propria caixa e com cor
+   de fundo solida, conta como opaca: bloco atrasado sai na cor da secao, sem
+   o hero por tras. A faixa fica fora (canto redondo e sombra nao sao opacos).
+   Secao com fundo so de degrade precisa da cor por baixo, senao nao conta. */
+@media (hover:none){
+  main > section:not(.hero):not(.faixa){will-change:transform;overflow:clip}
+  .exp{background-color:var(--noite)}
+  .avaliacoes-secao{background-color:var(--esmeralda)}
+}
 
 /* =====================================================================
    REDUZIR MOVIMENTO: sai o que se MEXE sozinho ou com a rolagem (parallax,
