@@ -841,7 +841,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
 .comodo__txt b{display:block;font:600 1.38rem/1.2 var(--serif);color:var(--tinta);transition:color .3s}
 .comodo__txt small{display:block;font-size:.88rem;color:var(--tinta-suave)}
 .comodo__linha{position:absolute;left:0;right:0;bottom:-1px;height:2px;overflow:hidden}
-.comodo__linha i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ouro-aceso),var(--ouro))}
+.comodo__linha i{display:block;height:100%;width:100%;transform:scaleX(0);transform-origin:0 50%;will-change:transform;background:linear-gradient(90deg,var(--ouro-aceso),var(--ouro))}
 .comodo[aria-current="true"] .comodo__txt b,.comodo[aria-current="true"] .comodo__n,.comodo:hover .comodo__txt b{color:var(--ouro-texto)}
 @media (max-width:979px){
   .js .comodos{
@@ -1205,6 +1205,29 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
 .js .zap{opacity:0;transform:translateY(20px);pointer-events:none}
 .js .zap.zap--on{opacity:1;transform:none;pointer-events:auto}
 @media (max-width:430px){.zap span{display:none}.zap{padding:.9rem}}
+
+/* =====================================================================
+   ROLAGEM LISA NO CELULAR (21/10/2026, "da uma travadinha descendo a tela")
+   ---------------------------------------------------------------------
+   Medido no trace: a cada quadro de rolagem o navegador repintava a pagina
+   INTEIRA (camada de 390x12937), porque o hero coberto, o parallax e a barra
+   de progresso mexiam em pecas sem camada propria. No PC passa; no celular
+   e a travadinha. Com will-change cada peca ganha camada e anda so na placa
+   de video, sem repintar nada. Peca nova com data-px ja entra na regra.
+   ===================================================================== */
+.progresso{will-change:transform}
+@media (prefers-reduced-motion:no-preference){
+  .js .hero__midia,.js .hero__conteudo,.js [data-px]{will-change:transform}
+  .js .hero::after{will-change:opacity}
+}
+/* Vidro fosco (backdrop-filter) e refeito a cada quadro quando o que esta
+   atras dele anda: no topo fixo, em cima de tudo, era custo em toda a
+   rolagem. Na tela de toque sai o desfoque e o fundo fica mais fechado. */
+@media (hover:none){
+  .topo,.hero__selo,.tcard__n,.vitrine__seta,.palco__seta,.quem__medalha,.js .time__seta,.membro__n{-webkit-backdrop-filter:none;backdrop-filter:none}
+  .topo{background:rgba(20,17,14,.96)}
+  .hero__selo,.tcard__n,.membro__n{background:rgba(20,17,14,.6)}
+}
 
 /* =====================================================================
    REDUZIR MOVIMENTO: sai o que se MEXE sozinho ou com a rolagem (parallax,
@@ -2115,6 +2138,20 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   function $(s, r){ return (r || document).querySelector(s); }
   function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
 
+  /* No celular a barra de endereco some na descida e volta na subida, e cada
+     vez o navegador dispara "resize" so com a altura mudando. Remedir topo,
+     parallax, vitrines e equipe nessa hora custava um quadro inteiro no meio
+     da rolagem (a "travadinha descendo a tela", 21/10/2026). Na tela de
+     toque so largura nova conta como redimensionar. */
+  var toque = !!(window.matchMedia && matchMedia("(hover:none)").matches);
+  var redims = [], larguraR = innerWidth;
+  function aoRedimensionar(fn){ redims.push(fn); }
+  addEventListener("resize", function(){
+    if (toque && innerWidth === larguraR) return;
+    larguraR = innerWidth;
+    redims.forEach(function(fn){ fn(); });
+  });
+
   /* ---------- 1. abertura ---------- */
   var intro = $("#intro");
   if (intro && d.classList.contains("com-intro")) {
@@ -2141,14 +2178,20 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
 
   /* ---------- 2. topo, barra de progresso e botao flutuante ---------- */
   var topo = $(".topo"), barra = $(".progresso"), zap = $(".zap");
+  /* Altura da pagina em cache, medida pelo ResizeObserver (que roda depois
+     do layout): ler scrollHeight a cada evento de rolagem forcava layout no
+     meio do quadro. E uma vez por quadro, no requestAnimationFrame. */
+  var temRO = "ResizeObserver" in window, altPagina = d.scrollHeight, pedidoR = false;
+  if (temRO) new ResizeObserver(function(){ altPagina = d.scrollHeight; }).observe(document.body);
   function aoRolar(){
+    pedidoR = false;
     var y = window.pageYOffset || d.scrollTop || 0;
-    var max = d.scrollHeight - innerHeight;
+    var max = (temRO ? altPagina : d.scrollHeight) - innerHeight;
     if (topo) topo.classList.toggle("topo--rolado", y > 24);
     if (barra) barra.style.transform = "scaleX(" + (max > 0 ? Math.min(y / max, 1) : 0).toFixed(4) + ")";
     if (zap) zap.classList.toggle("zap--on", y > innerHeight * .7);
   }
-  addEventListener("scroll", aoRolar, { passive: true });
+  addEventListener("scroll", function(){ if (!pedidoR) { pedidoR = true; requestAnimationFrame(aoRolar); } }, { passive: true });
   aoRolar();
 
   /* ---------- 3. hero coberto pelo scroll ----------
@@ -2156,22 +2199,23 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
      obriga o navegador a recalcular layout. */
   var hero = $(".hero");
   if (hero) {
-    var alturaHero = 0, inicio = 0, pedidoH = false;
+    var alturaHero = 0, inicio = 0, telaH = innerHeight, pedidoH = false;
     var mede = function(){
       alturaHero = hero.offsetHeight;
-      hero.style.setProperty("--hero-topo", Math.min(0, innerHeight - alturaHero) + "px");
-      inicio = Math.max(0, alturaHero - innerHeight);
+      telaH = innerHeight;
+      hero.style.setProperty("--hero-topo", Math.min(0, telaH - alturaHero) + "px");
+      inicio = Math.max(0, alturaHero - telaH);
       cobre();
     };
     var cobre = function(){
       pedidoH = false;
-      var p = ((window.pageYOffset || 0) - inicio) / innerHeight;
+      var p = ((window.pageYOffset || 0) - inicio) / telaH;
       p = p < 0 ? 0 : p > 1 ? 1 : p;
       hero.style.setProperty("--cobre", reduzido ? (p >= 1 ? 1 : 0) : p.toFixed(3));
       hero.classList.toggle("hero--coberto", p >= 1);
     };
     addEventListener("scroll", function(){ if (!pedidoH) { pedidoH = true; requestAnimationFrame(cobre); } }, { passive: true });
-    addEventListener("resize", mede);
+    aoRedimensionar(mede);
     mede();
   }
 
@@ -2197,7 +2241,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
   if (camadas.length) {
     var pedeParallax = function(){ if (!pedidoP) { pedidoP = true; requestAnimationFrame(parallax); } };
     addEventListener("scroll", pedeParallax, { passive: true });
-    addEventListener("resize", pedeParallax);
+    aoRedimensionar(pedeParallax);
     parallax();
   }
 
@@ -2249,7 +2293,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     };
     var pedeV = function(){ if (!pedidoV) { pedidoV = true; requestAnimationFrame(atualizaV); } };
     trilhoV.addEventListener("scroll", pedeV, { passive: true });
-    addEventListener("resize", pedeV);
+    aoRedimensionar(pedeV);
     var andaV = function(dir){
       var p = passoV(), cabem = Math.max(1, Math.floor((trilhoV.clientWidth - margemV() + (p - cartoes[0].offsetWidth)) / p));
       trilhoV.scrollBy({ left: dir * cabem * p, behavior: comoRola });
@@ -2326,7 +2370,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
       });
     });
     abreAba(acesaT(), false);
-    addEventListener("resize", function(){ pilula(false); });
+    aoRedimensionar(function(){ pilula(false); });
     /* a pilula mede a aba: refaz quando a fonte da web termina de chegar */
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ pilula(false); });
   }
@@ -2442,7 +2486,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
       alturaT();
     };
     timeT.addEventListener("scroll", function(){ if (!pedidoT) { pedidoT = true; requestAnimationFrame(olhaT); } }, { passive: true });
-    addEventListener("resize", function(){ ativoT = -1; olhaT(); });
+    aoRedimensionar(function(){ ativoT = -1; olhaT(); });
     /* a fonte da web muda a altura do texto: remede quando ela chega */
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ ativoT = -1; olhaT(); });
     if (tAnt) tAnt.addEventListener("click", function(){ centraT(Math.max(0, ativoT - 1)); });
@@ -2588,7 +2632,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     fila[i] = [cb];
     var im = new Image();
     im.decoding = "async";
-    im.onload = function(){
+    var sobe = function(){
       /* Aberto direto da pasta (file://), o navegador trata a foto como de
          outra origem e o texImage2D lanca SecurityError. Sem o try, o erro
          matava a fila e o palco ficava parado na primeira foto pra sempre
@@ -2599,6 +2643,9 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
       }
       var f = fila[i]; fila[i] = null; f.forEach(function(k){ k(!!tex[i]); });
     };
+    /* decode() descomprime a foto fora da linha principal: sem ele o
+       texImage2D descomprimia na hora, travando a rolagem ao chegar no palco */
+    im.onload = function(){ if (im.decode) im.decode().then(sobe, sobe); else sobe(); };
     im.onerror = function(){ var f = fila[i]; fila[i] = null; f.forEach(function(k){ k(false); }); };
     im.src = itens[i].getAttribute("data-img");
   }
@@ -2631,7 +2678,7 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     itens.forEach(function(li, i){
       li.setAttribute("aria-current", i === n ? "true" : "false");
       var f = li.querySelector(".comodo__linha i");
-      if (f) { f.style.transition = "width .2s ease-out"; f.style.width = "0%"; }
+      if (f) { f.style.transition = "transform .2s ease-out"; f.style.transform = "scaleX(0)"; }
     });
     if (elAt) elAt.textContent = pad(n + 1);
     foto.alt = itens[n].getAttribute("data-alt") || "";
@@ -2648,11 +2695,13 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     paraRelogio();
     if (semMovimento || !visivel || indo || !pronto) return;
     var f = itens[atual].querySelector(".comodo__linha i");
-    if (f) f.style.transition = "width .1s linear";
+    if (f) f.style.transition = "transform .1s linear";
     relogio = requestAnimationFrame(function tic(t){
       if (!t0) t0 = t;
       var p = Math.min((t - t0) / DEMORA, 1);
-      if (f) f.style.width = (p * 100) + "%";
+      /* scaleX e nao width: largura mudando a cada quadro refazia o layout
+         da pagina enquanto o palco estava na tela */
+      if (f) f.style.transform = "scaleX(" + p.toFixed(4) + ")";
       if (p < 1) relogio = requestAnimationFrame(tic);
       else { relogio = null; vai(atual + 1); }
     });
@@ -2708,8 +2757,11 @@ a.extra:hover{border-color:var(--ouro);background:rgba(201,174,120,.06)}
     if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) { paraRelogio(); vai(atual + (dx < 0 ? 1 : -1)); }
     x0 = y0 = null;
   }, { passive: true });
-  var esperaR = null;
+  /* barra de endereco do celular sumindo nao e resize (ver o script 1) */
+  var esperaR = null, larguraP = innerWidth, toqueP = !!(window.matchMedia && matchMedia("(hover:none)").matches);
   addEventListener("resize", function(){
+    if (toqueP && innerWidth === larguraP) return;
+    larguraP = innerWidth;
     clearTimeout(esperaR);
     esperaR = setTimeout(function(){ ajusta(); if (!indo) desenha(0, atual, atual); }, 150);
   });
